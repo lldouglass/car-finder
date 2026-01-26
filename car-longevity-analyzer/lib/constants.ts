@@ -66,6 +66,13 @@ export const RATE_LIMIT_DEFAULTS = {
     windowMs: 60000, // 1 minute
 } as const;
 
+// Lifespan adjustment limits (multiplier bounds)
+export const LIFESPAN_ADJUSTMENT_LIMITS = {
+    minMultiplier: 0.5,  // Floor at 50% of base lifespan
+    maxMultiplier: 1.5,  // Cap at 150% of base lifespan
+    defaultLifespan: 200000, // Default lifespan when vehicle not in database
+} as const;
+
 // HTTP status codes with user-friendly messages
 export const ERROR_MESSAGES: Record<number, string> = {
     400: 'Invalid request. Please check your input.',

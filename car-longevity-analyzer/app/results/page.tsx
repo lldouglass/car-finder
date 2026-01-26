@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -74,7 +74,7 @@ function ScoreDisplay({ score, label, description }: { score: number | null; lab
 }
 
 function VerdictBadge({ verdict }: { verdict: string }) {
-  const variants: Record<string, { className: string; icon: JSX.Element; label: string }> = {
+  const variants: Record<string, { className: string; icon: React.ReactNode; label: string }> = {
     BUY: {
       className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
       icon: <CheckCircle className="size-4" aria-hidden="true" />,
@@ -141,7 +141,7 @@ function RedFlagItem({ flag, index }: { flag: RedFlag; index: number }) {
     low: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
   };
 
-  const severityIcons: Record<string, JSX.Element> = {
+  const severityIcons: Record<string, React.ReactNode> = {
     critical: <AlertCircle className="size-4 text-red-500" aria-hidden="true" />,
     high: <AlertTriangle className="size-4 text-orange-500" aria-hidden="true" />,
     medium: <AlertTriangle className="size-4 text-yellow-500" aria-hidden="true" />,

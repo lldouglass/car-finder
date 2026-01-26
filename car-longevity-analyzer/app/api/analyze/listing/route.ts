@@ -14,15 +14,52 @@ import {
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
-import { INPUT_LIMITS, VEHICLE_CONSTANTS } from '@/lib/constants';
+import { INPUT_LIMITS, VEHICLE_CONSTANTS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
+import {
+    calculateAdjustedLifespan,
+    ownerCountToHistory,
+    type LifespanFactors,
+    type MaintenanceQuality,
+    type DrivingConditions,
+    type AccidentSeverity,
+} from '@/lib/lifespan-factors';
+import { mergeLifespanFactors } from '@/lib/vin-factor-mapper';
+import { getClimateRegion } from '@/lib/region-mapper';
 
 const AnalyzeListingSchema = z.object({
     listingText: z.string()
         .min(10, "Listing text is too short")
         .max(INPUT_LIMITS.maxListingLength, "Listing text exceeds maximum length"),
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice).optional(),
-    mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage).optional()
+    mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage).optional(),
+    location: z.string().max(100).optional(), // State code or name for climate region
 });
+
+// Helper to map AI usage pattern to DrivingConditions type
+function mapUsagePatternToConditions(pattern: string | null): DrivingConditions {
+    if (!pattern) return 'unknown';
+    const mapping: Record<string, DrivingConditions> = {
+        highway: 'highway_primary',
+        city: 'city_primary',
+        mixed: 'mixed',
+        severe: 'severe',
+    };
+    return mapping[pattern] || 'unknown';
+}
+
+// Helper to map AI accident history to AccidentSeverity type
+function mapAccidentToSeverity(history: { hasAccident: boolean; severity?: string }): AccidentSeverity {
+    if (!history.hasAccident) return 'none';
+    if (history.severity) {
+        const mapping: Record<string, AccidentSeverity> = {
+            minor: 'minor',
+            moderate: 'moderate',
+            severe: 'severe',
+        };
+        return mapping[history.severity] || 'unknown';
+    }
+    return 'unknown';
+}
 
 export async function POST(request: Request) {
     try {
@@ -32,12 +69,12 @@ export async function POST(request: Request) {
         const result = AnalyzeListingSchema.safeParse(body);
         if (!result.success) {
             return NextResponse.json(
-                { success: false, error: "Validation Error", details: result.error.errors },
+                { success: false, error: "Validation Error", details: result.error.issues },
                 { status: 400 }
             );
         }
 
-        const { listingText } = result.data;
+        const { listingText, location } = result.data;
         let { askingPrice, mileage } = result.data;
 
         // 2. AI Analysis to extract info
@@ -53,22 +90,45 @@ export async function POST(request: Request) {
         // Use constant for fallback age calculation
         const year = extracted?.year || new Date().getFullYear() - VEHICLE_CONSTANTS.defaultFallbackAge;
 
-        // 3. Scores Calculation (if sufficient data)
+        // 3. Extract lifespan factors from AI analysis
+        const aiLifespanFactors = aiResult.lifespanFactors;
+
+        // Convert AI-extracted data to lifespan factor types
+        const aiFactors: Partial<LifespanFactors> = {
+            maintenance: aiLifespanFactors.maintenanceQuality as MaintenanceQuality | undefined,
+            drivingConditions: mapUsagePatternToConditions(aiLifespanFactors.usagePattern),
+            accidentHistory: mapAccidentToSeverity(aiLifespanFactors.accidentHistory),
+            ownerCount: ownerCountToHistory(aiLifespanFactors.ownerCount),
+        };
+
+        // Get climate region from location
+        const climateRegion = getClimateRegion(location);
+
+        // Merge with empty VIN factors (no VIN decode for listing analysis)
+        const lifespanFactors: LifespanFactors = mergeLifespanFactors({}, aiFactors, climateRegion);
+
+        // 4. Scores Calculation (if sufficient data)
         let reliabilityScore = 0;
-        let longevityResult: any = null;
-        let priceResult: any = null;
-        let overallResult: any = null;
+        let longevityResult: ReturnType<typeof calculateLongevityScore> | null = null;
+        let priceResult: ReturnType<typeof calculatePriceScore> | null = null;
+        let overallResult: ReturnType<typeof calculateOverallScore> | null = null;
         let priceEstimate: { low: number; high: number } | null = null;
+        let lifespanAnalysis: ReturnType<typeof calculateAdjustedLifespan> | null = null;
 
         // Reliability
         if (extracted?.make && extracted?.model) {
             reliabilityScore = calculateReliabilityScore(make, model, year, []);
         }
 
-        // Longevity
+        // Longevity with adjusted lifespan
         if (mileage !== undefined) {
             const relData = getReliabilityData(make, model);
-            const expectedLifespan = relData ? relData.expectedLifespanMiles : 200000;
+            const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
+
+            // Calculate adjusted lifespan based on factors
+            lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
+            const expectedLifespan = lifespanAnalysis.adjustedLifespan;
+
             longevityResult = calculateLongevityScore(expectedLifespan, mileage);
         }
 
@@ -131,9 +191,18 @@ export async function POST(request: Request) {
                 overall: overallResult?.score || null
             },
             longevity: longevityResult ? {
+                expectedLifespan: lifespanAnalysis?.adjustedLifespan,
+                baseLifespan: lifespanAnalysis?.baseLifespan,
                 estimatedRemainingMiles: longevityResult.remainingMiles,
                 remainingYears: longevityResult.remainingYears,
                 percentUsed: longevityResult.percentUsed
+            } : null,
+            lifespanAnalysis: lifespanAnalysis ? {
+                baseLifespan: lifespanAnalysis.baseLifespan,
+                adjustedLifespan: lifespanAnalysis.adjustedLifespan,
+                totalMultiplier: lifespanAnalysis.totalMultiplier,
+                appliedFactors: lifespanAnalysis.appliedFactors,
+                confidence: lifespanAnalysis.confidence,
             } : null,
             pricing: priceResult ? {
                 askingPrice,
@@ -145,7 +214,8 @@ export async function POST(request: Request) {
             aiAnalysis: {
                 trustworthiness: aiResult.trustworthinessScore,
                 impression: aiResult.overallImpression,
-                concerns: aiResult.concerns
+                concerns: aiResult.concerns,
+                extractedLifespanFactors: aiResult.lifespanFactors,
             },
             redFlags: allRedFlags,
             recommendation: {

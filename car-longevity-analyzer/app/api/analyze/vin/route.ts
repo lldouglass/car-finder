@@ -14,14 +14,18 @@ import {
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
-import { INPUT_LIMITS } from '@/lib/constants';
+import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
+import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-factors';
+import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
+import { getClimateRegion } from '@/lib/region-mapper';
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
     vin: z.string().length(17).regex(/^[A-HJ-NPR-Z0-9]{17}$/i, "Invalid VIN format (cannot contain I, O, Q)"),
     mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage, "Mileage exceeds maximum"),
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice, "Price exceeds maximum"),
-    listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional()
+    listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional(),
+    location: z.string().max(100).optional(), // State code or name for climate region
 });
 
 // Custom error class for better error handling
@@ -44,12 +48,12 @@ export async function POST(request: Request) {
         const result = AnalyzeVinSchema.safeParse(body);
         if (!result.success) {
             return NextResponse.json(
-                { success: false, error: "Validation Error", details: result.error.errors },
+                { success: false, error: "Validation Error", details: result.error.issues },
                 { status: 400 }
             );
         }
 
-        const { vin, mileage, askingPrice, listingText } = result.data;
+        const { vin, mileage, askingPrice, listingText, location } = result.data;
 
         // 2. Decode VIN
         const vehicle = await decodeVin(vin);
@@ -80,13 +84,26 @@ export async function POST(request: Request) {
 
         // 4. Look up Reliability Data
         const relData = getReliabilityData(vehicle.make, vehicle.model);
-        const expectedLifespan = relData ? relData.expectedLifespanMiles : 200000;
+        const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
 
-        // 5. Calculate Scores
+        // 5. Calculate Lifespan Factors from VIN data
+        const vinFactors = mapVinToLifespanFactors(vehicle, vehicle.transmissionStyle);
+        const climateRegion = getClimateRegion(location);
+
+        // Merge factors (no AI factors for VIN-only analysis)
+        const lifespanFactors: LifespanFactors = mergeLifespanFactors(
+            vinFactors,
+            {}, // No AI-extracted factors for pure VIN analysis
+            climateRegion
+        );
+
+        // Calculate adjusted lifespan
+        const lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
+        const expectedLifespan = lifespanAnalysis.adjustedLifespan;
+
+        // 6. Calculate Scores
 
         // Reliability
-        // We don't have "Known Issues" database fully populated yet, so we'll infer some from complaints/recalls roughly
-        // Or just pass empty array for now + relying on hardcoded reliability base score
         const reliabilityScore = calculateReliabilityScore(
             vehicle.make,
             vehicle.model,
@@ -94,7 +111,7 @@ export async function POST(request: Request) {
             []
         );
 
-        // Longevity
+        // Longevity (using adjusted lifespan)
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
 
         // Price
@@ -121,7 +138,7 @@ export async function POST(request: Request) {
             recalls
         );
 
-        // 7. Response
+        // 8. Response
         return NextResponse.json({
             success: true,
             vehicle,
@@ -132,9 +149,18 @@ export async function POST(request: Request) {
                 overall: overallResult.score
             },
             longevity: {
+                expectedLifespan,
+                baseLifespan,
                 estimatedRemainingMiles: longevityResult.remainingMiles,
                 remainingYears: longevityResult.remainingYears,
                 percentUsed: longevityResult.percentUsed
+            },
+            lifespanAnalysis: {
+                baseLifespan: lifespanAnalysis.baseLifespan,
+                adjustedLifespan: lifespanAnalysis.adjustedLifespan,
+                totalMultiplier: lifespanAnalysis.totalMultiplier,
+                appliedFactors: lifespanAnalysis.appliedFactors,
+                confidence: lifespanAnalysis.confidence,
             },
             pricing: {
                 askingPrice,

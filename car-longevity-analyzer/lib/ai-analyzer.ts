@@ -50,12 +50,29 @@ export interface Concern {
     explanation: string;
 }
 
+export interface AccidentHistoryInfo {
+    hasAccident: boolean;
+    severity?: 'minor' | 'moderate' | 'severe';
+    details?: string;
+}
+
+export interface LifespanFactorsExtracted {
+    maintenanceQuality: 'excellent' | 'good' | 'average' | 'poor' | null;
+    maintenanceIndicators: string[];
+    ownerCount: number | null;
+    accidentHistory: AccidentHistoryInfo;
+    usagePattern: 'highway' | 'city' | 'mixed' | 'severe' | null;
+    conditionIndicators: string[];
+    estimatedCondition: 'excellent' | 'good' | 'fair' | 'poor' | null;
+}
+
 export interface AIAnalysisResult {
     extractedVehicle: ExtractedVehicle | null;
     concerns: Concern[];
     trustworthinessScore: number;
     suggestedQuestions: string[];
     overallImpression: string;
+    lifespanFactors: LifespanFactorsExtracted;
     rawResponse?: string;
     isFallback?: boolean;
 }
@@ -93,6 +110,15 @@ Return a JSON object with:
 - trustworthinessScore: number (1-10)
 - suggestedQuestions: string[]
 - overallImpression: string (2-3 sentences)
+- lifespanFactors: {
+    maintenanceQuality: "excellent"|"good"|"average"|"poor"|null (look for: "full service history", "dealer maintained", "timing belt done", "all records", "meticulous", "neglected", "needs work"),
+    maintenanceIndicators: string[] (list specific maintenance mentions like "new timing belt", "recent brakes", "oil changes documented"),
+    ownerCount: number|null (look for: "one owner", "single owner", "2nd owner", "3 owners"),
+    accidentHistory: { hasAccident: boolean, severity: "minor"|"moderate"|"severe"|null, details: string|null } (look for: "clean title", "no accidents", "clean carfax", "minor fender bender", "rebuilt title", "frame damage"),
+    usagePattern: "highway"|"city"|"mixed"|"severe"|null (look for: "highway miles", "mostly highway", "city driven", "commuter car", "used for towing", "work truck", "garage queen"),
+    conditionIndicators: string[] (list condition mentions like "rust free", "garage kept", "southern car", "no rust", "needs bodywork"),
+    estimatedCondition: "excellent"|"good"|"fair"|"poor"|null (overall condition assessment)
+}
 
 Output PURE JSON ONLY. No markdown blocks.
 `;
@@ -124,7 +150,16 @@ Output PURE JSON ONLY. No markdown blocks.
         // Attempt parse
         try {
             const result = JSON.parse(jsonString) as AIAnalysisResult;
-            return { ...result, isFallback: false };
+            // Ensure lifespanFactors has default values if AI didn't return it
+            const lifespanFactors = result.lifespanFactors || getDefaultLifespanFactors();
+            return {
+                ...result,
+                lifespanFactors: {
+                    ...getDefaultLifespanFactors(),
+                    ...lifespanFactors,
+                },
+                isFallback: false,
+            };
         } catch (parseError) {
             // Log only that parsing failed, not the content (security)
             console.error('Failed to parse AI response JSON (length:', content.length, ')');
@@ -135,6 +170,18 @@ Output PURE JSON ONLY. No markdown blocks.
         console.error('Error calling OpenAI API:', error);
         return getFallbackAnalysis();
     }
+}
+
+function getDefaultLifespanFactors(): LifespanFactorsExtracted {
+    return {
+        maintenanceQuality: null,
+        maintenanceIndicators: [],
+        ownerCount: null,
+        accidentHistory: { hasAccident: false },
+        usagePattern: null,
+        conditionIndicators: [],
+        estimatedCondition: null,
+    };
 }
 
 function getFallbackAnalysis(rawResponse?: string): AIAnalysisResult {
@@ -148,6 +195,7 @@ function getFallbackAnalysis(rawResponse?: string): AIAnalysisResult {
         trustworthinessScore: 5,
         suggestedQuestions: ['Can you provide more details about the condition?'],
         overallImpression: 'Unable to generate detailed impression. Please review listing manually.',
+        lifespanFactors: getDefaultLifespanFactors(),
         isFallback: true,
         rawResponse
     };

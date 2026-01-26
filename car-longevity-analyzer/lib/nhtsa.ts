@@ -73,6 +73,7 @@ export type VehicleDetails = {
     bodyClass?: string;
     driveType?: string;
     fuelType?: string;
+    transmissionStyle?: string;
 };
 
 export type Recall = z.infer<typeof RecallSchema>;
@@ -137,6 +138,7 @@ export async function decodeVin(vin: string): Promise<VehicleDetails | null> {
             bodyClass: results['Body Class'],
             driveType: results['Drive Type'],
             fuelType: results['Fuel Type - Primary'],
+            transmissionStyle: results['Transmission Style'],
         };
     } catch (error) {
         console.error('Error decoding VIN:', error);
