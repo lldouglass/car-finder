@@ -13,6 +13,7 @@ import {
     generateQuestionsForSeller
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
+import { estimateFairPrice } from '@/lib/pricing';
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
@@ -21,40 +22,6 @@ const AnalyzeVinSchema = z.object({
     askingPrice: z.number().nonnegative(),
     listingText: z.string().optional()
 });
-
-// Helper to estimate fair price (Mock/heuristic since we don't have a real pricing API yet)
-// In a real app, this would call Auto.dev, KBB, or Blackbook
-function estimateFairPrice(originalMsrp: number, year: number, mileage: number): { low: number, high: number } {
-    const age = new Date().getFullYear() - year;
-    let depreciation = 0.15; // Year 1
-    for (let i = 1; i < age; i++) {
-        depreciation += 0.10; // Subsequent years
-    }
-    // High mileage penalty
-    const avgMilesPerYear = 12000;
-    const excessMiles = Math.max(0, mileage - (age * avgMilesPerYear));
-    const mileagePenalty = (excessMiles / 10000) * 0.02; // 2% per 10k excess
-
-    const totalDepreciation = Math.min(0.90, depreciation + mileagePenalty);
-    const estimatedValue = originalMsrp * (1 - totalDepreciation);
-
-    return {
-        low: Math.round(estimatedValue * 0.9),
-        high: Math.round(estimatedValue * 1.1)
-    };
-}
-
-// Heuristic MSRP map (very basic fallback)
-function getApproximateMsrp(make: string, model: string): number {
-    const key = `${make.toLowerCase()} ${model.toLowerCase()}`;
-    if (key.includes('camry')) return 28000;
-    if (key.includes('corolla')) return 22000;
-    if (key.includes('civic')) return 24000;
-    if (key.includes('accord')) return 29000;
-    if (key.includes('f-150')) return 40000;
-    if (key.includes('silverado')) return 42000;
-    return 30000; // Generic average
-}
 
 export async function POST(request: Request) {
     try {
@@ -106,13 +73,12 @@ export async function POST(request: Request) {
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
 
         // Price
-        const msrp = getApproximateMsrp(vehicle.make, vehicle.model);
-        const { low, high } = estimateFairPrice(msrp, vehicle.year, mileage);
-        const priceResult = calculatePriceScore(askingPrice, low, high);
+        const priceEstimate = estimateFairPrice(vehicle.make, vehicle.model, vehicle.year, mileage);
+        const priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
 
         // Red Flags
         const redFlags = listingText ? detectRedFlags(listingText) : [];
-        const priceRedFlag = detectPriceAnomaly(askingPrice, low, high);
+        const priceRedFlag = detectPriceAnomaly(askingPrice, priceEstimate.low, priceEstimate.high);
         if (priceRedFlag) redFlags.push(priceRedFlag);
 
         // Overall
@@ -147,8 +113,8 @@ export async function POST(request: Request) {
             },
             pricing: {
                 askingPrice,
-                fairPriceLow: low,
-                fairPriceHigh: high,
+                fairPriceLow: priceEstimate.low,
+                fairPriceHigh: priceEstimate.high,
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             },

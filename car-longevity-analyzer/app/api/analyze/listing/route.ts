@@ -13,45 +13,13 @@ import {
     generateQuestionsForSeller
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
+import { estimateFairPrice } from '@/lib/pricing';
 
 const AnalyzeListingSchema = z.object({
     listingText: z.string().min(10, "Listing text is too short"),
     askingPrice: z.number().nonnegative().optional(),
     mileage: z.number().nonnegative().optional()
 });
-
-// Mock/heuristic helpers (duplicated from VIN route for independence/speed)
-function estimateFairPrice(originalMsrp: number, year: number, mileage: number): { low: number, high: number } {
-    const age = new Date().getFullYear() - year;
-    let depreciation = 0.15; // Year 1
-    for (let i = 1; i < age; i++) {
-        depreciation += 0.10; // Subsequent years
-    }
-    const avgMilesPerYear = 12000;
-    const excessMiles = Math.max(0, mileage - (age * avgMilesPerYear));
-    const mileagePenalty = (excessMiles / 10000) * 0.02;
-
-    const totalDepreciation = Math.min(0.90, depreciation + mileagePenalty);
-    const estimatedValue = originalMsrp * (1 - totalDepreciation);
-
-    return {
-        low: Math.round(estimatedValue * 0.9),
-        high: Math.round(estimatedValue * 1.1)
-    };
-}
-
-function getApproximateMsrp(make: string, model: string): number {
-    const key = `${make.toLowerCase()} ${model.toLowerCase()}`;
-    if (key.includes('camry')) return 28000;
-    if (key.includes('corolla')) return 22000;
-    if (key.includes('civic')) return 24000;
-    if (key.includes('accord')) return 29000;
-    if (key.includes('f-150')) return 40000;
-    if (key.includes('silverado')) return 42000;
-    if (key.includes('bmw')) return 50000;
-    if (key.includes('mercedes')) return 55000;
-    return 30000;
-}
 
 export async function POST(request: Request) {
     try {
@@ -86,7 +54,7 @@ export async function POST(request: Request) {
         let longevityResult: any = null;
         let priceResult: any = null;
         let overallResult: any = null;
-        let estimatedFairPrice: any = null;
+        let priceEstimate: { low: number; high: number } | null = null;
 
         // Reliability
         if (extracted?.make && extracted?.model) {
@@ -102,10 +70,8 @@ export async function POST(request: Request) {
 
         // Price
         if (askingPrice !== undefined && mileage !== undefined && extracted?.make) {
-            const msrp = getApproximateMsrp(make, model);
-            const { low, high } = estimateFairPrice(msrp, year, mileage);
-            estimatedFairPrice = { low, high };
-            priceResult = calculatePriceScore(askingPrice, low, high);
+            priceEstimate = estimateFairPrice(make, model, year, mileage);
+            priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
         }
 
         // 4. Red Flags
@@ -122,8 +88,8 @@ export async function POST(request: Request) {
         let allRedFlags = [...regexRedFlags, ...aiRedFlags];
 
         // Price anomaly check
-        if (priceResult && askingPrice !== undefined && estimatedFairPrice) {
-            const priceFlag = detectPriceAnomaly(askingPrice, estimatedFairPrice.low, estimatedFairPrice.high);
+        if (priceResult && askingPrice !== undefined && priceEstimate) {
+            const priceFlag = detectPriceAnomaly(askingPrice, priceEstimate.low, priceEstimate.high);
             if (priceFlag) allRedFlags.push(priceFlag);
         }
 
@@ -167,8 +133,8 @@ export async function POST(request: Request) {
             } : null,
             pricing: priceResult ? {
                 askingPrice,
-                fairPriceLow: estimatedFairPrice?.low,
-                fairPriceHigh: estimatedFairPrice?.high,
+                fairPriceLow: priceEstimate?.low,
+                fairPriceHigh: priceEstimate?.high,
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             } : null,
