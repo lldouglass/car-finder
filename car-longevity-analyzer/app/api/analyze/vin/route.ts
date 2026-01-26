@@ -14,14 +14,27 @@ import {
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
+import { INPUT_LIMITS } from '@/lib/constants';
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
-    vin: z.string().length(17).regex(/^[A-HJ-NPR-Z0-9]{17}$/, "Invalid VIN format (cannot contain I, O, Q)"),
-    mileage: z.number().nonnegative(),
-    askingPrice: z.number().nonnegative(),
-    listingText: z.string().optional()
+    vin: z.string().length(17).regex(/^[A-HJ-NPR-Z0-9]{17}$/i, "Invalid VIN format (cannot contain I, O, Q)"),
+    mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage, "Mileage exceeds maximum"),
+    askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice, "Price exceeds maximum"),
+    listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional()
 });
+
+// Custom error class for better error handling
+class AnalysisError extends Error {
+    constructor(
+        message: string,
+        public statusCode: number = 500,
+        public isRetryable: boolean = false
+    ) {
+        super(message);
+        this.name = 'AnalysisError';
+    }
+}
 
 export async function POST(request: Request) {
     try {
@@ -47,11 +60,23 @@ export async function POST(request: Request) {
             );
         }
 
-        // 3. Fetch Data (Parallel)
-        const [recalls, complaints] = await Promise.all([
+        // 3. Fetch Data (Parallel) - Use allSettled for graceful degradation
+        const [recallsResult, complaintsResult] = await Promise.allSettled([
             getRecalls(vehicle.make, vehicle.model, vehicle.year),
             getComplaints(vehicle.make, vehicle.model, vehicle.year)
         ]);
+
+        // Extract results with fallbacks
+        const recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
+        const complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
+
+        // Log if any fetch failed but continue with partial data
+        if (recallsResult.status === 'rejected') {
+            console.warn('Failed to fetch recalls:', recallsResult.reason);
+        }
+        if (complaintsResult.status === 'rejected') {
+            console.warn('Failed to fetch complaints:', complaintsResult.reason);
+        }
 
         // 4. Look up Reliability Data
         const relData = getReliabilityData(vehicle.make, vehicle.model);
@@ -131,8 +156,30 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error("Analysis Error:", error);
+
+        // Handle known error types
+        if (error instanceof AnalysisError) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: error.message,
+                    retryable: error.isRetryable
+                },
+                { status: error.statusCode }
+            );
+        }
+
+        // Handle JSON parse errors
+        if (error instanceof SyntaxError) {
+            return NextResponse.json(
+                { success: false, error: "Invalid request body" },
+                { status: 400 }
+            );
+        }
+
+        // Generic server error
         return NextResponse.json(
-            { success: false, error: "Internal Server Error" },
+            { success: false, error: "Internal Server Error", retryable: true },
             { status: 500 }
         );
     }

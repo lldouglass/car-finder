@@ -1,4 +1,10 @@
 import { getReliabilityData } from './reliability-data';
+import {
+    SCORE_WEIGHTS,
+    RED_FLAG_PENALTIES,
+    RECOMMENDATION_THRESHOLDS,
+    VEHICLE_CONSTANTS
+} from './constants';
 
 // Types for parameters
 interface KnownIssue {
@@ -73,22 +79,31 @@ export function calculateReliabilityScore(
 export function calculateLongevityScore(
     expectedLifespan: number, // e.g., 250000
     currentMileage: number,   // e.g., 120000
-    annualMiles: number = 12000
+    annualMiles: number = VEHICLE_CONSTANTS.avgMilesPerYear
 ): LongevityResult {
+    // Guard against invalid inputs
+    if (expectedLifespan <= 0 || !Number.isFinite(expectedLifespan)) {
+        return { score: 5, remainingMiles: 0, remainingYears: 0, percentUsed: 100 };
+    }
+    if (currentMileage < 0 || !Number.isFinite(currentMileage)) {
+        currentMileage = 0;
+    }
+    if (annualMiles <= 0 || !Number.isFinite(annualMiles)) {
+        annualMiles = VEHICLE_CONSTANTS.avgMilesPerYear;
+    }
+
     const remainingMiles = Math.max(0, expectedLifespan - currentMileage);
     const percentUsed = (currentMileage / expectedLifespan) * 100;
     const percentRemaining = 100 - percentUsed;
 
     // Convert to 1-10 scale (100% remaining = 10, 0% = 1)
-    // Curve it slightly so even high mileage cars get some points if they run
-    // But extremely high mileage should be low.
     const score = 1 + (percentRemaining / 100) * 9;
 
     return {
-        score: Math.round(score * 10) / 10,
+        score: Math.round(Math.max(1, Math.min(10, score)) * 10) / 10,
         remainingMiles,
         remainingYears: Math.round(remainingMiles / annualMiles),
-        percentUsed: Math.round(percentUsed),
+        percentUsed: Math.round(Math.min(100, percentUsed)),
     };
 }
 
@@ -100,35 +115,41 @@ export function calculatePriceScore(
     fairPriceLow: number,
     fairPriceHigh: number
 ): PriceResult {
-    const midpoint = (fairPriceLow + fairPriceHigh) / 2;
+    // Guard against invalid inputs
+    if (!Number.isFinite(askingPrice) || askingPrice < 0) {
+        return { score: 5, dealQuality: 'FAIR', analysis: 'Unable to calculate price score.' };
+    }
+    if (!Number.isFinite(fairPriceLow) || fairPriceLow <= 0) {
+        fairPriceLow = 1000; // Fallback minimum
+    }
+    if (!Number.isFinite(fairPriceHigh) || fairPriceHigh <= 0) {
+        fairPriceHigh = fairPriceLow * 1.2;
+    }
+
+    // Ensure low <= high
+    if (fairPriceLow > fairPriceHigh) {
+        [fairPriceLow, fairPriceHigh] = [fairPriceHigh, fairPriceLow];
+    }
+
     const range = fairPriceHigh - fairPriceLow;
 
-    // Deviation from midpoint (-1 = great deal, +1 = overpriced relative to range half-width)
-    // Actually, let's look at the skill logic:
-    // const deviation = (askingPrice - midpoint) / (range || 1);
-    // The range might be small, so be careful.
-
-    // Let's use percentage difference from fair price low for "Great" deals
-    // and percentage above fair price high for "Overpriced"
-
     let score = 5;
-    let deviation = 0;
 
     if (askingPrice < fairPriceLow) {
-        // Better than low price
-        // Max score 10 at 85% of low price
+        // Better than low price - Max score 10 at 85% of low price
         const discount = (fairPriceLow - askingPrice) / fairPriceLow;
         score = 7 + (discount / 0.15) * 3;
     } else if (askingPrice > fairPriceHigh) {
-        // Worse than high price
-        // Min score 1 at 120% of high price
+        // Worse than high price - Min score 1 at 120% of high price
         const premium = (askingPrice - fairPriceHigh) / fairPriceHigh;
         score = 4 - (premium / 0.2) * 3;
-    } else {
-        // Inside range (4 to 7)
-        // Linear interpolation between High(4) and Low(7)
-        const position = (askingPrice - fairPriceLow) / (fairPriceHigh - fairPriceLow);
+    } else if (range > 0) {
+        // Inside range (4 to 7) - Linear interpolation
+        const position = (askingPrice - fairPriceLow) / range;
         score = 7 - (position * 3);
+    } else {
+        // Range is zero (low === high), score based on match
+        score = askingPrice === fairPriceLow ? 7 : 5;
     }
 
     score = Math.max(1, Math.min(10, score));
@@ -163,40 +184,51 @@ export function calculateOverallScore(
     price: number,
     redFlags: RedFlag[]
 ): OverallResult {
-    // Weighted average (reliability and longevity weighted higher)
-    // Reliability: 35%, Longevity: 35%, Price: 30%
+    // Validate inputs
+    reliability = Number.isFinite(reliability) ? Math.max(1, Math.min(10, reliability)) : 5;
+    longevity = Number.isFinite(longevity) ? Math.max(1, Math.min(10, longevity)) : 5;
+    price = Number.isFinite(price) ? Math.max(1, Math.min(10, price)) : 5;
+
+    // Weighted average using constants
     const baseScore = (
-        reliability * 0.35 +
-        longevity * 0.35 +
-        price * 0.30
+        reliability * SCORE_WEIGHTS.reliability +
+        longevity * SCORE_WEIGHTS.longevity +
+        price * SCORE_WEIGHTS.price
     );
 
-    // Red flag penalties
-    const redFlagCount = redFlags.length;
-    // Assuming 'critical' red flags should pass immediately, typically handled by caller or severe penalty
+    // Red flag penalties using constants
     const hasCriticalRedFlag = redFlags.some(f => f.severity.toLowerCase() === 'critical');
+    const hasHighRedFlag = redFlags.some(f => f.severity.toLowerCase() === 'high');
+    const mediumLowFlags = redFlags.filter(f =>
+        f.severity.toLowerCase() === 'medium' || f.severity.toLowerCase() === 'low'
+    ).length;
 
-    const penalty = (redFlagCount * 0.5) + (hasCriticalRedFlag ? 5.0 : 0); // stiffer penalty
+    let penalty = 0;
+    if (hasCriticalRedFlag) penalty += RED_FLAG_PENALTIES.critical;
+    if (hasHighRedFlag) penalty += RED_FLAG_PENALTIES.high;
+    penalty += mediumLowFlags * RED_FLAG_PENALTIES.medium;
+
     const finalScore = Math.max(1, baseScore - penalty);
 
-    // Determine recommendation
+    // Determine recommendation using constants
     let recommendation: OverallResult['recommendation'];
 
     if (hasCriticalRedFlag || finalScore < 3.0) {
         recommendation = 'PASS';
-    } else if (finalScore >= 7.5) {
+    } else if (finalScore >= RECOMMENDATION_THRESHOLDS.buy) {
         recommendation = 'BUY';
-    } else if (finalScore >= 5.0) {
+    } else if (finalScore >= RECOMMENDATION_THRESHOLDS.maybe) {
         recommendation = 'MAYBE';
     } else {
         recommendation = 'PASS';
     }
 
-    // Confidence - placeholder logic
-    const confidence = 0.85; // Static for now until we typically rely on data completeness
+    // Confidence based on data completeness
+    const hasAllScores = [reliability, longevity, price].every(s => s !== 5);
+    const confidence = hasAllScores ? 0.85 : 0.65;
 
     const generateSummary = (rec: string, r: number, l: number, p: number) => {
-        if (rec === 'PASS') return `Pass on this vehicle due to low overall score/issues.`;
+        if (rec === 'PASS') return `Pass on this vehicle due to low overall score or critical issues.`;
         return `Rated ${rec} based on Reliability(${r.toFixed(1)}), Longevity(${l.toFixed(1)}), and Price(${p.toFixed(1)}).`;
     };
 

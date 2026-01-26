@@ -14,11 +14,14 @@ import {
 } from '@/lib/red-flags';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
+import { INPUT_LIMITS, VEHICLE_CONSTANTS } from '@/lib/constants';
 
 const AnalyzeListingSchema = z.object({
-    listingText: z.string().min(10, "Listing text is too short"),
-    askingPrice: z.number().nonnegative().optional(),
-    mileage: z.number().nonnegative().optional()
+    listingText: z.string()
+        .min(10, "Listing text is too short")
+        .max(INPUT_LIMITS.maxListingLength, "Listing text exceeds maximum length"),
+    askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice).optional(),
+    mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage).optional()
 });
 
 export async function POST(request: Request) {
@@ -47,7 +50,8 @@ export async function POST(request: Request) {
 
         const make = extracted?.make || 'Unknown';
         const model = extracted?.model || 'Unknown';
-        const year = extracted?.year || new Date().getFullYear() - 5; // Fallback to avg age if unknown
+        // Use constant for fallback age calculation
+        const year = extracted?.year || new Date().getFullYear() - VEHICLE_CONSTANTS.defaultFallbackAge;
 
         // 3. Scores Calculation (if sufficient data)
         let reliabilityScore = 0;
@@ -154,8 +158,17 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error("Listing Analysis Error:", error);
+
+        // Handle JSON parse errors
+        if (error instanceof SyntaxError) {
+            return NextResponse.json(
+                { success: false, error: "Invalid request body" },
+                { status: 400 }
+            );
+        }
+
         return NextResponse.json(
-            { success: false, error: "Internal Server Error" },
+            { success: false, error: "Internal Server Error", retryable: true },
             { status: 500 }
         );
     }

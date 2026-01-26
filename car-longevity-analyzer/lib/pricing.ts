@@ -3,6 +3,8 @@
  * Uses realistic depreciation curves based on industry data.
  */
 
+import { VEHICLE_CONSTANTS, PRICING_CONSTANTS } from './constants';
+
 export interface PriceEstimate {
     low: number;
     high: number;
@@ -187,7 +189,10 @@ function calculateDepreciation(age: number, category: MsrpData['category']): num
     const curve = DEPRECIATION_CURVES[category];
     let retention = 1.0;
 
-    for (let year = 0; year < age; year++) {
+    // Cap age at maximum to prevent performance issues
+    const cappedAge = Math.min(age, VEHICLE_CONSTANTS.maxVehicleAgeYears);
+
+    for (let year = 0; year < cappedAge; year++) {
         const rateIndex = Math.min(year, curve.length - 1);
         retention *= curve[rateIndex];
     }
@@ -200,15 +205,24 @@ function calculateDepreciation(age: number, category: MsrpData['category']): num
 /**
  * Calculate mileage adjustment factor.
  * High mileage reduces value, low mileage increases it.
+ * @param mileage - Current vehicle mileage
+ * @param age - Vehicle age in years
+ * @returns Adjustment factor (negative = reduce value, positive = increase value)
  */
 function calculateMileageAdjustment(mileage: number, age: number): number {
-    const avgMilesPerYear = 12000;
-    const expectedMiles = age * avgMilesPerYear;
+    // Guard against invalid inputs
+    if (!Number.isFinite(mileage) || mileage < 0) mileage = 0;
+    if (!Number.isFinite(age) || age < 0) age = 0;
+
+    const expectedMiles = age * VEHICLE_CONSTANTS.avgMilesPerYear;
     const mileageDiff = mileage - expectedMiles;
 
-    // +/- 2% per 10,000 miles difference, capped at +/- 15%
-    const adjustment = (mileageDiff / 10000) * -0.02;
-    return Math.max(-0.15, Math.min(0.15, adjustment));
+    // Adjustment per 10,000 miles difference, capped at maximum
+    const adjustment = (mileageDiff / 10000) * -PRICING_CONSTANTS.mileageAdjustmentPer10k;
+    return Math.max(
+        -PRICING_CONSTANTS.maxMileageAdjustment,
+        Math.min(PRICING_CONSTANTS.maxMileageAdjustment, adjustment)
+    );
 }
 
 /**
@@ -246,14 +260,14 @@ export function estimateFairPrice(
     const mileageAdj = calculateMileageAdjustment(mileage, age);
     baseValue = baseValue * (1 + mileageAdj);
 
-    // Calculate range (typically +/- 10-12% for private sales)
-    const variance = 0.11;
+    // Calculate range (typically +/- 8-12% for private sales)
+    const variance = PRICING_CONSTANTS.priceRangeMargin;
     const midpoint = Math.round(baseValue);
     const low = Math.round(baseValue * (1 - variance));
     const high = Math.round(baseValue * (1 + variance));
 
     // Ensure minimum values make sense
-    const absoluteMin = 2000;
+    const absoluteMin = PRICING_CONSTANTS.minimumValue;
     return {
         low: Math.max(absoluteMin, low),
         high: Math.max(absoluteMin + 500, high),

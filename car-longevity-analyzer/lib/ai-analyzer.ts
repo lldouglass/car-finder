@@ -1,9 +1,34 @@
 import OpenAI from 'openai';
+import { INPUT_LIMITS } from './constants';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || '',
-});
+// Lazy initialization of OpenAI client
+let openaiClient: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI | null {
+    if (openaiClient) return openaiClient;
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        console.warn('OPENAI_API_KEY not configured');
+        return null;
+    }
+
+    openaiClient = new OpenAI({ apiKey });
+    return openaiClient;
+}
+
+/**
+ * Sanitizes user input to remove control characters and limit length
+ */
+function sanitizeInput(text: string): string {
+    return text
+        // Remove control characters (except newlines and tabs)
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+        // Normalize whitespace
+        .replace(/\r\n/g, '\n')
+        // Limit length
+        .substring(0, INPUT_LIMITS.maxListingLength);
+}
 
 export interface VehicleInfo {
     make: string;
@@ -42,13 +67,17 @@ export async function analyzeListingWithAI(
     listingText: string,
     vehicleInfo?: VehicleInfo
 ): Promise<AIAnalysisResult> {
-    if (!process.env.OPENAI_API_KEY) {
-        console.warn('OPENAI_API_KEY not set. Returning fallback analysis.');
+    const openai = getOpenAIClient();
+    if (!openai) {
         return getFallbackAnalysis();
     }
 
-    // Sanitize input roughly to avoid too large prompts
-    const cleanListing = listingText.substring(0, 15000); // 15k chars safety limit
+    // Sanitize input to remove control characters and limit length
+    const cleanListing = sanitizeInput(listingText);
+
+    if (cleanListing.length < 10) {
+        return getFallbackAnalysis('Listing text too short for analysis');
+    }
 
     const prompt = `
 Analyze this used car listing and extract information:
@@ -70,8 +99,8 @@ Output PURE JSON ONLY. No markdown blocks.
 
     try {
         const response = await openai.chat.completions.create({
-            model: "gpt-5-mini",
-            max_tokens: 1000,
+            model: "gpt-4o-mini",
+            max_completion_tokens: 1000,
             temperature: 0,
             messages: [
                 {
@@ -97,8 +126,9 @@ Output PURE JSON ONLY. No markdown blocks.
             const result = JSON.parse(jsonString) as AIAnalysisResult;
             return { ...result, isFallback: false };
         } catch (parseError) {
-            console.error('Failed to parse AI response JSON:', content);
-            return getFallbackAnalysis(content);
+            // Log only that parsing failed, not the content (security)
+            console.error('Failed to parse AI response JSON (length:', content.length, ')');
+            return getFallbackAnalysis('AI response was not valid JSON');
         }
 
     } catch (error) {

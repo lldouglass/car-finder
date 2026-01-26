@@ -53,12 +53,81 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     { make: 'Chevrolet', model: 'Malibu', baseScore: 7.0, expectedLifespanMiles: 200000, yearsToAvoid: [2010, 2013] },
 ];
 
-export function getReliabilityData(make: string, model: string): VehicleReliability | null {
-    const normMake = make.toLowerCase();
-    const normModel = model.toLowerCase();
+/**
+ * Normalizes model names for consistent matching.
+ * Handles common variations like "Mazda3" vs "3" vs "MAZDA3".
+ */
+function normalizeModel(model: string): string {
+    return model
+        .toLowerCase()
+        .trim()
+        // Remove common prefixes/suffixes that vary
+        .replace(/^(the\s+)/i, '')
+        // Normalize hyphens and spaces
+        .replace(/[-\s]+/g, ' ')
+        // Remove common trim level indicators for base matching
+        .replace(/\s+(ex|lx|se|le|xle|sport|limited|touring|premium)$/i, '');
+}
 
-    return RELIABILITY_DATA.find(v =>
+/**
+ * Calculates similarity score between two strings.
+ * Returns a value between 0 and 1, where 1 is exact match.
+ */
+function calculateSimilarity(a: string, b: string): number {
+    if (a === b) return 1;
+    if (a.length === 0 || b.length === 0) return 0;
+
+    // Check for substring match
+    if (a.includes(b) || b.includes(a)) {
+        const shorter = a.length < b.length ? a : b;
+        const longer = a.length >= b.length ? a : b;
+        return shorter.length / longer.length;
+    }
+
+    // Check if one starts with the other
+    if (a.startsWith(b) || b.startsWith(a)) {
+        return 0.8;
+    }
+
+    return 0;
+}
+
+/**
+ * Finds reliability data for a vehicle with improved matching.
+ * Uses exact matching first, then falls back to fuzzy matching.
+ *
+ * @param make - Vehicle manufacturer
+ * @param model - Vehicle model name
+ * @returns Reliability data or null if not found
+ */
+export function getReliabilityData(make: string, model: string): VehicleReliability | null {
+    const normMake = make.toLowerCase().trim();
+    const normModel = normalizeModel(model);
+
+    // First pass: Exact make and model match
+    const exactMatch = RELIABILITY_DATA.find(v =>
         v.make.toLowerCase() === normMake &&
-        (v.model.toLowerCase() === normModel || v.model.toLowerCase().includes(normModel) || normModel.includes(v.model.toLowerCase()))
-    ) || null;
+        normalizeModel(v.model) === normModel
+    );
+
+    if (exactMatch) return exactMatch;
+
+    // Second pass: Exact make, fuzzy model match
+    // Only consider matches with high similarity
+    let bestMatch: VehicleReliability | null = null;
+    let bestScore = 0.6; // Minimum threshold for fuzzy match
+
+    for (const vehicle of RELIABILITY_DATA) {
+        if (vehicle.make.toLowerCase() !== normMake) continue;
+
+        const dbModel = normalizeModel(vehicle.model);
+        const similarity = calculateSimilarity(normModel, dbModel);
+
+        if (similarity > bestScore) {
+            bestScore = similarity;
+            bestMatch = vehicle;
+        }
+    }
+
+    return bestMatch;
 }
