@@ -323,8 +323,20 @@ function ResultsContent() {
                 {hasLongevityData ? (
                   <div className="space-y-4">
                     <div className="flex justify-between">
+                      <span className="text-muted-foreground">Expected Lifespan</span>
+                      <span className="font-medium">
+                        {formatNumber(
+                          longevity.percentUsed < 100
+                            ? Math.round(longevity.estimatedRemainingMiles / ((100 - longevity.percentUsed) / 100))
+                            : longevity.estimatedRemainingMiles
+                        )} miles
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-muted-foreground">Remaining Miles</span>
-                      <span className="font-medium">{formatNumber(longevity.estimatedRemainingMiles)}</span>
+                      <span className="font-medium text-lg text-green-600 dark:text-green-400">
+                        {formatNumber(longevity.estimatedRemainingMiles)} miles
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Remaining Years</span>
