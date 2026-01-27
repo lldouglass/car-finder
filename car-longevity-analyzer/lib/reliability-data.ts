@@ -1,18 +1,34 @@
+export interface KnownIssue {
+    description: string;
+    repairCost: { low: number; high: number };
+    mileageRange: { start: number; end: number };
+    severity: 'minor' | 'moderate' | 'major' | 'critical';
+    component: 'engine' | 'transmission' | 'electrical' | 'suspension' | 'brakes' | 'body' | 'interior' | 'fuel' | 'cooling' | 'exhaust' | 'steering' | 'hvac';
+    affectedYears?: number[];
+}
+
 export interface VehicleReliability {
     make: string;
     model: string;
     baseScore: number;
     expectedLifespanMiles: number;
     yearsToAvoid: number[];
+    knownIssues?: KnownIssue[];
 }
 
 export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     // TOYOTA - Generally highest reliability
     // ============================================
-    { make: 'Toyota', model: 'Camry', baseScore: 9.5, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2008, 2009] },
-    { make: 'Toyota', model: 'Corolla', baseScore: 9.5, expectedLifespanMiles: 300000, yearsToAvoid: [2009] },
-    { make: 'Toyota', model: 'RAV4', baseScore: 9.0, expectedLifespanMiles: 250000, yearsToAvoid: [2007, 2008, 2019] },
+    { make: 'Toyota', model: 'Camry', baseScore: 9.5, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2008, 2009], knownIssues: [
+        { description: '2.4L 2AZ-FE engine excessive oil consumption - requires frequent top-offs', repairCost: { low: 1000, high: 4000 }, mileageRange: { start: 60000, end: 150000 }, severity: 'major', component: 'engine', affectedYears: [2007, 2008, 2009, 2010, 2011] },
+    ] },
+    { make: 'Toyota', model: 'Corolla', baseScore: 9.5, expectedLifespanMiles: 300000, yearsToAvoid: [2009], knownIssues: [
+        { description: 'Excessive oil consumption in 1.8L 2ZR-FE engine', repairCost: { low: 800, high: 3000 }, mileageRange: { start: 50000, end: 120000 }, severity: 'moderate', component: 'engine', affectedYears: [2009, 2010, 2011, 2012, 2013] },
+    ] },
+    { make: 'Toyota', model: 'RAV4', baseScore: 9.0, expectedLifespanMiles: 250000, yearsToAvoid: [2007, 2008, 2019], knownIssues: [
+        { description: '2.5L Dynamic Force engine fuel pump defect causing stalling', repairCost: { low: 500, high: 1200 }, mileageRange: { start: 0, end: 50000 }, severity: 'major', component: 'fuel', affectedYears: [2019, 2020] },
+    ] },
     { make: 'Toyota', model: 'Highlander', baseScore: 9.0, expectedLifespanMiles: 250000, yearsToAvoid: [2003, 2008] },
     { make: 'Toyota', model: 'Tacoma', baseScore: 9.5, expectedLifespanMiles: 300000, yearsToAvoid: [2016, 2017] },
     { make: 'Toyota', model: 'Tundra', baseScore: 9.0, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2008, 2012] },
@@ -52,9 +68,17 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     { make: 'Honda', model: 'Accord', baseScore: 9.0, expectedLifespanMiles: 250000, yearsToAvoid: [2008, 2009, 2010, 2013, 2014, 2015, 2016] },
     { make: 'Honda', model: 'Civic', baseScore: 9.0, expectedLifespanMiles: 250000, yearsToAvoid: [2001, 2002, 2006, 2016] },
-    { make: 'Honda', model: 'CR-V', baseScore: 8.8, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2015, 2017, 2018, 2019] },
-    { make: 'Honda', model: 'Pilot', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [2003, 2005, 2016] },
-    { make: 'Honda', model: 'Odyssey', baseScore: 8.5, expectedLifespanMiles: 250000, yearsToAvoid: [2002, 2003, 2011, 2014, 2018] },
+    { make: 'Honda', model: 'CR-V', baseScore: 8.8, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2015, 2017, 2018, 2019], knownIssues: [
+        { description: '1.5T engine oil dilution from fuel - oil level rises, gas smell in oil', repairCost: { low: 100, high: 500 }, mileageRange: { start: 5000, end: 50000 }, severity: 'moderate', component: 'engine', affectedYears: [2017, 2018, 2019] },
+        { description: 'A/C condenser damage from road debris causing refrigerant leaks', repairCost: { low: 600, high: 1200 }, mileageRange: { start: 20000, end: 80000 }, severity: 'moderate', component: 'hvac', affectedYears: [2017, 2018, 2019, 2020, 2021] },
+    ] },
+    { make: 'Honda', model: 'Pilot', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [2003, 2005, 2016], knownIssues: [
+        { description: '9-speed transmission rough shifting and hesitation', repairCost: { low: 200, high: 3000 }, mileageRange: { start: 10000, end: 80000 }, severity: 'moderate', component: 'transmission', affectedYears: [2016, 2017, 2018, 2019] },
+    ] },
+    { make: 'Honda', model: 'Odyssey', baseScore: 8.5, expectedLifespanMiles: 250000, yearsToAvoid: [2002, 2003, 2011, 2014, 2018], knownIssues: [
+        { description: 'Transmission failure in early models with 4-speed auto', repairCost: { low: 2500, high: 4500 }, mileageRange: { start: 80000, end: 140000 }, severity: 'critical', component: 'transmission', affectedYears: [1999, 2000, 2001, 2002, 2003, 2004] },
+        { description: '10-speed transmission surging and hesitation', repairCost: { low: 200, high: 3500 }, mileageRange: { start: 10000, end: 60000 }, severity: 'moderate', component: 'transmission', affectedYears: [2018, 2019, 2020] },
+    ] },
     { make: 'Honda', model: 'HR-V', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [2016, 2017] },
     { make: 'Honda', model: 'Passport', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [] },
     { make: 'Honda', model: 'Ridgeline', baseScore: 8.5, expectedLifespanMiles: 250000, yearsToAvoid: [2006, 2007, 2017] },
@@ -78,8 +102,14 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     // SUBARU - Good reliability, head gasket issues in older models
     // ============================================
-    { make: 'Subaru', model: 'Outback', baseScore: 8.0, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2012, 2013, 2015, 2020] },
-    { make: 'Subaru', model: 'Forester', baseScore: 8.0, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2014, 2015, 2019] },
+    { make: 'Subaru', model: 'Outback', baseScore: 8.0, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2012, 2013, 2015, 2020], knownIssues: [
+        { description: 'Head gasket failure - external oil leaks and coolant loss', repairCost: { low: 1500, high: 3000 }, mileageRange: { start: 80000, end: 150000 }, severity: 'major', component: 'engine', affectedYears: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009] },
+        { description: 'CVT transmission judder and hesitation', repairCost: { low: 2500, high: 4500 }, mileageRange: { start: 70000, end: 120000 }, severity: 'major', component: 'transmission', affectedYears: [2015, 2016, 2017, 2018, 2019, 2020] },
+    ] },
+    { make: 'Subaru', model: 'Forester', baseScore: 8.0, expectedLifespanMiles: 250000, yearsToAvoid: [2011, 2014, 2015, 2019], knownIssues: [
+        { description: 'Head gasket failure - external leaks, overheating', repairCost: { low: 1500, high: 3000 }, mileageRange: { start: 80000, end: 150000 }, severity: 'major', component: 'engine', affectedYears: [1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010] },
+        { description: 'Excessive oil consumption in 2.5L FB25 engine', repairCost: { low: 2000, high: 4000 }, mileageRange: { start: 40000, end: 100000 }, severity: 'major', component: 'engine', affectedYears: [2011, 2012, 2013, 2014] },
+    ] },
     { make: 'Subaru', model: 'Crosstrek', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [2013, 2014, 2018] },
     { make: 'Subaru', model: 'Impreza', baseScore: 8.0, expectedLifespanMiles: 225000, yearsToAvoid: [2008, 2012, 2013] },
     { make: 'Subaru', model: 'WRX', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2008, 2013, 2015, 2022] },
@@ -109,10 +139,19 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     // HYUNDAI - Improved significantly, engine issues in some years
     // ============================================
-    { make: 'Hyundai', model: 'Sonata', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2015, 2016, 2017, 2018] },
-    { make: 'Hyundai', model: 'Elantra', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2017, 2018] },
-    { make: 'Hyundai', model: 'Tucson', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2016, 2017] },
-    { make: 'Hyundai', model: 'Santa Fe', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2007, 2012, 2017, 2018, 2019] },
+    { make: 'Hyundai', model: 'Sonata', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2015, 2016, 2017, 2018], knownIssues: [
+        { description: 'Theta II engine failure - connecting rod bearing failure, engine seizure', repairCost: { low: 4000, high: 8000 }, mileageRange: { start: 60000, end: 150000 }, severity: 'critical', component: 'engine', affectedYears: [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+        { description: 'Dual-clutch transmission (DCT) shuddering and jerking', repairCost: { low: 1500, high: 3000 }, mileageRange: { start: 30000, end: 80000 }, severity: 'major', component: 'transmission', affectedYears: [2011, 2012, 2013, 2014] },
+    ] },
+    { make: 'Hyundai', model: 'Elantra', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2017, 2018], knownIssues: [
+        { description: 'Engine bearing failure in 1.8L/2.0L Nu engines', repairCost: { low: 3500, high: 6000 }, mileageRange: { start: 50000, end: 100000 }, severity: 'critical', component: 'engine', affectedYears: [2011, 2012, 2013, 2014, 2015, 2016] },
+    ] },
+    { make: 'Hyundai', model: 'Tucson', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2016, 2017], knownIssues: [
+        { description: 'Theta II engine failure risk - sudden power loss, engine seizure', repairCost: { low: 4000, high: 7500 }, mileageRange: { start: 60000, end: 120000 }, severity: 'critical', component: 'engine', affectedYears: [2016, 2017, 2018, 2019, 2020, 2021] },
+    ] },
+    { make: 'Hyundai', model: 'Santa Fe', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2007, 2012, 2017, 2018, 2019], knownIssues: [
+        { description: 'Theta II engine failure - manufacturing debris causing bearing failure', repairCost: { low: 4500, high: 8500 }, mileageRange: { start: 60000, end: 140000 }, severity: 'critical', component: 'engine', affectedYears: [2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+    ] },
     { make: 'Hyundai', model: 'Kona', baseScore: 8.0, expectedLifespanMiles: 200000, yearsToAvoid: [2018, 2019] },
     { make: 'Hyundai', model: 'Palisade', baseScore: 8.0, expectedLifespanMiles: 225000, yearsToAvoid: [2020, 2021] },
     { make: 'Hyundai', model: 'Venue', baseScore: 8.0, expectedLifespanMiles: 200000, yearsToAvoid: [] },
@@ -126,10 +165,16 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     // KIA - Sister brand to Hyundai, similar reliability
     // ============================================
-    { make: 'Kia', model: 'Optima', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2015, 2016] },
+    { make: 'Kia', model: 'Optima', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2015, 2016], knownIssues: [
+        { description: 'Theta II engine failure - rod bearing damage causing engine seizure', repairCost: { low: 4000, high: 8000 }, mileageRange: { start: 60000, end: 150000 }, severity: 'critical', component: 'engine', affectedYears: [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+    ] },
     { make: 'Kia', model: 'K5', baseScore: 8.0, expectedLifespanMiles: 200000, yearsToAvoid: [2021] },
-    { make: 'Kia', model: 'Sorento', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2014, 2016] },
-    { make: 'Kia', model: 'Sportage', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2017] },
+    { make: 'Kia', model: 'Sorento', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2014, 2016], knownIssues: [
+        { description: 'Theta II engine failure - metal debris causing bearing failure', repairCost: { low: 4500, high: 8500 }, mileageRange: { start: 60000, end: 140000 }, severity: 'critical', component: 'engine', affectedYears: [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+    ] },
+    { make: 'Kia', model: 'Sportage', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2011, 2012, 2013, 2017], knownIssues: [
+        { description: 'Theta II engine defect - sudden power loss, potential fire risk', repairCost: { low: 4000, high: 7500 }, mileageRange: { start: 60000, end: 120000 }, severity: 'critical', component: 'engine', affectedYears: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021] },
+    ] },
     { make: 'Kia', model: 'Telluride', baseScore: 8.5, expectedLifespanMiles: 225000, yearsToAvoid: [2020] },
     { make: 'Kia', model: 'Soul', baseScore: 8.0, expectedLifespanMiles: 200000, yearsToAvoid: [2012, 2014, 2020] },
     { make: 'Kia', model: 'Forte', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2012, 2013, 2017, 2019, 2020] },
@@ -164,8 +209,15 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     { make: 'Ford', model: 'Bronco', baseScore: 7.0, expectedLifespanMiles: 200000, yearsToAvoid: [2021, 2022] },
     { make: 'Ford', model: 'Bronco Sport', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2021] },
     { make: 'Ford', model: 'Mustang', baseScore: 7.5, expectedLifespanMiles: 200000, yearsToAvoid: [2005, 2006, 2010, 2015, 2018] },
-    { make: 'Ford', model: 'Focus', baseScore: 6.0, expectedLifespanMiles: 175000, yearsToAvoid: [2012, 2013, 2014, 2015, 2016, 2017, 2018] },
-    { make: 'Ford', model: 'Fiesta', baseScore: 6.0, expectedLifespanMiles: 175000, yearsToAvoid: [2011, 2012, 2013, 2014, 2015, 2016] },
+    { make: 'Ford', model: 'Focus', baseScore: 6.0, expectedLifespanMiles: 175000, yearsToAvoid: [2012, 2013, 2014, 2015, 2016, 2017, 2018], knownIssues: [
+        { description: 'PowerShift DCT transmission shuddering, slipping, and hesitation', repairCost: { low: 2000, high: 4000 }, mileageRange: { start: 20000, end: 80000 }, severity: 'critical', component: 'transmission', affectedYears: [2012, 2013, 2014, 2015, 2016, 2017, 2018] },
+        { description: 'Transmission control module (TCM) failure', repairCost: { low: 400, high: 900 }, mileageRange: { start: 30000, end: 70000 }, severity: 'major', component: 'transmission', affectedYears: [2012, 2013, 2014, 2015, 2016] },
+        { description: 'Clutch pack premature wear causing grinding and hard shifts', repairCost: { low: 1500, high: 2500 }, mileageRange: { start: 40000, end: 100000 }, severity: 'major', component: 'transmission', affectedYears: [2012, 2013, 2014, 2015, 2016, 2017, 2018] },
+    ] },
+    { make: 'Ford', model: 'Fiesta', baseScore: 6.0, expectedLifespanMiles: 175000, yearsToAvoid: [2011, 2012, 2013, 2014, 2015, 2016], knownIssues: [
+        { description: 'PowerShift DCT transmission shuddering and harsh engagement', repairCost: { low: 2000, high: 3500 }, mileageRange: { start: 20000, end: 80000 }, severity: 'critical', component: 'transmission', affectedYears: [2011, 2012, 2013, 2014, 2015, 2016] },
+        { description: 'Door latch failures causing doors to open while driving', repairCost: { low: 200, high: 500 }, mileageRange: { start: 30000, end: 90000 }, severity: 'major', component: 'body', affectedYears: [2011, 2012, 2013, 2014, 2015, 2016] },
+    ] },
     { make: 'Ford', model: 'Expedition', baseScore: 7.5, expectedLifespanMiles: 250000, yearsToAvoid: [2004, 2005, 2018, 2019] },
     { make: 'Ford', model: 'Transit', baseScore: 7.0, expectedLifespanMiles: 250000, yearsToAvoid: [2015, 2016, 2017] },
     { make: 'Ford', model: 'F-250', baseScore: 8.0, expectedLifespanMiles: 300000, yearsToAvoid: [2008, 2011, 2017] },
@@ -190,9 +242,16 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     // NISSAN - CVT reliability concerns, trucks are better
     // ============================================
-    { make: 'Nissan', model: 'Altima', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2009, 2013, 2014, 2015, 2016, 2017, 2018] },
-    { make: 'Nissan', model: 'Rogue', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2013, 2014, 2015, 2016, 2017] },
-    { make: 'Nissan', model: 'Sentra', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2013, 2014, 2015, 2016, 2017] },
+    { make: 'Nissan', model: 'Altima', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2009, 2013, 2014, 2015, 2016, 2017, 2018], knownIssues: [
+        { description: 'CVT transmission failure - shuddering, slipping, complete failure', repairCost: { low: 3000, high: 5500 }, mileageRange: { start: 60000, end: 120000 }, severity: 'critical', component: 'transmission', affectedYears: [2013, 2014, 2015, 2016, 2017, 2018] },
+        { description: 'CVT cooler failure leading to transmission overheating', repairCost: { low: 800, high: 1500 }, mileageRange: { start: 70000, end: 100000 }, severity: 'major', component: 'transmission', affectedYears: [2013, 2014, 2015, 2016] },
+    ] },
+    { make: 'Nissan', model: 'Rogue', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2013, 2014, 2015, 2016, 2017], knownIssues: [
+        { description: 'CVT transmission failure - juddering, hesitation, premature wear', repairCost: { low: 3000, high: 5000 }, mileageRange: { start: 60000, end: 110000 }, severity: 'critical', component: 'transmission', affectedYears: [2013, 2014, 2015, 2016, 2017] },
+    ] },
+    { make: 'Nissan', model: 'Sentra', baseScore: 6.5, expectedLifespanMiles: 180000, yearsToAvoid: [2013, 2014, 2015, 2016, 2017], knownIssues: [
+        { description: 'CVT transmission failure - jerky acceleration, whining noise', repairCost: { low: 2800, high: 4500 }, mileageRange: { start: 60000, end: 100000 }, severity: 'critical', component: 'transmission', affectedYears: [2013, 2014, 2015, 2016, 2017] },
+    ] },
     { make: 'Nissan', model: 'Maxima', baseScore: 7.0, expectedLifespanMiles: 200000, yearsToAvoid: [2009, 2010, 2011, 2012, 2016] },
     { make: 'Nissan', model: 'Murano', baseScore: 6.5, expectedLifespanMiles: 200000, yearsToAvoid: [2009, 2010, 2011, 2015] },
     { make: 'Nissan', model: 'Pathfinder', baseScore: 6.5, expectedLifespanMiles: 200000, yearsToAvoid: [2005, 2006, 2013, 2014, 2015, 2017] },
@@ -226,8 +285,13 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     { make: 'Chevrolet', model: 'Silverado 1500', baseScore: 8.0, expectedLifespanMiles: 250000, yearsToAvoid: [2007, 2014, 2015, 2016, 2017, 2019] },
     { make: 'Chevrolet', model: 'Silverado 2500', baseScore: 8.0, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2011, 2016, 2017] },
     { make: 'Chevrolet', model: 'Silverado 3500', baseScore: 8.0, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2011, 2016, 2017] },
-    { make: 'Chevrolet', model: 'Equinox', baseScore: 6.0, expectedLifespanMiles: 180000, yearsToAvoid: [2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019] },
-    { make: 'Chevrolet', model: 'Malibu', baseScore: 7.0, expectedLifespanMiles: 200000, yearsToAvoid: [2010, 2013, 2016, 2017, 2018, 2019] },
+    { make: 'Chevrolet', model: 'Equinox', baseScore: 6.0, expectedLifespanMiles: 180000, yearsToAvoid: [2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019], knownIssues: [
+        { description: '2.4L Ecotec engine excessive oil consumption - requires top-offs between changes', repairCost: { low: 1500, high: 4000 }, mileageRange: { start: 40000, end: 120000 }, severity: 'major', component: 'engine', affectedYears: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017] },
+        { description: 'Timing chain stretch/failure in 2.4L causing rough running and check engine light', repairCost: { low: 800, high: 1500 }, mileageRange: { start: 60000, end: 120000 }, severity: 'major', component: 'engine', affectedYears: [2010, 2011, 2012, 2013, 2014, 2015] },
+    ] },
+    { make: 'Chevrolet', model: 'Malibu', baseScore: 7.0, expectedLifespanMiles: 200000, yearsToAvoid: [2010, 2013, 2016, 2017, 2018, 2019], knownIssues: [
+        { description: 'Transmission shudder and harsh shifting in 8/9-speed automatic', repairCost: { low: 500, high: 3500 }, mileageRange: { start: 30000, end: 80000 }, severity: 'major', component: 'transmission', affectedYears: [2016, 2017, 2018, 2019] },
+    ] },
     { make: 'Chevrolet', model: 'Tahoe', baseScore: 8.0, expectedLifespanMiles: 275000, yearsToAvoid: [2007, 2015, 2016] },
     { make: 'Chevrolet', model: 'Suburban', baseScore: 8.0, expectedLifespanMiles: 300000, yearsToAvoid: [2007, 2015, 2016] },
     { make: 'Chevrolet', model: 'Traverse', baseScore: 6.5, expectedLifespanMiles: 200000, yearsToAvoid: [2009, 2010, 2011, 2013, 2014, 2018, 2019] },
