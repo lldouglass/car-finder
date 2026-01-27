@@ -61,6 +61,16 @@ export function NoKnownIssues() {
     );
 }
 
+export function NoComponentIssues() {
+    return (
+        <EmptyState
+            icon={<CheckCircle className="size-5 text-green-600" />}
+            title="No NHTSA Complaints"
+            description="No complaints have been reported to NHTSA for this vehicle."
+        />
+    );
+}
+
 export function NoRedFlags() {
     return (
         <EmptyState

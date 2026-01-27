@@ -138,6 +138,51 @@ export async function POST(request: Request) {
             recalls
         );
 
+        // 7. Aggregate complaints by component
+        const componentMap = new Map<string, {
+            count: number;
+            hasCrashes: boolean;
+            hasFires: boolean;
+            hasInjuries: boolean;
+            summaries: string[];
+        }>();
+
+        for (const complaint of complaints) {
+            const component = complaint.Component || 'UNKNOWN';
+            const existing = componentMap.get(component) || {
+                count: 0,
+                hasCrashes: false,
+                hasFires: false,
+                hasInjuries: false,
+                summaries: [],
+            };
+
+            existing.count++;
+            existing.hasCrashes = existing.hasCrashes || complaint.Crash;
+            existing.hasFires = existing.hasFires || complaint.Fire;
+            existing.hasInjuries = existing.hasInjuries || (complaint.Injuries > 0);
+
+            // Keep up to 3 sample summaries per component
+            if (existing.summaries.length < 3 && complaint.Summary) {
+                existing.summaries.push(complaint.Summary.slice(0, 200));
+            }
+
+            componentMap.set(component, existing);
+        }
+
+        // Convert to array and sort by count (most complaints first)
+        const componentIssues = Array.from(componentMap.entries())
+            .map(([component, data]) => ({
+                component,
+                count: data.count,
+                hasCrashes: data.hasCrashes,
+                hasFires: data.hasFires,
+                hasInjuries: data.hasInjuries,
+                sampleComplaints: data.summaries,
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10); // Limit to top 10 components
+
         // 8. Response
         return NextResponse.json({
             success: true,
@@ -169,7 +214,7 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             },
-            knownIssues: [], // TODO: Populate from real database
+            componentIssues,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5), // Limit size
             redFlags,
             recommendation: {

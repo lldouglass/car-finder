@@ -54,6 +54,15 @@ export interface Recall {
     date: string;
 }
 
+export interface ComponentIssue {
+    component: string;
+    count: number;
+    hasCrashes: boolean;
+    hasFires: boolean;
+    hasInjuries: boolean;
+    sampleComplaints: string[];
+}
+
 export interface AIConcern {
     issue: string;
     severity: string;
@@ -82,6 +91,7 @@ export interface AnalysisResponse {
     longevity?: Longevity | null;
     pricing?: Pricing | null;
     knownIssues?: string[];
+    componentIssues?: ComponentIssue[];
     recalls?: Recall[];
     redFlags?: RedFlag[];
     aiAnalysis?: AIAnalysis;

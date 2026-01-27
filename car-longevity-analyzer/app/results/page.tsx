@@ -18,6 +18,7 @@ import {
   NoQuestionsGenerated,
   AIAnalysisUnavailable,
   VehicleNotIdentified,
+  NoComponentIssues,
 } from '@/components/empty-states';
 import {
   Car,
@@ -34,8 +35,12 @@ import {
   MessageCircle,
   AlertCircle,
   Info,
+  Wrench,
+  Flame,
+  CarFront,
+  Ambulance,
 } from 'lucide-react';
-import type { RedFlag } from '@/lib/api';
+import type { RedFlag, ComponentIssue } from '@/lib/api';
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
@@ -185,13 +190,14 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis } = result;
+  const { vehicle, scores, longevity, pricing, redFlags, recalls, componentIssues, recommendation, aiAnalysis } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
   const hasPricingData = pricing && pricing.askingPrice !== undefined;
   const hasRedFlags = redFlags && redFlags.length > 0;
   const hasRecalls = recalls && recalls.length > 0;
+  const hasComponentIssues = componentIssues && componentIssues.length > 0;
   const hasQuestions = recommendation?.questionsForSeller && recommendation.questionsForSeller.length > 0;
   const hasAIAnalysis = aiAnalysis && !aiAnalysis.concerns?.some(c => c.issue === 'AI Analysis Unavailable');
 
@@ -490,6 +496,70 @@ function ResultsContent() {
                 </div>
               ) : (
                 <NoRecallsFound />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Component Issues from NHTSA Complaints */}
+          <Card className="mb-6" role="region" aria-labelledby="component-issues-heading">
+            <CardHeader>
+              <CardTitle id="component-issues-heading" className="text-lg flex items-center gap-2">
+                <Wrench className="size-5 text-orange-500" aria-hidden="true" />
+                Component Issues {hasComponentIssues && `(${componentIssues.reduce((sum, c) => sum + c.count, 0)} complaints)`}
+              </CardTitle>
+              <CardDescription>NHTSA complaints reported for this make/model/year</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {hasComponentIssues ? (
+                <div className="space-y-4" role="list" aria-label="List of component issues">
+                  {componentIssues.map((issue, index) => (
+                    <div
+                      key={index}
+                      className="border rounded-lg p-4"
+                      role="listitem"
+                      aria-label={`${issue.component}: ${issue.count} complaints`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{issue.component}</span>
+                          <Badge variant="secondary">{issue.count} {issue.count === 1 ? 'complaint' : 'complaints'}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {issue.hasCrashes && (
+                            <span className="flex items-center gap-1 text-xs text-red-600" title="Crash reported">
+                              <CarFront className="size-3" aria-hidden="true" />
+                              Crash
+                            </span>
+                          )}
+                          {issue.hasFires && (
+                            <span className="flex items-center gap-1 text-xs text-orange-600" title="Fire reported">
+                              <Flame className="size-3" aria-hidden="true" />
+                              Fire
+                            </span>
+                          )}
+                          {issue.hasInjuries && (
+                            <span className="flex items-center gap-1 text-xs text-yellow-600" title="Injury reported">
+                              <Ambulance className="size-3" aria-hidden="true" />
+                              Injury
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {issue.sampleComplaints.length > 0 && (
+                        <div className="space-y-2 mt-3">
+                          <p className="text-xs text-muted-foreground font-medium">Sample complaints:</p>
+                          {issue.sampleComplaints.map((complaint, i) => (
+                            <p key={i} className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                              {complaint}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <NoComponentIssues />
               )}
             </CardContent>
           </Card>
