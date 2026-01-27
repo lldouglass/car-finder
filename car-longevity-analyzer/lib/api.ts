@@ -31,6 +31,30 @@ export interface Longevity {
     estimatedRemainingMiles: number;
     remainingYears: number;
     percentUsed: number;
+    expectedLifespan?: number;
+    baseLifespan?: number;
+}
+
+export interface AppliedFactor {
+    category: string;
+    value: string;
+    multiplier: number;
+    impact: 'positive' | 'negative' | 'neutral';
+}
+
+export interface LifespanAnalysis {
+    baseLifespan: number;
+    adjustedLifespan: number;
+    totalMultiplier: number;
+    appliedFactors: AppliedFactor[];
+    confidence: 'high' | 'medium' | 'low';
+}
+
+export interface ReliabilityAnalysis {
+    baseScore: number;
+    yearAdjustment: number;
+    isYearToAvoid: boolean;
+    inDatabase: boolean;
 }
 
 export interface Pricing {
@@ -89,6 +113,8 @@ export interface AnalysisResponse {
     vehicle?: Vehicle;
     scores?: Scores;
     longevity?: Longevity | null;
+    lifespanAnalysis?: LifespanAnalysis;
+    reliabilityAnalysis?: ReliabilityAnalysis;
     pricing?: Pricing | null;
     knownIssues?: string[];
     componentIssues?: ComponentIssue[];

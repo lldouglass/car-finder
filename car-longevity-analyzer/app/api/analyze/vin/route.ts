@@ -103,13 +103,16 @@ export async function POST(request: Request) {
 
         // 6. Calculate Scores
 
-        // Reliability
-        const reliabilityScore = calculateReliabilityScore(
-            vehicle.make,
-            vehicle.model,
-            vehicle.year,
-            []
-        );
+        // Reliability - calculate breakdown for transparency
+        const reliabilityBaseScore = relData ? relData.baseScore : 5.0;
+        const isYearToAvoid = relData?.yearsToAvoid.includes(vehicle.year) || false;
+        let reliabilityYearAdjustment = 0;
+        if (isYearToAvoid) {
+            reliabilityYearAdjustment = -2.0;
+        } else if (vehicle.year >= 2018) {
+            reliabilityYearAdjustment = 0.5;
+        }
+        const reliabilityScore = Math.max(1, Math.min(10, reliabilityBaseScore + reliabilityYearAdjustment));
 
         // Longevity (using adjusted lifespan)
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
@@ -206,6 +209,12 @@ export async function POST(request: Request) {
                 totalMultiplier: lifespanAnalysis.totalMultiplier,
                 appliedFactors: lifespanAnalysis.appliedFactors,
                 confidence: lifespanAnalysis.confidence,
+            },
+            reliabilityAnalysis: {
+                baseScore: reliabilityBaseScore,
+                yearAdjustment: reliabilityYearAdjustment,
+                isYearToAvoid,
+                inDatabase: !!relData,
             },
             pricing: {
                 askingPrice,

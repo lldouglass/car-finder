@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -39,8 +39,11 @@ import {
   Flame,
   CarFront,
   Ambulance,
+  ChevronDown,
+  ChevronUp,
+  Calculator,
 } from 'lucide-react';
-import type { RedFlag, ComponentIssue } from '@/lib/api';
+import type { RedFlag, ComponentIssue, AppliedFactor, LifespanAnalysis, ReliabilityAnalysis } from '@/lib/api';
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
@@ -52,29 +55,64 @@ function formatCurrency(num: number | null | undefined): string {
   return `$${num.toLocaleString()}`;
 }
 
-function ScoreDisplay({ score, label, description }: { score: number | null; label: string; description?: string }) {
+function getScoreColor(s: number) {
+  if (s >= 7) return 'text-green-600 dark:text-green-400';
+  if (s >= 5) return 'text-yellow-600 dark:text-yellow-400';
+  return 'text-red-600 dark:text-red-400';
+}
+
+interface ScoreCardProps {
+  score: number | null;
+  label: string;
+  icon: React.ReactNode;
+  children?: React.ReactNode;
+}
+
+function ScoreCard({ score, label, icon, children }: ScoreCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const scoreValue = score?.toFixed(1) ?? '--';
-  const getColor = (s: number) => {
-    if (s >= 7) return 'text-green-600 dark:text-green-400';
-    if (s >= 5) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
-  };
 
   return (
-    <div
-      className="text-center"
-      role="meter"
-      aria-valuenow={score ?? undefined}
-      aria-valuemin={0}
-      aria-valuemax={10}
-      aria-label={`${label} score: ${scoreValue} out of 10`}
-    >
-      <div className={`text-3xl font-bold ${score !== null ? getColor(score) : 'text-muted-foreground'}`}>
-        {scoreValue}
-      </div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      {description && <div className="sr-only">{description}</div>}
-    </div>
+    <Card className="overflow-hidden">
+      <CardContent className="pt-6 pb-4">
+        <div className="flex items-center justify-center mb-2" aria-hidden="true">
+          {icon}
+        </div>
+        <div
+          className="text-center"
+          role="meter"
+          aria-valuenow={score ?? undefined}
+          aria-valuemin={0}
+          aria-valuemax={10}
+          aria-label={`${label} score: ${scoreValue} out of 10`}
+        >
+          <div className={`text-3xl font-bold ${score !== null ? getScoreColor(score) : 'text-muted-foreground'}`}>
+            {scoreValue}
+          </div>
+          <div className="text-sm font-medium text-foreground">{label}</div>
+        </div>
+
+        {children && (
+          <>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="w-full mt-3 flex items-center justify-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
+              aria-expanded={isExpanded}
+            >
+              <Calculator className="size-3" />
+              {isExpanded ? 'Hide calculation' : 'How calculated?'}
+              {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+            </button>
+
+            {isExpanded && (
+              <div className="mt-3 pt-3 border-t text-xs space-y-2">
+                {children}
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -190,7 +228,7 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, pricing, redFlags, recalls, componentIssues, recommendation, aiAnalysis } = result;
+  const { vehicle, scores, longevity, lifespanAnalysis, reliabilityAnalysis, pricing, redFlags, recalls, componentIssues, recommendation, aiAnalysis } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
@@ -213,11 +251,10 @@ function ResultsContent() {
         </a>
 
         {/* Header */}
-        <nav className="flex items-center justify-between mb-6" aria-label="Results navigation">
+        <nav className="flex items-center mb-6" aria-label="Results navigation">
           <Link href="/">
-            <Button variant="ghost" size="sm" aria-label="Go back and analyze a new vehicle">
-              <ArrowLeft className="size-4 mr-2" aria-hidden="true" />
-              New Analysis
+            <Button variant="ghost" size="icon" aria-label="Go back to home">
+              <ArrowLeft className="size-5" aria-hidden="true" />
             </Button>
           </Link>
         </nav>
@@ -263,55 +300,168 @@ function ResultsContent() {
           {/* Scores Grid */}
           <section aria-labelledby="scores-heading" className="mb-6">
             <h2 id="scores-heading" className="sr-only">Vehicle Scores</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4" role="list">
-              <Card role="listitem">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <Target className="size-5 text-muted-foreground" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Overall Score */}
+              <ScoreCard
+                score={scores?.overall ?? null}
+                label="Overall"
+                icon={<Target className="size-5 text-muted-foreground" />}
+              >
+                <div className="space-y-1.5">
+                  <div className="font-medium text-foreground">Weighted Average:</div>
+                  <div className="flex justify-between">
+                    <span>Reliability (35%)</span>
+                    <span className="font-mono">{((scores?.reliability ?? 0) * 0.35).toFixed(2)}</span>
                   </div>
-                  <ScoreDisplay
-                    score={scores?.overall ?? null}
-                    label="Overall"
-                    description="Combined score based on reliability, longevity, and value"
-                  />
-                </CardContent>
-              </Card>
-              <Card role="listitem">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <Shield className="size-5 text-muted-foreground" />
+                  <div className="flex justify-between">
+                    <span>Longevity (35%)</span>
+                    <span className="font-mono">{((scores?.longevity ?? 0) * 0.35).toFixed(2)}</span>
                   </div>
-                  <ScoreDisplay
-                    score={scores?.reliability ?? null}
-                    label="Reliability"
-                    description="Based on historical data for this make and model"
-                  />
-                </CardContent>
-              </Card>
-              <Card role="listitem">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <Clock className="size-5 text-muted-foreground" />
+                  <div className="flex justify-between">
+                    <span>Value (30%)</span>
+                    <span className="font-mono">{((scores?.priceValue ?? 0) * 0.30).toFixed(2)}</span>
                   </div>
-                  <ScoreDisplay
-                    score={scores?.longevity ?? null}
-                    label="Longevity"
-                    description="Estimated remaining useful life"
-                  />
-                </CardContent>
-              </Card>
-              <Card role="listitem">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <DollarSign className="size-5 text-muted-foreground" />
+                  {redFlags && redFlags.length > 0 && (
+                    <div className="flex justify-between text-red-600">
+                      <span>Red flag penalty</span>
+                      <span>−{redFlags.reduce((sum, f) => {
+                        const sev = f.severity?.toLowerCase();
+                        if (sev === 'critical') return sum + 5.0;
+                        if (sev === 'high') return sum + 1.0;
+                        if (sev === 'medium') return sum + 0.5;
+                        return sum + 0.25;
+                      }, 0).toFixed(1)}</span>
+                    </div>
+                  )}
+                  <div className="pt-1.5 border-t mt-1.5">
+                    <div className="text-muted-foreground">
+                      BUY ≥7.5 · MAYBE ≥5.0 · PASS &lt;5.0
+                    </div>
                   </div>
-                  <ScoreDisplay
-                    score={scores?.priceValue ?? null}
-                    label="Value"
-                    description="Price compared to fair market value"
-                  />
-                </CardContent>
-              </Card>
+                </div>
+              </ScoreCard>
+
+              {/* Reliability Score */}
+              <ScoreCard
+                score={scores?.reliability ?? null}
+                label="Reliability"
+                icon={<Shield className="size-5 text-muted-foreground" />}
+              >
+                <div className="space-y-1.5">
+                  {reliabilityAnalysis ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Base score</span>
+                        <span className="font-mono">{reliabilityAnalysis.baseScore.toFixed(1)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Year adjustment</span>
+                        <span className={`font-mono ${reliabilityAnalysis.yearAdjustment >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {reliabilityAnalysis.yearAdjustment >= 0 ? '+' : ''}{reliabilityAnalysis.yearAdjustment.toFixed(1)}
+                        </span>
+                      </div>
+                      {reliabilityAnalysis.isYearToAvoid && (
+                        <div className="text-red-600 flex items-center gap-1 mt-1">
+                          <AlertTriangle className="size-3" />
+                          Known problem year
+                        </div>
+                      )}
+                      {!reliabilityAnalysis.inDatabase && (
+                        <div className="text-muted-foreground mt-1">
+                          Vehicle not in database, using default score
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-muted-foreground">
+                      Based on {vehicle?.make} {vehicle?.model} historical data
+                    </div>
+                  )}
+                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
+                    Weight: 35% of overall
+                  </div>
+                </div>
+              </ScoreCard>
+
+              {/* Longevity Score */}
+              <ScoreCard
+                score={scores?.longevity ?? null}
+                label="Longevity"
+                icon={<Clock className="size-5 text-muted-foreground" />}
+              >
+                <div className="space-y-1.5">
+                  {lifespanAnalysis ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Base lifespan</span>
+                        <span className="font-mono">{formatNumber(lifespanAnalysis.baseLifespan)} mi</span>
+                      </div>
+                      {lifespanAnalysis.appliedFactors.length > 0 && (
+                        <>
+                          <div className="font-medium text-foreground mt-2">Adjustments:</div>
+                          {lifespanAnalysis.appliedFactors.slice(0, 4).map((factor, i) => (
+                            <div key={i} className="flex justify-between">
+                              <span className="truncate pr-2">{factor.value}</span>
+                              <span className={`font-mono ${factor.impact === 'positive' ? 'text-green-600' : factor.impact === 'negative' ? 'text-red-600' : ''}`}>
+                                {factor.multiplier > 1 ? '+' : ''}{((factor.multiplier - 1) * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          ))}
+                          {lifespanAnalysis.appliedFactors.length > 4 && (
+                            <div className="text-muted-foreground">+{lifespanAnalysis.appliedFactors.length - 4} more factors</div>
+                          )}
+                        </>
+                      )}
+                      <div className="flex justify-between font-medium pt-1.5 border-t mt-1.5">
+                        <span>Adjusted</span>
+                        <span className="font-mono">{formatNumber(lifespanAnalysis.adjustedLifespan)} mi</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-muted-foreground">
+                      Based on remaining useful life
+                    </div>
+                  )}
+                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
+                    Weight: 35% of overall
+                  </div>
+                </div>
+              </ScoreCard>
+
+              {/* Value Score */}
+              <ScoreCard
+                score={scores?.priceValue ?? null}
+                label="Value"
+                icon={<DollarSign className="size-5 text-muted-foreground" />}
+              >
+                <div className="space-y-1.5">
+                  {pricing ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Asking</span>
+                        <span className="font-mono">{formatCurrency(pricing.askingPrice)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Fair range</span>
+                        <span className="font-mono text-[10px]">{formatCurrency(pricing.fairPriceLow)}-{formatCurrency(pricing.fairPriceHigh)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Deal quality</span>
+                        <Badge variant={pricing.dealQuality === 'GREAT' || pricing.dealQuality === 'GOOD' ? 'default' : pricing.dealQuality === 'FAIR' ? 'secondary' : 'destructive'} className="text-[10px]">
+                          {pricing.dealQuality}
+                        </Badge>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-muted-foreground">
+                      Price vs fair market value
+                    </div>
+                  )}
+                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
+                    Weight: 30% of overall
+                  </div>
+                </div>
+              </ScoreCard>
             </div>
           </section>
 
