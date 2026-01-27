@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { decodeVin, getRecalls, getComplaints } from '@/lib/nhtsa';
+import { decodeVin, getRecalls, getComplaints, getSafetyRatings } from '@/lib/nhtsa';
 import {
     calculateReliabilityScore,
+    calculateReliabilityFromComplaints,
+    identifyComponentIssues,
     calculateLongevityScore,
     calculatePriceScore,
     calculateOverallScore
@@ -12,6 +14,7 @@ import {
     detectPriceAnomaly,
     generateQuestionsForSeller
 } from '@/lib/red-flags';
+import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
 import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
@@ -65,14 +68,16 @@ export async function POST(request: Request) {
         }
 
         // 3. Fetch Data (Parallel) - Use allSettled for graceful degradation
-        const [recallsResult, complaintsResult] = await Promise.allSettled([
+        const [recallsResult, complaintsResult, safetyRatingsResult] = await Promise.allSettled([
             getRecalls(vehicle.make, vehicle.model, vehicle.year),
-            getComplaints(vehicle.make, vehicle.model, vehicle.year)
+            getComplaints(vehicle.make, vehicle.model, vehicle.year),
+            getSafetyRatings(vehicle.make, vehicle.model, vehicle.year)
         ]);
 
         // Extract results with fallbacks
         const recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
         const complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
+        const safetyRatings = safetyRatingsResult.status === 'fulfilled' ? safetyRatingsResult.value : null;
 
         // Log if any fetch failed but continue with partial data
         if (recallsResult.status === 'rejected') {
@@ -80,6 +85,9 @@ export async function POST(request: Request) {
         }
         if (complaintsResult.status === 'rejected') {
             console.warn('Failed to fetch complaints:', complaintsResult.reason);
+        }
+        if (safetyRatingsResult.status === 'rejected') {
+            console.warn('Failed to fetch safety ratings:', safetyRatingsResult.reason);
         }
 
         // 4. Look up Reliability Data
@@ -103,13 +111,24 @@ export async function POST(request: Request) {
 
         // 6. Calculate Scores
 
-        // Reliability
-        const reliabilityScore = calculateReliabilityScore(
+        // Reliability - use NHTSA complaint data for dynamic scoring
+        // Get static base score as fallback
+        const staticReliabilityScore = calculateReliabilityScore(
             vehicle.make,
             vehicle.model,
             vehicle.year,
             []
         );
+
+        // Calculate dynamic score from complaints
+        const reliabilityScore = calculateReliabilityFromComplaints(
+            complaints,
+            vehicle.year,
+            staticReliabilityScore
+        );
+
+        // Identify component-specific issues from complaints
+        const componentIssues = identifyComponentIssues(complaints);
 
         // Longevity (using adjusted lifespan)
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
@@ -118,17 +137,25 @@ export async function POST(request: Request) {
         const priceEstimate = estimateFairPrice(vehicle.make, vehicle.model, vehicle.year, mileage);
         const priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
 
+        // Safety
+        const safetyResult = calculateSafetyScore(safetyRatings, complaints, vehicle.year);
+
         // Red Flags
         const redFlags = listingText ? detectRedFlags(listingText) : [];
         const priceRedFlag = detectPriceAnomaly(askingPrice, priceEstimate.low, priceEstimate.high);
         if (priceRedFlag) redFlags.push(priceRedFlag);
 
-        // Overall
+        // Safety red flags
+        const safetyRedFlags = detectSafetyRedFlags(safetyResult, complaints);
+        redFlags.push(...safetyRedFlags);
+
+        // Overall (now includes safety)
         const overallResult = calculateOverallScore(
             reliabilityScore,
             longevityResult.score,
             priceResult.score,
-            redFlags
+            redFlags,
+            safetyResult.score
         );
 
         // 6. Generate Questions
@@ -146,6 +173,7 @@ export async function POST(request: Request) {
                 reliability: reliabilityScore,
                 longevity: longevityResult.score,
                 priceValue: priceResult.score,
+                safety: safetyResult.score,
                 overall: overallResult.score
             },
             longevity: {
@@ -169,7 +197,14 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             },
-            knownIssues: [], // TODO: Populate from real database
+            safety: {
+                score: safetyResult.score,
+                breakdown: safetyResult.breakdown,
+                confidence: safetyResult.confidence,
+                hasCrashTestData: safetyResult.hasCrashTestData,
+            },
+            knownIssues: componentIssues.map(issue => issue.description),
+            componentIssues, // Detailed component issue breakdown from NHTSA
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5), // Limit size
             redFlags,
             recommendation: {

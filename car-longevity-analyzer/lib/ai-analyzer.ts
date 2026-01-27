@@ -50,6 +50,20 @@ export interface Concern {
     explanation: string;
 }
 
+export interface InconsistencyFlag {
+    type: 'mileage_age' | 'price_condition' | 'usage_wear' | 'owner_age' | 'description_conflict';
+    description: string;
+    severity: 'low' | 'medium' | 'high';
+    details: string;
+}
+
+export interface SuspiciousPattern {
+    type: 'vague_damage' | 'pressure_tactics' | 'deflection' | 'missing_info' | 'defensive_language' | 'too_good';
+    phrase: string;
+    explanation: string;
+    severity: 'low' | 'medium' | 'high';
+}
+
 export interface AccidentHistoryInfo {
     hasAccident: boolean;
     severity?: 'minor' | 'moderate' | 'severe';
@@ -69,6 +83,8 @@ export interface LifespanFactorsExtracted {
 export interface AIAnalysisResult {
     extractedVehicle: ExtractedVehicle | null;
     concerns: Concern[];
+    inconsistencies: InconsistencyFlag[];
+    suspiciousPatterns: SuspiciousPattern[];
     trustworthinessScore: number;
     suggestedQuestions: string[];
     overallImpression: string;
@@ -97,7 +113,7 @@ export async function analyzeListingWithAI(
     }
 
     const prompt = `
-Analyze this used car listing and extract information:
+Analyze this used car listing for information extraction AND potential deception/inconsistencies:
 
 LISTING:
 ${cleanListing}
@@ -105,20 +121,53 @@ ${cleanListing}
 ${vehicleInfo ? `Known Context: ${vehicleInfo.year} ${vehicleInfo.make} ${vehicleInfo.model}` : ''}
 
 Return a JSON object with:
-- extractedVehicle: { year, make, model, mileage, price } (null if not found)
-- concerns: [{ issue: string, severity: "low"|"medium"|"high", explanation: string }]
-- trustworthinessScore: number (1-10)
-- suggestedQuestions: string[]
-- overallImpression: string (2-3 sentences)
-- lifespanFactors: {
-    maintenanceQuality: "excellent"|"good"|"average"|"poor"|null (look for: "full service history", "dealer maintained", "timing belt done", "all records", "meticulous", "neglected", "needs work"),
-    maintenanceIndicators: string[] (list specific maintenance mentions like "new timing belt", "recent brakes", "oil changes documented"),
-    ownerCount: number|null (look for: "one owner", "single owner", "2nd owner", "3 owners"),
-    accidentHistory: { hasAccident: boolean, severity: "minor"|"moderate"|"severe"|null, details: string|null } (look for: "clean title", "no accidents", "clean carfax", "minor fender bender", "rebuilt title", "frame damage"),
-    usagePattern: "highway"|"city"|"mixed"|"severe"|null (look for: "highway miles", "mostly highway", "city driven", "commuter car", "used for towing", "work truck", "garage queen"),
-    conditionIndicators: string[] (list condition mentions like "rust free", "garage kept", "southern car", "no rust", "needs bodywork"),
-    estimatedCondition: "excellent"|"good"|"fair"|"poor"|null (overall condition assessment)
+
+1. extractedVehicle: { year, make, model, mileage, price } (null if not found)
+
+2. concerns: [{ issue: string, severity: "low"|"medium"|"high", explanation: string }]
+
+3. inconsistencies: Check for logical contradictions and flag them:
+   [{ type: "mileage_age"|"price_condition"|"usage_wear"|"owner_age"|"description_conflict",
+      description: string,
+      severity: "low"|"medium"|"high",
+      details: string }]
+   Examples to check:
+   - mileage_age: A 2015 daily driver with only 20k miles is suspicious
+   - price_condition: "Perfect condition" but priced 40% below market suggests hidden issues
+   - usage_wear: "Highway miles only" but mentions high brake wear doesn't add up
+   - owner_age: "One owner" on a 15+ year old vehicle may need verification
+   - description_conflict: Contradicting statements within the listing
+
+4. suspiciousPatterns: Look for deceptive language patterns:
+   [{ type: "vague_damage"|"pressure_tactics"|"deflection"|"missing_info"|"defensive_language"|"too_good",
+      phrase: string (quote from listing),
+      explanation: string,
+      severity: "low"|"medium"|"high" }]
+   Patterns to detect:
+   - vague_damage: "minor cosmetic issue", "small scratch", "tiny dent" (minimizing language)
+   - pressure_tactics: "must sell today", "first come first served", "won't last", "serious buyers only"
+   - deflection: "runs great for its age", "just needs...", "easy fix"
+   - missing_info: Important details conspicuously absent (no mention of service history, accidents when asked)
+   - defensive_language: "nothing wrong with it", "don't lowball me", "I know what I have"
+   - too_good: Claims that seem unrealistically positive
+
+5. trustworthinessScore: number 1-10 (penalize for inconsistencies and suspicious patterns)
+
+6. suggestedQuestions: string[] (specific questions to verify suspicious items)
+
+7. overallImpression: string (2-3 sentences including any red flags found)
+
+8. lifespanFactors: {
+    maintenanceQuality: "excellent"|"good"|"average"|"poor"|null,
+    maintenanceIndicators: string[],
+    ownerCount: number|null,
+    accidentHistory: { hasAccident: boolean, severity: "minor"|"moderate"|"severe"|null, details: string|null },
+    usagePattern: "highway"|"city"|"mixed"|"severe"|null,
+    conditionIndicators: string[],
+    estimatedCondition: "excellent"|"good"|"fair"|"poor"|null
 }
+
+Be skeptical but fair. Flag genuine concerns but don't be paranoid about normal listings.
 
 Output PURE JSON ONLY. No markdown blocks.
 `;
@@ -150,10 +199,12 @@ Output PURE JSON ONLY. No markdown blocks.
         // Attempt parse
         try {
             const result = JSON.parse(jsonString) as AIAnalysisResult;
-            // Ensure lifespanFactors has default values if AI didn't return it
+            // Ensure all fields have default values if AI didn't return them
             const lifespanFactors = result.lifespanFactors || getDefaultLifespanFactors();
             return {
                 ...result,
+                inconsistencies: result.inconsistencies || [],
+                suspiciousPatterns: result.suspiciousPatterns || [],
                 lifespanFactors: {
                     ...getDefaultLifespanFactors(),
                     ...lifespanFactors,
@@ -192,6 +243,8 @@ function getFallbackAnalysis(rawResponse?: string): AIAnalysisResult {
             severity: 'low',
             explanation: 'Could not perform advanced AI analysis at this time. Relying on basic checks.'
         }],
+        inconsistencies: [],
+        suspiciousPatterns: [],
         trustworthinessScore: 5,
         suggestedQuestions: ['Can you provide more details about the condition?'],
         overallImpression: 'Unable to generate detailed impression. Please review listing manually.',
