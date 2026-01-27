@@ -63,3 +63,8 @@ ehthumbs.db
 ._*
 .Spotlight-V100
 .Trashes
+
+# Temporary test/build output
+build-output.txt
+test-output.txt
+test-safety.js
