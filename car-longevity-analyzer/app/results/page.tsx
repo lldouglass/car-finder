@@ -19,6 +19,9 @@ import {
   AIAnalysisUnavailable,
   VehicleNotIdentified,
 } from '@/components/empty-states';
+import { SafetyRatingsDisplay, NoSafetyRatings } from '@/components/safety-ratings-display';
+import { KnownIssuesDisplay } from '@/components/known-issues-display';
+import { LifespanFactorsDisplay } from '@/components/lifespan-factors-display';
 import {
   Car,
   ArrowLeft,
@@ -34,6 +37,8 @@ import {
   MessageCircle,
   AlertCircle,
   Info,
+  Wrench,
+  Activity,
 } from 'lucide-react';
 import type { RedFlag } from '@/lib/api';
 
@@ -133,7 +138,7 @@ function DealQualityBadge({ quality }: { quality: string }) {
   );
 }
 
-function RedFlagItem({ flag, index }: { flag: RedFlag; index: number }) {
+function RedFlagItem({ flag }: { flag: RedFlag }) {
   const severityColors: Record<string, string> = {
     critical: 'border-red-500 bg-red-50 dark:bg-red-950',
     high: 'border-orange-500 bg-orange-50 dark:bg-orange-950',
@@ -185,7 +190,7 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis } = result;
+  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis, safetyRating, knownIssues, lifespanAnalysis } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
@@ -194,6 +199,8 @@ function ResultsContent() {
   const hasRecalls = recalls && recalls.length > 0;
   const hasQuestions = recommendation?.questionsForSeller && recommendation.questionsForSeller.length > 0;
   const hasAIAnalysis = aiAnalysis && !aiAnalysis.concerns?.some(c => c.issue === 'AI Analysis Unavailable');
+  const hasKnownIssues = knownIssues && knownIssues.length > 0;
+  const hasLifespanAnalysis = lifespanAnalysis && lifespanAnalysis.appliedFactors;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
@@ -404,6 +411,57 @@ function ResultsContent() {
             </Card>
           </div>
 
+          {/* Safety Ratings & Known Issues Grid */}
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Safety Ratings */}
+            <Card role="region" aria-labelledby="safety-heading">
+              <CardHeader>
+                <CardTitle id="safety-heading" className="text-lg flex items-center gap-2">
+                  <Shield className="size-5 text-blue-500" aria-hidden="true" />
+                  Safety Ratings
+                </CardTitle>
+                <CardDescription>NHTSA crash test results</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {safetyRating ? (
+                  <SafetyRatingsDisplay safetyRating={safetyRating} />
+                ) : (
+                  <NoSafetyRatings />
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Known Issues */}
+            <Card role="region" aria-labelledby="issues-heading">
+              <CardHeader>
+                <CardTitle id="issues-heading" className="text-lg flex items-center gap-2">
+                  <Wrench className="size-5 text-orange-500" aria-hidden="true" />
+                  Known Issues {hasKnownIssues && `(${knownIssues.length})`}
+                </CardTitle>
+                <CardDescription>Common problems from NHTSA complaints</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <KnownIssuesDisplay issues={knownIssues || []} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lifespan Factors */}
+          {hasLifespanAnalysis && (
+            <Card className="mb-6" role="region" aria-labelledby="lifespan-factors-heading">
+              <CardHeader>
+                <CardTitle id="lifespan-factors-heading" className="text-lg flex items-center gap-2">
+                  <Activity className="size-5 text-purple-500" aria-hidden="true" />
+                  Lifespan Analysis
+                </CardTitle>
+                <CardDescription>How vehicle factors affect expected lifespan</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LifespanFactorsDisplay lifespanAnalysis={lifespanAnalysis} />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Red Flags */}
           <Card className="mb-6" role="region" aria-labelledby="redflags-heading">
             <CardHeader>
@@ -417,7 +475,7 @@ function ResultsContent() {
               {hasRedFlags ? (
                 <div className="space-y-3" role="list" aria-label="List of red flags">
                   {redFlags.map((flag, index) => (
-                    <RedFlagItem key={index} flag={flag} index={index} />
+                    <RedFlagItem key={index} flag={flag} />
                   ))}
                 </div>
               ) : (

@@ -73,6 +73,41 @@ export interface Recommendation {
     questionsForSeller: string[];
 }
 
+// Safety Ratings from NHTSA crash tests
+export interface SafetyRating {
+    overallRating: string;
+    frontalCrashRating: string;
+    sideCrashRating: string;
+    rolloverRating: string;
+    complaintsCount: number;
+    recallsCount: number;
+}
+
+// Known issues derived from NHTSA complaints
+export interface KnownIssue {
+    component: string;
+    severity: 'MINOR' | 'MODERATE' | 'MAJOR' | 'CRITICAL';
+    complaintCount: number;
+    description: string;
+    hasSafetyIncidents: boolean;
+}
+
+// Lifespan adjustment factors for display
+export interface AppliedFactor {
+    category: string;
+    value: string;
+    multiplier: number;
+    impact: 'positive' | 'negative' | 'neutral';
+}
+
+export interface LifespanAnalysis {
+    baseLifespan: number;
+    adjustedLifespan: number;
+    totalMultiplier: number;
+    appliedFactors: AppliedFactor[];
+    confidence: 'high' | 'medium' | 'low';
+}
+
 export interface AnalysisResponse {
     success: boolean;
     error?: string;
@@ -81,11 +116,13 @@ export interface AnalysisResponse {
     scores?: Scores;
     longevity?: Longevity | null;
     pricing?: Pricing | null;
-    knownIssues?: string[];
+    knownIssues?: KnownIssue[];
     recalls?: Recall[];
     redFlags?: RedFlag[];
     aiAnalysis?: AIAnalysis;
     recommendation?: Recommendation;
+    safetyRating?: SafetyRating | null;
+    lifespanAnalysis?: LifespanAnalysis;
 }
 
 export class APIError extends Error {

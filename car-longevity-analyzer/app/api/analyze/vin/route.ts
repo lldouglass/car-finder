@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { decodeVin, getRecalls, getComplaints } from '@/lib/nhtsa';
+import { decodeVin, getRecalls, getComplaints, getSafetyRatings } from '@/lib/nhtsa';
 import {
-    calculateReliabilityScore,
     calculateLongevityScore,
     calculatePriceScore,
     calculateOverallScore
 } from '@/lib/scoring';
+import { calculateDynamicReliability } from '@/lib/dynamic-reliability';
 import {
     detectRedFlags,
     detectPriceAnomaly,
@@ -18,6 +18,7 @@ import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
 import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-factors';
 import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
+import { extractKnownIssues } from '@/lib/complaint-analyzer';
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
@@ -65,14 +66,16 @@ export async function POST(request: Request) {
         }
 
         // 3. Fetch Data (Parallel) - Use allSettled for graceful degradation
-        const [recallsResult, complaintsResult] = await Promise.allSettled([
+        const [recallsResult, complaintsResult, safetyResult] = await Promise.allSettled([
             getRecalls(vehicle.make, vehicle.model, vehicle.year),
-            getComplaints(vehicle.make, vehicle.model, vehicle.year)
+            getComplaints(vehicle.make, vehicle.model, vehicle.year),
+            getSafetyRatings(vehicle.make, vehicle.model, vehicle.year)
         ]);
 
         // Extract results with fallbacks
         const recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
         const complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
+        const safetyRatingData = safetyResult.status === 'fulfilled' ? safetyResult.value : null;
 
         // Log if any fetch failed but continue with partial data
         if (recallsResult.status === 'rejected') {
@@ -80,6 +83,9 @@ export async function POST(request: Request) {
         }
         if (complaintsResult.status === 'rejected') {
             console.warn('Failed to fetch complaints:', complaintsResult.reason);
+        }
+        if (safetyResult.status === 'rejected') {
+            console.warn('Failed to fetch safety ratings:', safetyResult.reason);
         }
 
         // 4. Look up Reliability Data
@@ -103,13 +109,15 @@ export async function POST(request: Request) {
 
         // 6. Calculate Scores
 
-        // Reliability
-        const reliabilityScore = calculateReliabilityScore(
+        // Reliability (using dynamic calculation with NHTSA data)
+        const reliabilityResult = calculateDynamicReliability(
             vehicle.make,
             vehicle.model,
             vehicle.year,
-            []
+            complaints,
+            safetyRatingData
         );
+        const reliabilityScore = reliabilityResult.score;
 
         // Longevity (using adjusted lifespan)
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
@@ -169,9 +177,17 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             },
-            knownIssues: [], // TODO: Populate from real database
+            knownIssues: extractKnownIssues(complaints),
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5), // Limit size
             redFlags,
+            safetyRating: safetyRatingData ? {
+                overallRating: safetyRatingData.OverallRating,
+                frontalCrashRating: safetyRatingData.FrontalCrashRating,
+                sideCrashRating: safetyRatingData.SideCrashRating,
+                rolloverRating: safetyRatingData.RolloverRating,
+                complaintsCount: safetyRatingData.ComplaintsCount,
+                recallsCount: safetyRatingData.RecallsCount,
+            } : null,
             recommendation: {
                 verdict: overallResult.recommendation,
                 confidence: overallResult.confidence,
