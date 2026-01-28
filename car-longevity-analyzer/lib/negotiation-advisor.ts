@@ -296,6 +296,12 @@ export function generateNegotiationStrategy(
     mileage: number,
     year: number
 ): NegotiationStrategy {
+    const fairMid = (fairPriceLow + fairPriceHigh) / 2;
+
+    // Check if asking price is already a good deal
+    const isGoodDeal = askingPrice <= fairPriceLow;
+    const isFairDeal = askingPrice <= fairMid;
+
     // Generate all negotiation points
     const allPoints: NegotiationPoint[] = [
         ...generatePricePoints(askingPrice, fairPriceLow, fairPriceHigh),
@@ -312,39 +318,58 @@ export function generateNegotiationStrategy(
     // Calculate total suggested reduction
     const totalReduction = allPoints.reduce((sum, p) => sum + p.suggestedReduction, 0);
 
-    // Determine suggested offer (don't go below fair price low)
-    const suggestedOffer = Math.max(
-        fairPriceLow * 0.95, // Floor at 95% of fair low
-        askingPrice - totalReduction
-    );
-
-    // Walk-away price should be slightly above suggested offer
-    const walkAwayPrice = Math.round(suggestedOffer + (askingPrice - suggestedOffer) * 0.3);
-
-    // Determine overall leverage
-    const strongPoints = allPoints.filter(p => p.leverage === 'strong').length;
-    const moderatePoints = allPoints.filter(p => p.leverage === 'moderate').length;
-
+    let suggestedOffer: number;
+    let walkAwayPrice: number;
     let overallLeverage: 'strong' | 'moderate' | 'weak' | 'none';
-    if (strongPoints >= 2 || (strongPoints === 1 && moderatePoints >= 2)) {
-        overallLeverage = 'strong';
-    } else if (strongPoints === 1 || moderatePoints >= 2) {
-        overallLeverage = 'moderate';
-    } else if (moderatePoints === 1 || allPoints.length > 0) {
-        overallLeverage = 'weak';
-    } else {
-        overallLeverage = 'none';
-    }
+    let openingStatement: string;
 
-    // Generate opening statement
-    const strongestPoint = allPoints.find(p => p.leverage === 'strong') || allPoints[0];
-    const openingStatement = generateOpeningStatement(askingPrice, suggestedOffer, strongestPoint);
+    if (isGoodDeal) {
+        // Price is already below fair value - don't suggest MORE than asking
+        suggestedOffer = askingPrice;
+        walkAwayPrice = Math.round(askingPrice * 1.05); // Walk away if they raise price
+        overallLeverage = 'none';
+        openingStatement = `This is already priced below market value at $${askingPrice.toLocaleString()}. Consider making a quick, clean offer at asking price to secure the deal before someone else does.`;
+    } else if (isFairDeal) {
+        // Price is fair but not a steal - modest negotiation
+        suggestedOffer = Math.max(askingPrice * 0.95, fairPriceLow);
+        walkAwayPrice = Math.round(askingPrice * 1.02);
+        overallLeverage = 'weak';
+        openingStatement = `The price is fair. You might get a small discount by offering $${Math.round(suggestedOffer).toLocaleString()}, but don't push too hard or you may lose the deal.`;
+    } else {
+        // Price is above fair value - normal negotiation
+        suggestedOffer = Math.max(
+            fairPriceLow * 0.95, // Floor at 95% of fair low
+            askingPrice - totalReduction
+        );
+        // Cap suggested offer at asking price (never suggest more)
+        suggestedOffer = Math.min(suggestedOffer, askingPrice);
+
+        walkAwayPrice = Math.round(suggestedOffer + (askingPrice - suggestedOffer) * 0.3);
+
+        // Determine overall leverage
+        const strongPoints = allPoints.filter(p => p.leverage === 'strong').length;
+        const moderatePoints = allPoints.filter(p => p.leverage === 'moderate').length;
+
+        if (strongPoints >= 2 || (strongPoints === 1 && moderatePoints >= 2)) {
+            overallLeverage = 'strong';
+        } else if (strongPoints === 1 || moderatePoints >= 2) {
+            overallLeverage = 'moderate';
+        } else if (moderatePoints === 1 || allPoints.length > 0) {
+            overallLeverage = 'weak';
+        } else {
+            overallLeverage = 'none';
+        }
+
+        // Generate opening statement
+        const strongestPoint = allPoints.find(p => p.leverage === 'strong') || allPoints[0];
+        openingStatement = generateOpeningStatement(askingPrice, suggestedOffer, strongestPoint);
+    }
 
     return {
         overallLeverage,
         suggestedOffer: Math.round(suggestedOffer),
         walkAwayPrice: Math.round(walkAwayPrice),
-        points: allPoints.slice(0, 6), // Return top 6 points
+        points: isGoodDeal ? [] : allPoints.slice(0, 6), // No points needed for good deals
         openingStatement,
         closingTactics: generateClosingTactics(overallLeverage),
         warningsForBuyer: generateWarnings(redFlags)

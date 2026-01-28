@@ -226,25 +226,71 @@ export function calculateWarrantyValue(
 export function detectWarrantyFromListing(listingText: string): WarrantyInfo {
     const text = listingText.toLowerCase();
 
+    // Try to extract remaining warranty time/miles first (for more specific info)
+    // Patterns like: "24 months / 21,000 miles", "remaining: 24 months", "21,000 miles remaining"
+    const monthsPatterns = [
+        /(\d+)\s*months?\s*[\/&,]\s*[\d,]+\s*miles/i,                    // "24 months / 21,000 miles"
+        /remaining[:\s]+(\d+)\s*months?/i,                               // "remaining: 24 months"
+        /(\d+)\s*months?\s*(of\s*)?(warranty|remaining|left|coverage)/i, // "24 months warranty"
+        /warranty[:\s]+(\d+)\s*months?/i,                                // "warranty: 24 months"
+    ];
+
+    const milesPatterns = [
+        /(\d{1,3},?\d{3})\s*miles?\s*(of\s*)?(warranty|remaining|left|coverage)/i,  // "21,000 miles remaining"
+        /remaining[:\s]+[\d,]+\s*months?\s*[\/&,]\s*(\d{1,3},?\d{3})\s*miles/i,     // "remaining: 24 months / 21,000 miles"
+        /(\d{1,3},?\d{3})\s*miles?\s*[\/&,]\s*\d+\s*months?/i,                       // "21,000 miles / 24 months"
+        /warranty[:\s]+(\d{1,3},?\d{3})\s*miles?/i,                                  // "warranty: 21,000 miles"
+    ];
+
+    let monthsRemaining: number | undefined;
+    let milesRemaining: number | undefined;
+
+    for (const pattern of monthsPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+            monthsRemaining = parseInt(match[1]);
+            break;
+        }
+    }
+
+    for (const pattern of milesPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+            milesRemaining = parseInt(match[1].replace(/,/g, ''));
+            break;
+        }
+    }
+
     // CPO detection
     if (/certified\s*pre[\s-]*owned|cpo\b/i.test(text)) {
-        return { type: 'cpo' };
+        return { type: 'cpo', monthsRemaining, milesRemaining };
+    }
+
+    // Full factory warranty detection (bumper-to-bumper)
+    if (/bumper[\s-]*to[\s-]*bumper|full\s*coverage|comprehensive\s*warranty/i.test(text)) {
+        return { type: 'factory_full', monthsRemaining, milesRemaining };
     }
 
     // Factory warranty detection
-    if (/factory\s*warranty|manufacturer'?s?\s*warranty|original\s*warranty/i.test(text)) {
-        if (/bumper[\s-]*to[\s-]*bumper|full\s*coverage|comprehensive/i.test(text)) {
-            return { type: 'factory_full' };
-        }
+    if (/factory\s*warranty|manufacturer'?s?\s*warranty|original\s*warranty|still\s*(under|has)\s*warranty/i.test(text)) {
         if (/powertrain|drivetrain|engine\s*(and|&)\s*transmission/i.test(text)) {
-            return { type: 'factory_powertrain' };
+            return { type: 'factory_powertrain', monthsRemaining, milesRemaining };
         }
-        return { type: 'factory_powertrain' }; // Default to powertrain if unspecified
+        // If significant coverage remaining, likely full warranty
+        if ((monthsRemaining && monthsRemaining >= 12) || (milesRemaining && milesRemaining >= 12000)) {
+            return { type: 'factory_full', monthsRemaining, milesRemaining };
+        }
+        return { type: 'factory_powertrain', monthsRemaining, milesRemaining };
+    }
+
+    // Powertrain warranty detection
+    if (/powertrain\s*warranty|drivetrain\s*warranty/i.test(text)) {
+        return { type: 'factory_powertrain', monthsRemaining, milesRemaining };
     }
 
     // Extended warranty detection
     if (/extended\s*warranty|aftermarket\s*warranty|service\s*contract/i.test(text)) {
-        return { type: 'third_party' };
+        return { type: 'third_party', monthsRemaining, milesRemaining };
     }
 
     // No warranty indicators
@@ -252,16 +298,12 @@ export function detectWarrantyFromListing(listingText: string): WarrantyInfo {
         return { type: 'none' };
     }
 
-    // Try to extract remaining warranty time/miles
-    const monthsMatch = text.match(/(\d+)\s*months?\s*(of\s*)?(warranty|remaining|left)/i);
-    const milesMatch = text.match(/(\d{1,3},?\d{3})\s*miles?\s*(of\s*)?(warranty|remaining|left)/i);
-
-    if (monthsMatch || milesMatch) {
-        return {
-            type: 'unknown',
-            monthsRemaining: monthsMatch ? parseInt(monthsMatch[1]) : undefined,
-            milesRemaining: milesMatch ? parseInt(milesMatch[1].replace(',', '')) : undefined
-        };
+    // If we found months/miles but no type, return unknown with the values
+    if (monthsRemaining || milesRemaining) {
+        // Check for warranty-related context
+        if (/warranty|coverage|covered/i.test(text)) {
+            return { type: 'unknown', monthsRemaining, milesRemaining };
+        }
     }
 
     return { type: 'unknown' };
