@@ -128,6 +128,30 @@ export interface Longevity {
     estimatedRemainingMiles: number;
     remainingYears: number;
     percentUsed: number;
+    expectedLifespan?: number;
+    baseLifespan?: number;
+}
+
+export interface AppliedFactor {
+    category: string;
+    value: string;
+    multiplier: number;
+    impact: 'positive' | 'negative' | 'neutral';
+}
+
+export interface LifespanAnalysis {
+    baseLifespan: number;
+    adjustedLifespan: number;
+    totalMultiplier: number;
+    appliedFactors: AppliedFactor[];
+    confidence: 'high' | 'medium' | 'low';
+}
+
+export interface ReliabilityAnalysis {
+    baseScore: number;
+    yearAdjustment: number;
+    isYearToAvoid: boolean;
+    inDatabase: boolean;
 }
 
 export interface Pricing {
@@ -149,6 +173,46 @@ export interface Recall {
     component: string;
     summary: string;
     date: string;
+}
+
+export interface ComponentIssue {
+    component: string;
+    count: number;
+    hasCrashes: boolean;
+    hasFires: boolean;
+    hasInjuries: boolean;
+    sampleComplaints: string[];
+}
+
+export interface MaintenanceItemApi {
+    id: string;
+    name: string;
+    component: string;
+    category: string;
+    severity: 'critical' | 'major' | 'moderate' | 'minor';
+    description: string;
+    warningSymptoms?: string[];
+}
+
+export interface MaintenanceProjectionApi {
+    item: MaintenanceItemApi;
+    urgency: 'past_due' | 'due_now' | 'upcoming';
+    milesUntilDue: number;
+    progressThroughWindow: number;
+    adjustedCostLow: number;
+    adjustedCostHigh: number;
+}
+
+export interface MaintenanceCostSummaryApi {
+    projections: MaintenanceProjectionApi[];
+    pastDueCount: number;
+    dueNowCount: number;
+    upcomingCount: number;
+    immediateRepairCostLow: number;
+    immediateRepairCostHigh: number;
+    upcomingCostLow: number;
+    upcomingCostHigh: number;
+    maintenanceHealthScore: number;
 }
 
 export interface AIConcern {
@@ -212,8 +276,12 @@ export interface AnalysisResponse {
     vehicle?: Vehicle;
     scores?: Scores;
     longevity?: Longevity | null;
+    lifespanAnalysis?: LifespanAnalysis;
+    reliabilityAnalysis?: ReliabilityAnalysis;
     pricing?: Pricing | null;
     knownIssues?: KnownIssue[];
+    componentIssues?: ComponentIssue[];
+    maintenanceCost?: MaintenanceCostSummaryApi;
     recalls?: Recall[];
     redFlags?: RedFlag[];
     aiAnalysis?: AIAnalysis;
