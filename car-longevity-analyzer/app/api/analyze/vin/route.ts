@@ -26,6 +26,7 @@ import { generateNegotiationStrategy } from '@/lib/negotiation-advisor';
 import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
 import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
+import { calculateMaintenanceProjections } from '@/lib/maintenance-data';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -108,6 +109,7 @@ export async function POST(request: Request) {
         const lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
         const expectedLifespan = lifespanAnalysis.adjustedLifespan;
 
+        // Calculate reliability using dynamic system
         const reliabilityResult = calculateDynamicReliability(
             vehicle.make,
             vehicle.model,
@@ -116,6 +118,16 @@ export async function POST(request: Request) {
             safetyRatingData
         );
         const reliabilityScore = reliabilityResult.score;
+
+        // Calculate reliability breakdown for transparency
+        const reliabilityBaseScore = relData ? relData.baseScore : 5.0;
+        const isYearToAvoid = relData?.yearsToAvoid.includes(vehicle.year) || false;
+        let reliabilityYearAdjustment = 0;
+        if (isYearToAvoid) {
+            reliabilityYearAdjustment = -2.0;
+        } else if (vehicle.year >= 2018) {
+            reliabilityYearAdjustment = 0.5;
+        }
 
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
 
@@ -201,6 +213,60 @@ export async function POST(request: Request) {
             overallResult.recommendation
         );
 
+        // Aggregate complaints by component for detailed display
+        const componentMap = new Map<string, {
+            count: number;
+            hasCrashes: boolean;
+            hasFires: boolean;
+            hasInjuries: boolean;
+            summaries: string[];
+        }>();
+
+        for (const complaint of complaints) {
+            const component = complaint.Component || 'UNKNOWN';
+            const existing = componentMap.get(component) || {
+                count: 0,
+                hasCrashes: false,
+                hasFires: false,
+                hasInjuries: false,
+                summaries: [],
+            };
+
+            existing.count++;
+            existing.hasCrashes = existing.hasCrashes || complaint.Crash;
+            existing.hasFires = existing.hasFires || complaint.Fire;
+            existing.hasInjuries = existing.hasInjuries || (complaint.Injuries > 0);
+
+            // Keep up to 3 sample summaries per component
+            if (existing.summaries.length < 3 && complaint.Summary) {
+                existing.summaries.push(complaint.Summary.slice(0, 200));
+            }
+
+            componentMap.set(component, existing);
+        }
+
+        // Convert to array and sort by count (most complaints first)
+        const componentIssues = Array.from(componentMap.entries())
+            .map(([component, data]) => ({
+                component,
+                count: data.count,
+                hasCrashes: data.hasCrashes,
+                hasFires: data.hasFires,
+                hasInjuries: data.hasInjuries,
+                sampleComplaints: data.summaries,
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10); // Limit to top 10 components
+
+        // Calculate Maintenance Projections (detailed mileage-based)
+        const maintenanceCost = calculateMaintenanceProjections(
+            vehicle.make,
+            vehicle.model,
+            vehicle.year,
+            mileage
+        );
+
+        // Response
         return NextResponse.json({
             success: true,
             vehicle,
@@ -225,6 +291,12 @@ export async function POST(request: Request) {
                 appliedFactors: lifespanAnalysis.appliedFactors,
                 confidence: lifespanAnalysis.confidence,
             },
+            reliabilityAnalysis: {
+                baseScore: reliabilityBaseScore,
+                yearAdjustment: reliabilityYearAdjustment,
+                isYearToAvoid,
+                inDatabase: !!relData,
+            },
             pricing: {
                 askingPrice,
                 fairPriceLow: priceEstimate.low,
@@ -239,7 +311,15 @@ export async function POST(request: Request) {
                 hasCrashTestData: safetyScoreResult.hasCrashTestData,
             },
             knownIssues,
+            componentIssues,
+            maintenanceCost,
             reliabilityBreakdown: reliabilityResult.breakdown,
+            reliabilityAnalysis: {
+                baseScore: reliabilityBaseScore,
+                yearAdjustment: reliabilityYearAdjustment,
+                isYearToAvoid,
+                inDatabase: !!relData,
+            },
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             safetyRating: safetyRatingData ? {
                 overallRating: safetyRatingData.OverallRating,

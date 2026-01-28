@@ -9,6 +9,7 @@ import {
     DollarSign,
     FileQuestion,
     Database,
+    Wrench,
 } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -57,6 +58,16 @@ export function NoKnownIssues() {
             icon={<CheckCircle className="size-5 text-green-600" />}
             title="No Known Issues"
             description="No common issues reported for this make/model/year."
+        />
+    );
+}
+
+export function NoComponentIssues() {
+    return (
+        <EmptyState
+            icon={<CheckCircle className="size-5 text-green-600" />}
+            title="No NHTSA Complaints"
+            description="No complaints have been reported to NHTSA for this vehicle."
         />
     );
 }
@@ -131,6 +142,16 @@ export function VehicleNotIdentified() {
             icon={<HelpCircle className="size-5 text-muted-foreground" />}
             title="Vehicle Not Identified"
             description="Could not identify vehicle details from the listing."
+        />
+    );
+}
+
+export function NoMaintenanceData() {
+    return (
+        <EmptyState
+            icon={<Wrench className="size-5 text-green-600" />}
+            title="No Maintenance Items Due"
+            description="No upcoming maintenance items identified for this vehicle at its current mileage."
         />
     );
 }
