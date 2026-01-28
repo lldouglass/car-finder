@@ -5,11 +5,20 @@ import {
     RECOMMENDATION_THRESHOLDS,
     VEHICLE_CONSTANTS
 } from './constants';
+import type { Complaint } from './nhtsa';
 
 // Types for parameters
 interface KnownIssue {
     severity: 'MINOR' | 'MODERATE' | 'MAJOR' | 'CRITICAL';
     description?: string;
+}
+
+// Component issue identified from NHTSA complaints
+export interface ComponentIssue {
+    component: string;
+    complaintCount: number;
+    severityScore: number;
+    description: string;
 }
 
 interface LongevityResult {
@@ -71,6 +80,200 @@ export function calculateReliabilityScore(
 
     const finalScore = baseScore + yearAdjustment - issuePenalty;
     return Math.max(1, Math.min(10, finalScore));
+}
+
+// Severity weights for complaint-based scoring
+const COMPLAINT_SEVERITY_WEIGHTS = {
+    death: 50,
+    injury: 20,
+    crash: 10,
+    fire: 15,
+    default: 1
+};
+
+// Component name normalization mapping
+const COMPONENT_NORMALIZATION: Record<string, string> = {
+    'ENGINE': 'Engine',
+    'ENGINE AND ENGINE COOLING': 'Engine',
+    'POWER TRAIN': 'Transmission',
+    'POWERTRAIN': 'Transmission',
+    'VEHICLE SPEED CONTROL': 'Transmission',
+    'ELECTRICAL SYSTEM': 'Electrical',
+    'ELECTRICAL': 'Electrical',
+    'AIR BAGS': 'Airbags',
+    'SERVICE BRAKES': 'Brakes',
+    'BRAKES': 'Brakes',
+    'SERVICE BRAKES, HYDRAULIC': 'Brakes',
+    'STEERING': 'Steering',
+    'SUSPENSION': 'Suspension',
+    'FUEL SYSTEM, GASOLINE': 'Fuel System',
+    'FUEL SYSTEM': 'Fuel System',
+    'STRUCTURE': 'Body/Structure',
+    'VISIBILITY/WIPER': 'Visibility',
+    'VISIBILITY': 'Visibility',
+    'LIGHTING': 'Lighting',
+    'WHEELS': 'Wheels/Tires',
+    'TIRES': 'Wheels/Tires',
+};
+
+/**
+ * Normalizes NHTSA component names to consistent categories.
+ */
+function normalizeComponent(component: string): string {
+    const upper = component.toUpperCase().trim();
+    // Try direct match first
+    if (COMPONENT_NORMALIZATION[upper]) {
+        return COMPONENT_NORMALIZATION[upper];
+    }
+    // Try partial match
+    for (const [key, value] of Object.entries(COMPONENT_NORMALIZATION)) {
+        if (upper.includes(key) || key.includes(upper)) {
+            return value;
+        }
+    }
+    // Return original with title case
+    return component.split(' ').map(w =>
+        w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    ).join(' ');
+}
+
+/**
+ * Calculates a weighted severity score for a single complaint.
+ */
+function getComplaintSeverityWeight(complaint: Complaint): number {
+    if (complaint.Deaths > 0) return COMPLAINT_SEVERITY_WEIGHTS.death;
+    if (complaint.Injuries > 0) return COMPLAINT_SEVERITY_WEIGHTS.injury;
+    if (complaint.Fire) return COMPLAINT_SEVERITY_WEIGHTS.fire;
+    if (complaint.Crash) return COMPLAINT_SEVERITY_WEIGHTS.crash;
+    return COMPLAINT_SEVERITY_WEIGHTS.default;
+}
+
+/**
+ * Calculates reliability score from NHTSA complaint data.
+ * This provides a dynamic, data-driven reliability assessment.
+ *
+ * @param complaints - Array of NHTSA complaints
+ * @param vehicleYear - Model year of the vehicle
+ * @param fallbackScore - Score to blend with if complaints are sparse
+ * @returns Reliability score from 1-10
+ */
+export function calculateReliabilityFromComplaints(
+    complaints: Complaint[],
+    vehicleYear: number,
+    fallbackScore: number = 5.0
+): number {
+    // If no complaints, return a moderate-high score (lack of data, not necessarily reliable)
+    if (!complaints || complaints.length === 0) {
+        // Blend with fallback - unknown reliability leans toward average
+        return Math.min(10, (fallbackScore + 6.5) / 2);
+    }
+
+    // Calculate weighted severity score
+    let totalSeverityScore = 0;
+    for (const complaint of complaints) {
+        totalSeverityScore += getComplaintSeverityWeight(complaint);
+    }
+
+    // Normalize by vehicle age (older cars have more time to accumulate complaints)
+    const currentYear = new Date().getFullYear();
+    const vehicleAge = Math.max(1, currentYear - vehicleYear);
+    const ageNormalizedScore = totalSeverityScore / vehicleAge;
+
+    // Also consider raw complaint count (many complaints = concerning even if minor)
+    const countPenalty = Math.log10(complaints.length + 1) * 2;
+
+    // Combined raw score (higher = worse)
+    const rawBadnessScore = ageNormalizedScore / 5 + countPenalty;
+
+    // Convert to 1-10 scale (lower badness = higher score)
+    // Calibration: 0-2 raw = 9-10 score, 10+ raw = 1-3 score
+    const calculatedScore = Math.max(1, Math.min(10, 10 - rawBadnessScore));
+
+    // If we have very few complaints (< 5), blend more heavily with fallback
+    // since sparse data isn't conclusive
+    if (complaints.length < 5) {
+        const weight = complaints.length / 5; // 0 to 1
+        return (calculatedScore * weight) + (fallbackScore * (1 - weight));
+    }
+
+    // Light blend with fallback to maintain some consistency with known reliability data
+    return (calculatedScore * 0.7) + (fallbackScore * 0.3);
+}
+
+/**
+ * Identifies specific component issues from NHTSA complaint data.
+ * Returns the top problem areas based on complaint frequency and severity.
+ *
+ * @param complaints - Array of NHTSA complaints
+ * @param limit - Maximum number of issues to return
+ * @returns Array of component issues sorted by severity
+ */
+export function identifyComponentIssues(
+    complaints: Complaint[],
+    limit: number = 3
+): ComponentIssue[] {
+    if (!complaints || complaints.length === 0) {
+        return [];
+    }
+
+    // Group complaints by normalized component
+    const componentMap = new Map<string, { count: number; severityScore: number; examples: string[] }>();
+
+    for (const complaint of complaints) {
+        const component = normalizeComponent(complaint.Component || 'Other');
+        const existing = componentMap.get(component) || { count: 0, severityScore: 0, examples: [] };
+
+        existing.count++;
+        existing.severityScore += getComplaintSeverityWeight(complaint);
+
+        // Store first few summaries as examples
+        if (existing.examples.length < 2 && complaint.Summary) {
+            const shortSummary = complaint.Summary.substring(0, 100);
+            existing.examples.push(shortSummary);
+        }
+
+        componentMap.set(component, existing);
+    }
+
+    // Convert to array and sort by severity score
+    const issues: ComponentIssue[] = [];
+    for (const [component, data] of componentMap.entries()) {
+        // Only include components with meaningful complaint counts
+        if (data.count >= 2 || data.severityScore >= 10) {
+            const description = generateComponentDescription(component, data.count, data.severityScore);
+            issues.push({
+                component,
+                complaintCount: data.count,
+                severityScore: data.severityScore,
+                description
+            });
+        }
+    }
+
+    // Sort by severity score descending
+    issues.sort((a, b) => b.severityScore - a.severityScore);
+
+    return issues.slice(0, limit);
+}
+
+/**
+ * Generates a human-readable description for a component issue.
+ */
+function generateComponentDescription(
+    component: string,
+    count: number,
+    severityScore: number
+): string {
+    const severityLevel =
+        severityScore > 50 ? 'Serious' :
+        severityScore > 20 ? 'Notable' : 'Minor';
+
+    const countText =
+        count >= 50 ? 'Many' :
+        count >= 20 ? 'Multiple' :
+        count >= 5 ? 'Several' : 'Some';
+
+    return `${severityLevel} ${component.toLowerCase()} issues reported (${count} complaints)`;
 }
 
 /**
@@ -177,12 +380,14 @@ export function calculatePriceScore(
 
 /**
  * Calculates overall weighted score and recommendation.
+ * @param safety - Optional safety score (1-10). If not provided, weight is redistributed.
  */
 export function calculateOverallScore(
     reliability: number,
     longevity: number,
     price: number,
-    redFlags: RedFlag[]
+    redFlags: RedFlag[],
+    safety?: number | null
 ): OverallResult {
     // Validate inputs
     reliability = Number.isFinite(reliability) ? Math.max(1, Math.min(10, reliability)) : 5;
@@ -190,11 +395,26 @@ export function calculateOverallScore(
     price = Number.isFinite(price) ? Math.max(1, Math.min(10, price)) : 5;
 
     // Weighted average using constants
-    const baseScore = (
-        reliability * SCORE_WEIGHTS.reliability +
-        longevity * SCORE_WEIGHTS.longevity +
-        price * SCORE_WEIGHTS.price
-    );
+    let baseScore: number;
+
+    if (safety !== null && safety !== undefined && Number.isFinite(safety)) {
+        // Include safety in weighted calculation
+        safety = Math.max(1, Math.min(10, safety));
+        baseScore = (
+            reliability * SCORE_WEIGHTS.reliability +
+            longevity * SCORE_WEIGHTS.longevity +
+            price * SCORE_WEIGHTS.price +
+            safety * SCORE_WEIGHTS.safety
+        );
+    } else {
+        // Redistribute safety weight proportionally to other scores
+        const weightWithoutSafety = SCORE_WEIGHTS.reliability + SCORE_WEIGHTS.longevity + SCORE_WEIGHTS.price;
+        baseScore = (
+            reliability * (SCORE_WEIGHTS.reliability / weightWithoutSafety) +
+            longevity * (SCORE_WEIGHTS.longevity / weightWithoutSafety) +
+            price * (SCORE_WEIGHTS.price / weightWithoutSafety)
+        );
+    }
 
     // Red flag penalties using constants
     const hasCriticalRedFlag = redFlags.some(f => f.severity.toLowerCase() === 'critical');

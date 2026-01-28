@@ -4,6 +4,7 @@ export interface RedFlag {
     message: string;
     advice: string;
     questionToAsk?: string;
+    source?: 'listing' | 'ai' | 'history' | 'price';
 }
 
 export interface PositiveIndicator {
@@ -235,6 +236,59 @@ export function detectPositiveIndicators(listingText: string): PositiveIndicator
     });
 
     return indicators;
+}
+
+/**
+ * Creates red flags from vehicle history data (NMVTIS/VinAudit).
+ */
+export function createHistoryRedFlags(historyAnalysis: {
+    hasCriticalIssue: boolean;
+    hasHighRiskIssue: boolean;
+    issues: Array<{ type: string; severity: 'critical' | 'high' | 'medium'; description: string }>;
+}): RedFlag[] {
+    const flags: RedFlag[] = [];
+
+    for (const issue of historyAnalysis.issues) {
+        let advice = '';
+        let questionToAsk = '';
+
+        switch (issue.type) {
+            case 'title_brand':
+                if (issue.severity === 'critical') {
+                    advice = 'Salvage/rebuilt/flood titles significantly impact value and may cause insurance/financing issues. Only buy if you are an expert.';
+                    questionToAsk = 'Can you provide documentation of the repairs that were made?';
+                } else {
+                    advice = 'This title brand may affect resale value and insurability.';
+                    questionToAsk = 'What was the reason for this title brand?';
+                }
+                break;
+            case 'odometer':
+                advice = 'Odometer discrepancy is a serious red flag. The mileage may have been tampered with.';
+                questionToAsk = 'Can you explain the odometer reading history?';
+                break;
+            case 'theft':
+                advice = 'A theft record requires careful verification of ownership and title.';
+                questionToAsk = 'Can you provide proof that the theft was resolved and you have clear title?';
+                break;
+            case 'total_loss':
+                advice = 'A total loss declaration means an insurance company determined the vehicle was not worth repairing.';
+                questionToAsk = 'What damage caused the total loss and what repairs were made?';
+                break;
+            default:
+                advice = 'Review this issue carefully before purchasing.';
+        }
+
+        flags.push({
+            type: `history_${issue.type}`,
+            severity: issue.severity,
+            message: issue.description,
+            advice,
+            questionToAsk,
+            source: 'history'
+        });
+    }
+
+    return flags;
 }
 
 /**

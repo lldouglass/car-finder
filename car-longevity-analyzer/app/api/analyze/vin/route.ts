@@ -12,6 +12,7 @@ import {
     detectPriceAnomaly,
     generateQuestionsForSeller
 } from '@/lib/red-flags';
+import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
 import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
@@ -26,10 +27,9 @@ const AnalyzeVinSchema = z.object({
     mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage, "Mileage exceeds maximum"),
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice, "Price exceeds maximum"),
     listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional(),
-    location: z.string().max(100).optional(), // State code or name for climate region
+    location: z.string().max(100).optional(),
 });
 
-// Custom error class for better error handling
 class AnalysisError extends Error {
     constructor(
         message: string,
@@ -45,7 +45,6 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
 
-        // 1. Validate Input
         const result = AnalyzeVinSchema.safeParse(body);
         if (!result.success) {
             return NextResponse.json(
@@ -56,7 +55,6 @@ export async function POST(request: Request) {
 
         const { vin, mileage, askingPrice, listingText, location } = result.data;
 
-        // 2. Decode VIN
         const vehicle = await decodeVin(vin);
         if (!vehicle) {
             return NextResponse.json(
@@ -65,19 +63,16 @@ export async function POST(request: Request) {
             );
         }
 
-        // 3. Fetch Data (Parallel) - Use allSettled for graceful degradation
         const [recallsResult, complaintsResult, safetyResult] = await Promise.allSettled([
             getRecalls(vehicle.make, vehicle.model, vehicle.year),
             getComplaints(vehicle.make, vehicle.model, vehicle.year),
             getSafetyRatings(vehicle.make, vehicle.model, vehicle.year)
         ]);
 
-        // Extract results with fallbacks
         const recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
         const complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
         const safetyRatingData = safetyResult.status === 'fulfilled' ? safetyResult.value : null;
 
-        // Log if any fetch failed but continue with partial data
         if (recallsResult.status === 'rejected') {
             console.warn('Failed to fetch recalls:', recallsResult.reason);
         }
@@ -88,28 +83,21 @@ export async function POST(request: Request) {
             console.warn('Failed to fetch safety ratings:', safetyResult.reason);
         }
 
-        // 4. Look up Reliability Data
         const relData = getReliabilityData(vehicle.make, vehicle.model);
         const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
 
-        // 5. Calculate Lifespan Factors from VIN data
         const vinFactors = mapVinToLifespanFactors(vehicle, vehicle.transmissionStyle);
         const climateRegion = getClimateRegion(location);
 
-        // Merge factors (no AI factors for VIN-only analysis)
         const lifespanFactors: LifespanFactors = mergeLifespanFactors(
             vinFactors,
-            {}, // No AI-extracted factors for pure VIN analysis
+            {},
             climateRegion
         );
 
-        // Calculate adjusted lifespan
         const lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
         const expectedLifespan = lifespanAnalysis.adjustedLifespan;
 
-        // 6. Calculate Scores
-
-        // Reliability (using dynamic calculation with NHTSA data)
         const reliabilityResult = calculateDynamicReliability(
             vehicle.make,
             vehicle.model,
@@ -119,34 +107,34 @@ export async function POST(request: Request) {
         );
         const reliabilityScore = reliabilityResult.score;
 
-        // Longevity (using adjusted lifespan)
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
 
-        // Price
         const priceEstimate = estimateFairPrice(vehicle.make, vehicle.model, vehicle.year, mileage);
         const priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
 
-        // Red Flags
+        const safetyScoreResult = calculateSafetyScore(safetyRatingData, complaints, vehicle.year);
+
         const redFlags = listingText ? detectRedFlags(listingText) : [];
         const priceRedFlag = detectPriceAnomaly(askingPrice, priceEstimate.low, priceEstimate.high);
         if (priceRedFlag) redFlags.push(priceRedFlag);
 
-        // Overall
+        const safetyRedFlags = detectSafetyRedFlags(safetyScoreResult, complaints);
+        redFlags.push(...safetyRedFlags);
+
         const overallResult = calculateOverallScore(
             reliabilityScore,
             longevityResult.score,
             priceResult.score,
-            redFlags
+            redFlags,
+            safetyScoreResult.score
         );
 
-        // 6. Generate Questions
         const questions = generateQuestionsForSeller(
             { make: vehicle.make, model: vehicle.model, year: vehicle.year },
             redFlags,
             recalls
         );
 
-        // 8. Response
         return NextResponse.json({
             success: true,
             vehicle,
@@ -154,6 +142,7 @@ export async function POST(request: Request) {
                 reliability: reliabilityScore,
                 longevity: longevityResult.score,
                 priceValue: priceResult.score,
+                safety: safetyScoreResult.score,
                 overall: overallResult.score
             },
             longevity: {
@@ -177,9 +166,15 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             },
+            safety: {
+                score: safetyScoreResult.score,
+                breakdown: safetyScoreResult.breakdown,
+                confidence: safetyScoreResult.confidence,
+                hasCrashTestData: safetyScoreResult.hasCrashTestData,
+            },
             knownIssues: extractKnownIssues(complaints),
-            recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5), // Limit size
-            redFlags,
+            reliabilityBreakdown: reliabilityResult.breakdown,
+            recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             safetyRating: safetyRatingData ? {
                 overallRating: safetyRatingData.OverallRating,
                 frontalCrashRating: safetyRatingData.FrontalCrashRating,
@@ -188,6 +183,7 @@ export async function POST(request: Request) {
                 complaintsCount: safetyRatingData.ComplaintsCount,
                 recallsCount: safetyRatingData.RecallsCount,
             } : null,
+            redFlags,
             recommendation: {
                 verdict: overallResult.recommendation,
                 confidence: overallResult.confidence,
@@ -199,7 +195,6 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error("Analysis Error:", error);
 
-        // Handle known error types
         if (error instanceof AnalysisError) {
             return NextResponse.json(
                 {
@@ -211,7 +206,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Handle JSON parse errors
         if (error instanceof SyntaxError) {
             return NextResponse.json(
                 { success: false, error: "Invalid request body" },
@@ -219,7 +213,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Generic server error
         return NextResponse.json(
             { success: false, error: "Internal Server Error", retryable: true },
             { status: 500 }

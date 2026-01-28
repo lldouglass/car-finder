@@ -4,9 +4,19 @@
 
 // Scoring weights for overall score calculation
 export const SCORE_WEIGHTS = {
-    reliability: 0.35,
-    longevity: 0.35,
-    price: 0.30,
+    reliability: 0.30,
+    longevity: 0.30,
+    price: 0.25,
+    safety: 0.15,
+} as const;
+
+// Safety thresholds for red flag detection
+export const SAFETY_THRESHOLDS = {
+    highInjuryCount: 5,      // 5+ injuries = high severity flag
+    highFireCount: 3,        // 3+ fires = high severity flag
+    highCrashCount: 20,      // 20+ crashes = medium severity flag
+    poorCrashRating: 2,      // 2 stars or below = medium severity flag
+    lowSafetyScore: 5,       // Below 5 = low severity flag
 } as const;
 
 // Red flag score penalties

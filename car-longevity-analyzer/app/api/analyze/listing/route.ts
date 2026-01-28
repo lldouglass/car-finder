@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { analyzeListingWithAI } from '@/lib/ai-analyzer';
+import { getComplaints, getSafetyRatings } from '@/lib/nhtsa';
 import {
     calculateReliabilityScore,
     calculateLongevityScore,
@@ -12,6 +13,7 @@ import {
     detectPriceAnomaly,
     generateQuestionsForSeller
 } from '@/lib/red-flags';
+import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPrice } from '@/lib/pricing';
 import { INPUT_LIMITS, VEHICLE_CONSTANTS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
@@ -61,6 +63,18 @@ function mapAccidentToSeverity(history: { hasAccident: boolean; severity?: strin
     return 'unknown';
 }
 
+// Helper to generate targeted questions for different inconsistency types
+function generateInconsistencyQuestion(type: string): string {
+    const questions: Record<string, string> = {
+        mileage_age: 'Can you explain how the vehicle has such low/high mileage for its age?',
+        price_condition: 'Why is the price significantly different from similar vehicles in this condition?',
+        usage_wear: 'Can you clarify the driving conditions the vehicle was primarily used in?',
+        owner_age: 'Can you provide documentation of ownership history?',
+        description_conflict: 'Some details in the listing seem inconsistent - can you clarify?'
+    };
+    return questions[type] || 'Can you provide more details about the vehicle history?';
+}
+
 export async function POST(request: Request) {
     try {
         const body = await request.json();
@@ -107,17 +121,37 @@ export async function POST(request: Request) {
         // Merge with empty VIN factors (no VIN decode for listing analysis)
         const lifespanFactors: LifespanFactors = mergeLifespanFactors({}, aiFactors, climateRegion);
 
-        // 4. Scores Calculation (if sufficient data)
+        // 4. Fetch safety data if we have vehicle info (parallel)
+        let complaints: Awaited<ReturnType<typeof getComplaints>> = [];
+        let safetyRatings: Awaited<ReturnType<typeof getSafetyRatings>> = null;
+
+        if (extracted?.make && extracted?.model && extracted?.year) {
+            const [complaintsResult, safetyRatingsResult] = await Promise.allSettled([
+                getComplaints(make, model, year),
+                getSafetyRatings(make, model, year)
+            ]);
+
+            complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
+            safetyRatings = safetyRatingsResult.status === 'fulfilled' ? safetyRatingsResult.value : null;
+        }
+
+        // 5. Scores Calculation (if sufficient data)
         let reliabilityScore = 0;
         let longevityResult: ReturnType<typeof calculateLongevityScore> | null = null;
         let priceResult: ReturnType<typeof calculatePriceScore> | null = null;
         let overallResult: ReturnType<typeof calculateOverallScore> | null = null;
         let priceEstimate: { low: number; high: number } | null = null;
         let lifespanAnalysis: ReturnType<typeof calculateAdjustedLifespan> | null = null;
+        let safetyResult: ReturnType<typeof calculateSafetyScore> | null = null;
 
         // Reliability
         if (extracted?.make && extracted?.model) {
             reliabilityScore = calculateReliabilityScore(make, model, year, []);
+        }
+
+        // Safety (calculate if we have vehicle info)
+        if (extracted?.make && extracted?.model && extracted?.year) {
+            safetyResult = calculateSafetyScore(safetyRatings, complaints, year);
         }
 
         // Longevity with adjusted lifespan
@@ -138,18 +172,35 @@ export async function POST(request: Request) {
             priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
         }
 
-        // 4. Red Flags
+        // 6. Red Flags
         const regexRedFlags = detectRedFlags(listingText);
 
-        // Merge AI concerns into red flags structure?
-        const aiRedFlags = aiResult.concerns.map(c => ({
+        // Convert AI concerns to red flags
+        const aiConcernFlags = aiResult.concerns.map(c => ({
             type: 'ai_concern',
             severity: c.severity,
             message: c.issue,
             advice: c.explanation
         }));
 
-        let allRedFlags = [...regexRedFlags, ...aiRedFlags];
+        // Convert AI inconsistencies to red flags (these are particularly important)
+        const inconsistencyFlags = aiResult.inconsistencies.map(inc => ({
+            type: `inconsistency_${inc.type}`,
+            severity: inc.severity,
+            message: `Inconsistency: ${inc.description}`,
+            advice: inc.details,
+            questionToAsk: generateInconsistencyQuestion(inc.type)
+        }));
+
+        // Convert suspicious patterns to red flags
+        const suspiciousFlags = aiResult.suspiciousPatterns.map(sp => ({
+            type: `suspicious_${sp.type}`,
+            severity: sp.severity,
+            message: `Suspicious language: "${sp.phrase}"`,
+            advice: sp.explanation
+        }));
+
+        let allRedFlags = [...regexRedFlags, ...aiConcernFlags, ...inconsistencyFlags, ...suspiciousFlags];
 
         // Price anomaly check
         if (priceResult && askingPrice !== undefined && priceEstimate) {
@@ -157,13 +208,20 @@ export async function POST(request: Request) {
             if (priceFlag) allRedFlags.push(priceFlag);
         }
 
-        // Overall Score
+        // Safety red flags
+        if (safetyResult) {
+            const safetyRedFlags = detectSafetyRedFlags(safetyResult, complaints);
+            allRedFlags.push(...safetyRedFlags);
+        }
+
+        // Overall Score (now includes safety when available)
         if (reliabilityScore > 0 && longevityResult && priceResult) {
             overallResult = calculateOverallScore(
                 reliabilityScore,
                 longevityResult.score,
                 priceResult.score,
-                allRedFlags
+                allRedFlags,
+                safetyResult?.score ?? null
             );
         }
 
@@ -188,6 +246,7 @@ export async function POST(request: Request) {
                 reliability: reliabilityScore || null,
                 longevity: longevityResult?.score || null,
                 priceValue: priceResult?.score || null,
+                safety: safetyResult?.score || null,
                 overall: overallResult?.score || null
             },
             longevity: longevityResult ? {
@@ -211,10 +270,18 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis
             } : null,
+            safety: safetyResult ? {
+                score: safetyResult.score,
+                breakdown: safetyResult.breakdown,
+                confidence: safetyResult.confidence,
+                hasCrashTestData: safetyResult.hasCrashTestData,
+            } : null,
             aiAnalysis: {
                 trustworthiness: aiResult.trustworthinessScore,
                 impression: aiResult.overallImpression,
                 concerns: aiResult.concerns,
+                inconsistencies: aiResult.inconsistencies,
+                suspiciousPatterns: aiResult.suspiciousPatterns,
                 extractedLifespanFactors: aiResult.lifespanFactors,
             },
             redFlags: allRedFlags,
