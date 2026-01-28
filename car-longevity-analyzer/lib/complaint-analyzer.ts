@@ -89,6 +89,50 @@ function generateDescription(
 }
 
 /**
+ * Extracts 2-3 representative sample complaints from a list.
+ * Prioritizes complaints with safety incidents.
+ */
+function extractSampleComplaints(complaints: Complaint[], maxSamples: number = 3): string[] {
+    if (complaints.length === 0) return [];
+
+    // Sort complaints to prioritize safety incidents
+    const sorted = [...complaints].sort((a, b) => {
+        // Prioritize by severity: deaths > injuries > crashes > fires > normal
+        const aScore = (a.Deaths * 1000) + (a.Injuries * 100) + (a.Crash ? 10 : 0) + (a.Fire ? 5 : 0);
+        const bScore = (b.Deaths * 1000) + (b.Injuries * 100) + (b.Crash ? 10 : 0) + (b.Fire ? 5 : 0);
+        return bScore - aScore;
+    });
+
+    const samples: string[] = [];
+    const maxChars = 250;
+
+    for (const complaint of sorted) {
+        if (samples.length >= maxSamples) break;
+
+        const summary = complaint.Summary?.trim();
+        if (!summary) continue;
+
+        // Truncate long complaints
+        let text = summary;
+        if (text.length > maxChars) {
+            text = text.substring(0, maxChars).replace(/\s+\S*$/, '') + '...';
+        }
+
+        // Avoid duplicates (similar complaints)
+        const isDuplicate = samples.some(s => {
+            const overlap = s.substring(0, 50).toLowerCase();
+            return text.toLowerCase().includes(overlap) || overlap.includes(text.substring(0, 50).toLowerCase());
+        });
+
+        if (!isDuplicate) {
+            samples.push(text);
+        }
+    }
+
+    return samples;
+}
+
+/**
  * Analyzes NHTSA complaints to extract known issues for a vehicle.
  * Groups complaints by component, counts occurrences, and assesses severity.
  *
@@ -133,6 +177,7 @@ export function extractKnownIssues(complaints: Complaint[]): KnownIssue[] {
             complaintCount: componentComplaints.length,
             description: generateDescription(component, componentComplaints),
             hasSafetyIncidents,
+            sampleComplaints: extractSampleComplaints(componentComplaints),
         });
     }
 

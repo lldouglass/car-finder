@@ -43,8 +43,6 @@ export interface NegotiationStrategy {
     walkAwayPrice: number;
     points: NegotiationPoint[];
     openingStatement: string;
-    closingTactics: string[];
-    warningsForBuyer: string[];
 }
 
 // Maintenance Cost types
@@ -77,10 +75,6 @@ export interface InspectionItem {
 
 export interface InspectionChecklist {
     vehicleSpecificItems: InspectionItem[];
-    standardItems: InspectionItem[];
-    testDriveChecklist: string[];
-    documentsToRequest: string[];
-    toolsNeeded: string[];
     estimatedInspectionTime: string;
 }
 
@@ -251,6 +245,7 @@ export interface KnownIssue {
     complaintCount: number;
     description: string;
     hasSafetyIncidents: boolean;
+    sampleComplaints: string[];  // 2-3 actual complaint summaries from NHTSA
 }
 
 // Lifespan adjustment factors for display
@@ -289,7 +284,6 @@ export interface AnalysisResponse {
     safetyRating?: SafetyRating | null;
     lifespanAnalysis?: LifespanAnalysis;
     // New features
-    sellerRisk?: SellerRiskResult;
     negotiationStrategy?: NegotiationStrategy;
     maintenanceCosts?: MaintenanceCostEstimate;
     inspectionChecklist?: InspectionChecklist;

@@ -32,16 +32,30 @@ const RecallsResponseSchema = z.object({
     results: z.array(RecallSchema).optional().default([]),
 });
 
-const ComplaintSchema = z.object({
-    Component: z.string().optional().default(''),
-    Summary: z.string().optional().default(''),
-    DateOfIncident: z.string().optional().default(''),
-    Crash: z.boolean().optional().default(false),
-    Fire: z.boolean().optional().default(false),
-    Injuries: z.number().optional().default(0),
-    Deaths: z.number().optional().default(0),
-    Vin: z.string().optional(),
+// NHTSA Complaints API uses lowercase field names (some can be null)
+const ComplaintRawSchema = z.object({
+    components: z.string().nullable().optional().default(''),
+    summary: z.string().nullable().optional().default(''),
+    dateOfIncident: z.string().nullable().optional().default(''),
+    crash: z.boolean().nullable().optional().default(false),
+    fire: z.boolean().nullable().optional().default(false),
+    numberOfInjuries: z.number().nullable().optional().default(0),
+    numberOfDeaths: z.number().nullable().optional().default(0),
+    vin: z.string().nullable().optional(),
 });
+
+// Transform to our internal format (PascalCase for consistency)
+// Handle null values by converting to appropriate defaults
+const ComplaintSchema = ComplaintRawSchema.transform((raw) => ({
+    Component: raw.components ?? '',
+    Summary: raw.summary ?? '',
+    DateOfIncident: raw.dateOfIncident ?? '',
+    Crash: raw.crash ?? false,
+    Fire: raw.fire ?? false,
+    Injuries: raw.numberOfInjuries ?? 0,
+    Deaths: raw.numberOfDeaths ?? 0,
+    Vin: raw.vin ?? undefined,
+}));
 
 const ComplaintsResponseSchema = z.object({
     results: z.array(ComplaintSchema).optional().default([]),
@@ -77,7 +91,7 @@ export type VehicleDetails = {
 };
 
 export type Recall = z.infer<typeof RecallSchema>;
-export type Complaint = z.infer<typeof ComplaintSchema>;
+export type Complaint = z.output<typeof ComplaintSchema>;
 export type SafetyRating = z.infer<typeof SafetyRatingDetailSchema>;
 
 /**
