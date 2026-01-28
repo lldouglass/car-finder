@@ -24,11 +24,13 @@ function HomeContent() {
   const [vin, setVin] = useState('');
   const [mileage, setMileage] = useState('');
   const [askingPrice, setAskingPrice] = useState('');
+  const [sellerType, setSellerType] = useState('');
 
   // Listing form state
   const [listingText, setListingText] = useState('');
   const [listingPrice, setListingPrice] = useState('');
   const [listingMileage, setListingMileage] = useState('');
+  const [listingSellerType, setListingSellerType] = useState('');
 
   // Track last submission for retry
   const [lastSubmission, setLastSubmission] = useState<{
@@ -49,6 +51,7 @@ function HomeContent() {
       vin: vin.toUpperCase(),
       mileage: parseInt(mileage, 10),
       askingPrice: parseInt(askingPrice, 10),
+      sellerType: sellerType || undefined,
     };
 
     setLastSubmission({ type: 'vin', data });
@@ -79,6 +82,7 @@ function HomeContent() {
       listingText,
       askingPrice: listingPrice ? parseInt(listingPrice, 10) : undefined,
       mileage: listingMileage ? parseInt(listingMileage, 10) : undefined,
+      sellerType: listingSellerType || undefined,
     };
 
     setLastSubmission({ type: 'listing', data });
@@ -304,6 +308,34 @@ function HomeContent() {
                       </div>
                     </div>
 
+                    <div>
+                      <label
+                        htmlFor="sellerType"
+                        className="block text-sm font-medium mb-1.5"
+                      >
+                        Seller Type (optional)
+                      </label>
+                      <select
+                        id="sellerType"
+                        value={sellerType}
+                        onChange={(e) => setSellerType(e.target.value)}
+                        disabled={isLoading}
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-describedby="seller-type-help"
+                      >
+                        <option value="">Auto-detect from listing</option>
+                        <option value="cpo">Certified Pre-Owned (CPO)</option>
+                        <option value="franchise_same">Franchise Dealer (Same Brand)</option>
+                        <option value="franchise_other">Franchise Dealer (Other Brand)</option>
+                        <option value="independent_lot">Independent Dealer</option>
+                        <option value="private">Private Seller</option>
+                        <option value="auction">Auction</option>
+                      </select>
+                      <p id="seller-type-help" className="text-xs text-muted-foreground mt-1">
+                        Helps assess buyer protections and risks
+                      </p>
+                    </div>
+
                     <Button
                       type="submit"
                       className="w-full"
@@ -400,6 +432,34 @@ function HomeContent() {
                           Optional: Enter price if not in listing
                         </p>
                       </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="listingSellerType"
+                        className="block text-sm font-medium mb-1.5"
+                      >
+                        Seller Type (optional)
+                      </label>
+                      <select
+                        id="listingSellerType"
+                        value={listingSellerType}
+                        onChange={(e) => setListingSellerType(e.target.value)}
+                        disabled={isLoading}
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-describedby="listing-seller-type-help"
+                      >
+                        <option value="">Auto-detect from listing</option>
+                        <option value="cpo">Certified Pre-Owned (CPO)</option>
+                        <option value="franchise_same">Franchise Dealer (Same Brand)</option>
+                        <option value="franchise_other">Franchise Dealer (Other Brand)</option>
+                        <option value="independent_lot">Independent Dealer</option>
+                        <option value="private">Private Seller</option>
+                        <option value="auction">Auction</option>
+                      </select>
+                      <p id="listing-seller-type-help" className="text-xs text-muted-foreground mt-1">
+                        Leave blank to auto-detect from listing text
+                      </p>
                     </div>
 
                     <Button

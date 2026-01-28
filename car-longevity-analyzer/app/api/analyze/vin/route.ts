@@ -4,7 +4,8 @@ import { decodeVin, getRecalls, getComplaints, getSafetyRatings } from '@/lib/nh
 import {
     calculateLongevityScore,
     calculatePriceScore,
-    calculateOverallScore
+    calculateOverallScore,
+    calculatePriceThresholds
 } from '@/lib/scoring';
 import { calculateDynamicReliability } from '@/lib/dynamic-reliability';
 import {
@@ -20,6 +21,14 @@ import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-
 import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
+import { assessSellerRisk, type SellerType } from '@/lib/seller-risk';
+import { generateNegotiationStrategy } from '@/lib/negotiation-advisor';
+import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
+import { generateInspectionChecklist } from '@/lib/inspection-checklist';
+import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
+
+// Seller type enum for validation
+const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
@@ -28,6 +37,7 @@ const AnalyzeVinSchema = z.object({
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice, "Price exceeds maximum"),
     listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional(),
     location: z.string().max(100).optional(),
+    sellerType: SellerTypeEnum.optional(),
 });
 
 class AnalysisError extends Error {
@@ -53,7 +63,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { vin, mileage, askingPrice, listingText, location } = result.data;
+        const { vin, mileage, askingPrice, listingText, location, sellerType } = result.data;
 
         const vehicle = await decodeVin(vin);
         if (!vehicle) {
@@ -135,6 +145,62 @@ export async function POST(request: Request) {
             recalls
         );
 
+        // New feature calculations
+        const knownIssues = extractKnownIssues(complaints);
+
+        // Seller Risk Assessment
+        const sellerRisk = assessSellerRisk(
+            (sellerType as SellerType) || 'unknown',
+            listingText
+        );
+
+        // Negotiation Strategy
+        const negotiationStrategy = generateNegotiationStrategy(
+            askingPrice,
+            priceEstimate.low,
+            priceEstimate.high,
+            relData?.knownIssues || [],
+            redFlags,
+            mileage,
+            vehicle.year
+        );
+
+        // Maintenance Cost Projection
+        const maintenanceCosts = calculateMaintenanceCosts(
+            vehicle.make,
+            vehicle.model,
+            vehicle.year,
+            mileage,
+            relData?.knownIssues || []
+        );
+
+        // Inspection Checklist
+        const inspectionChecklist = generateInspectionChecklist(
+            vehicle.make,
+            vehicle.model,
+            vehicle.year,
+            relData?.knownIssues || [],
+            redFlags
+        );
+
+        // Warranty Value (detect from listing if provided)
+        const warrantyInfo: WarrantyInfo = listingText
+            ? detectWarrantyFromListing(listingText)
+            : { type: 'unknown' };
+        const warrantyValue = calculateWarrantyValue(warrantyInfo, vehicle.make);
+
+        // Price Thresholds
+        const priceThresholds = calculatePriceThresholds(
+            askingPrice,
+            priceEstimate.low,
+            priceEstimate.high,
+            reliabilityScore,
+            longevityResult.score,
+            safetyScoreResult.score,
+            redFlags,
+            overallResult.recommendation
+        );
+
         return NextResponse.json({
             success: true,
             vehicle,
@@ -172,7 +238,7 @@ export async function POST(request: Request) {
                 confidence: safetyScoreResult.confidence,
                 hasCrashTestData: safetyScoreResult.hasCrashTestData,
             },
-            knownIssues: extractKnownIssues(complaints),
+            knownIssues,
             reliabilityBreakdown: reliabilityResult.breakdown,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             safetyRating: safetyRatingData ? {
@@ -189,7 +255,14 @@ export async function POST(request: Request) {
                 confidence: overallResult.confidence,
                 summary: overallResult.summary,
                 questionsForSeller: questions
-            }
+            },
+            // New features
+            sellerRisk,
+            negotiationStrategy,
+            maintenanceCosts,
+            inspectionChecklist,
+            warrantyValue,
+            priceThresholds
         });
 
     } catch (error) {

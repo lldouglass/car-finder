@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -39,6 +39,12 @@ import {
   Info,
   Wrench,
   Activity,
+  Store,
+  TrendingDown,
+  Clipboard,
+  BadgeCheck,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import type { RedFlag } from '@/lib/api';
 
@@ -190,7 +196,26 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis, safetyRating, knownIssues, lifespanAnalysis } = result;
+  const {
+    vehicle,
+    scores,
+    longevity,
+    pricing,
+    redFlags,
+    recalls,
+    recommendation,
+    aiAnalysis,
+    safetyRating,
+    knownIssues,
+    lifespanAnalysis,
+    // New features
+    sellerRisk,
+    negotiationStrategy,
+    maintenanceCosts,
+    inspectionChecklist,
+    warrantyValue,
+    priceThresholds
+  } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
@@ -201,6 +226,13 @@ function ResultsContent() {
   const hasAIAnalysis = aiAnalysis && !aiAnalysis.concerns?.some(c => c.issue === 'AI Analysis Unavailable');
   const hasKnownIssues = knownIssues && knownIssues.length > 0;
   const hasLifespanAnalysis = lifespanAnalysis && lifespanAnalysis.appliedFactors;
+  // New feature flags
+  const hasSellerRisk = sellerRisk && sellerRisk.sellerType !== 'unknown';
+  const hasNegotiationStrategy = negotiationStrategy && negotiationStrategy.points.length > 0;
+  const hasMaintenanceCosts = maintenanceCosts !== null && maintenanceCosts !== undefined;
+  const hasInspectionChecklist = inspectionChecklist !== null && inspectionChecklist !== undefined;
+  const hasWarrantyValue = warrantyValue && warrantyValue.coverageQuality !== 'none';
+  const hasPriceThresholds = priceThresholds !== null && priceThresholds !== undefined;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
@@ -458,6 +490,309 @@ function ResultsContent() {
               </CardHeader>
               <CardContent>
                 <LifespanFactorsDisplay lifespanAnalysis={lifespanAnalysis} />
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Price Impact - show if we have price thresholds */}
+          {hasPriceThresholds && priceThresholds.priceImpact && (
+            <Card className="mb-6 border-blue-200 dark:border-blue-800" role="region" aria-labelledby="price-impact-heading">
+              <CardHeader className="pb-2">
+                <CardTitle id="price-impact-heading" className="text-lg flex items-center gap-2">
+                  <TrendingDown className="size-5 text-blue-500" aria-hidden="true" />
+                  Price Impact
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{priceThresholds.priceImpact}</p>
+                {priceThresholds.buyThreshold && priceThresholds.currentVerdict !== 'BUY' && (
+                  <p className="text-sm mt-2 font-medium text-green-600 dark:text-green-400">
+                    BUY threshold: ${priceThresholds.buyThreshold.toLocaleString()}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Negotiation Strategy */}
+          {hasNegotiationStrategy && negotiationStrategy && (
+            <Card className="mb-6" role="region" aria-labelledby="negotiation-heading">
+              <CardHeader>
+                <CardTitle id="negotiation-heading" className="text-lg flex items-center gap-2">
+                  <DollarSign className="size-5 text-green-500" aria-hidden="true" />
+                  Negotiation Strategy
+                </CardTitle>
+                <CardDescription>
+                  Overall Leverage:{' '}
+                  <span className={
+                    negotiationStrategy.overallLeverage === 'strong' ? 'text-green-600 font-medium' :
+                    negotiationStrategy.overallLeverage === 'moderate' ? 'text-yellow-600 font-medium' :
+                    'text-muted-foreground'
+                  }>
+                    {negotiationStrategy.overallLeverage.toUpperCase()}
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Suggested Offer</p>
+                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                      ${negotiationStrategy.suggestedOffer.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-red-50 dark:bg-red-950 p-3 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Walk Away Above</p>
+                    <p className="text-xl font-bold text-red-600 dark:text-red-400">
+                      ${negotiationStrategy.walkAwayPrice.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                {negotiationStrategy.openingStatement && (
+                  <div className="bg-muted p-3 rounded-lg">
+                    <p className="text-xs font-medium mb-1">Opening Statement</p>
+                    <p className="text-sm italic">"{negotiationStrategy.openingStatement}"</p>
+                  </div>
+                )}
+
+                <div>
+                  <p className="font-medium text-sm mb-2">Talking Points:</p>
+                  <ul className="space-y-2">
+                    {negotiationStrategy.points.slice(0, 4).map((point, index) => (
+                      <li key={index} className="text-sm flex items-start gap-2">
+                        <Badge className={
+                          point.leverage === 'strong' ? 'bg-green-500' :
+                          point.leverage === 'moderate' ? 'bg-yellow-500' : 'bg-gray-500'
+                        }>
+                          {point.leverage}
+                        </Badge>
+                        <span>{point.point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Seller Risk Assessment */}
+          {hasSellerRisk && sellerRisk && (
+            <Card className="mb-6" role="region" aria-labelledby="seller-risk-heading">
+              <CardHeader>
+                <CardTitle id="seller-risk-heading" className="text-lg flex items-center gap-2">
+                  <Store className="size-5 text-indigo-500" aria-hidden="true" />
+                  Seller Risk Assessment
+                </CardTitle>
+                <CardDescription>
+                  Risk Level:{' '}
+                  <span className={
+                    sellerRisk.riskLevel === 'low' ? 'text-green-600 font-medium' :
+                    sellerRisk.riskLevel === 'medium' ? 'text-yellow-600 font-medium' :
+                    sellerRisk.riskLevel === 'high' ? 'text-red-600 font-medium' :
+                    'text-muted-foreground'
+                  }>
+                    {sellerRisk.riskLevel.toUpperCase()}
+                  </span>
+                  {' '}(Score: {sellerRisk.riskScore}/10)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {sellerRisk.protections.length > 0 && (
+                  <div>
+                    <p className="font-medium text-sm text-green-600 dark:text-green-400 mb-1">Buyer Protections:</p>
+                    <ul className="text-sm space-y-1">
+                      {sellerRisk.protections.slice(0, 3).map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <CheckCircle className="size-4 text-green-500 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {sellerRisk.warnings.length > 0 && (
+                  <div>
+                    <p className="font-medium text-sm text-yellow-600 dark:text-yellow-400 mb-1">Watch Out For:</p>
+                    <ul className="text-sm space-y-1">
+                      {sellerRisk.warnings.slice(0, 3).map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <AlertTriangle className="size-4 text-yellow-500 mt-0.5 shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Maintenance Costs */}
+          {hasMaintenanceCosts && maintenanceCosts && (
+            <Card className="mb-6" role="region" aria-labelledby="maintenance-heading">
+              <CardHeader>
+                <CardTitle id="maintenance-heading" className="text-lg flex items-center gap-2">
+                  <Wrench className="size-5 text-blue-500" aria-hidden="true" />
+                  Maintenance Cost Projection
+                </CardTitle>
+                <CardDescription>{maintenanceCosts.categoryLabel}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-muted p-3 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Est. Annual Cost</p>
+                    <p className="text-lg font-bold">
+                      ${maintenanceCosts.estimatedAnnualCost.low.toLocaleString()} - ${maintenanceCosts.estimatedAnnualCost.high.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-muted p-3 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">5-Year Projection</p>
+                    <p className="text-lg font-bold">
+                      ${maintenanceCosts.fiveYearProjection.low.toLocaleString()} - ${maintenanceCosts.fiveYearProjection.high.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                {maintenanceCosts.upcomingMaintenance.length > 0 && (
+                  <div>
+                    <p className="font-medium text-sm mb-2">Upcoming Maintenance:</p>
+                    <ul className="text-sm space-y-2">
+                      {maintenanceCosts.upcomingMaintenance.map((item, i) => (
+                        <li key={i} className="flex justify-between items-center p-2 bg-muted rounded">
+                          <div className="flex items-center gap-2">
+                            <span className={
+                              item.urgency === 'due_now' ? 'text-red-500 font-medium' :
+                              item.urgency === 'upcoming' ? 'text-yellow-500' : ''
+                            }>
+                              {item.item}
+                            </span>
+                            {item.urgency === 'due_now' && <Badge variant="destructive">Due Now</Badge>}
+                          </div>
+                          <span className="text-muted-foreground">
+                            ${item.estimatedCost.low}-${item.estimatedCost.high}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {maintenanceCosts.costFactors.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">
+                      {maintenanceCosts.costFactors.join(' | ')}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Warranty Value */}
+          {hasWarrantyValue && warrantyValue && (
+            <Card className="mb-6" role="region" aria-labelledby="warranty-heading">
+              <CardHeader>
+                <CardTitle id="warranty-heading" className="text-lg flex items-center gap-2">
+                  <BadgeCheck className="size-5 text-purple-500" aria-hidden="true" />
+                  Warranty Value
+                </CardTitle>
+                <CardDescription>
+                  Coverage Quality:{' '}
+                  <span className={
+                    warrantyValue.coverageQuality === 'excellent' ? 'text-green-600 font-medium' :
+                    warrantyValue.coverageQuality === 'good' ? 'text-blue-600 font-medium' :
+                    'text-muted-foreground'
+                  }>
+                    {warrantyValue.coverageQuality.toUpperCase()}
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {warrantyValue.estimatedValue.high > 0 && (
+                  <div className="bg-green-50 dark:bg-green-950 p-3 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">Estimated Warranty Value</p>
+                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                      ${warrantyValue.estimatedValue.low.toLocaleString()} - ${warrantyValue.estimatedValue.high.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground">{warrantyValue.valueExplanation}</p>
+                <p className="text-sm">{warrantyValue.recommendation}</p>
+                {warrantyValue.warrantyTips.length > 0 && (
+                  <ul className="text-sm space-y-1 mt-2">
+                    {warrantyValue.warrantyTips.slice(0, 3).map((tip, i) => (
+                      <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                        <Info className="size-4 mt-0.5 shrink-0" />
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Inspection Checklist */}
+          {hasInspectionChecklist && inspectionChecklist && (
+            <Card className="mb-6" role="region" aria-labelledby="inspection-heading">
+              <CardHeader>
+                <CardTitle id="inspection-heading" className="text-lg flex items-center gap-2">
+                  <Clipboard className="size-5 text-teal-500" aria-hidden="true" />
+                  Pre-Purchase Inspection Checklist
+                </CardTitle>
+                <CardDescription>
+                  Estimated time: {inspectionChecklist.estimatedInspectionTime}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {inspectionChecklist.vehicleSpecificItems.length > 0 && (
+                  <div>
+                    <p className="font-medium text-sm mb-2 text-red-600 dark:text-red-400">
+                      Vehicle-Specific Checks ({inspectionChecklist.vehicleSpecificItems.length}):
+                    </p>
+                    <ul className="text-sm space-y-2">
+                      {inspectionChecklist.vehicleSpecificItems.slice(0, 5).map((item, i) => (
+                        <li key={i} className="p-2 bg-red-50 dark:bg-red-950 rounded">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className={
+                              item.priority === 'critical' ? 'bg-red-500' :
+                              item.priority === 'important' ? 'bg-yellow-500' : 'bg-gray-500'
+                            }>
+                              {item.priority}
+                            </Badge>
+                            <span className="font-medium">{item.item}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{item.whatToLookFor}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div>
+                  <p className="font-medium text-sm mb-2">Documents to Request:</p>
+                  <ul className="text-sm grid grid-cols-2 gap-1">
+                    {inspectionChecklist.documentsToRequest.map((doc, i) => (
+                      <li key={i} className="flex items-center gap-1 text-muted-foreground">
+                        <CheckCircle className="size-3" />
+                        <span>{doc}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-medium text-sm mb-2">Test Drive Checklist:</p>
+                  <ul className="text-sm space-y-1">
+                    {inspectionChecklist.testDriveChecklist.slice(0, 5).map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                        <span className="text-primary">{i + 1}.</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </CardContent>
             </Card>
           )}

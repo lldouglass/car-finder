@@ -41,6 +41,13 @@ interface OverallResult {
     summary: string;
 }
 
+export interface PriceThresholds {
+    buyThreshold: number | null;    // Price at which verdict becomes BUY
+    maybeThreshold: number | null;  // Price at which verdict becomes MAYBE
+    currentVerdict: 'BUY' | 'MAYBE' | 'PASS';
+    priceImpact: string;           // Human-readable advice
+}
+
 interface RedFlag {
     severity: string;  // can be critical, high, medium, low
 }
@@ -457,5 +464,138 @@ export function calculateOverallScore(
         recommendation,
         confidence,
         summary: generateSummary(recommendation, reliability, longevity, price),
+    };
+}
+
+/**
+ * Calculates price thresholds that would change the verdict.
+ * Works backwards from target overall scores to find what price score is needed,
+ * then converts that to an actual dollar amount.
+ */
+export function calculatePriceThresholds(
+    currentPrice: number,
+    fairPriceLow: number,
+    fairPriceHigh: number,
+    reliabilityScore: number,
+    longevityScore: number,
+    safetyScore: number | null,
+    redFlags: RedFlag[],
+    currentVerdict: 'BUY' | 'MAYBE' | 'PASS'
+): PriceThresholds {
+    // Calculate red flag penalty (same logic as calculateOverallScore)
+    const hasCriticalRedFlag = redFlags.some(f => f.severity.toLowerCase() === 'critical');
+    const hasHighRedFlag = redFlags.some(f => f.severity.toLowerCase() === 'high');
+    const mediumLowFlags = redFlags.filter(f =>
+        f.severity.toLowerCase() === 'medium' || f.severity.toLowerCase() === 'low'
+    ).length;
+
+    let penalty = 0;
+    if (hasCriticalRedFlag) penalty += RED_FLAG_PENALTIES.critical;
+    if (hasHighRedFlag) penalty += RED_FLAG_PENALTIES.high;
+    penalty += mediumLowFlags * RED_FLAG_PENALTIES.medium;
+
+    // If critical red flag, no price can make this a BUY
+    if (hasCriticalRedFlag) {
+        return {
+            buyThreshold: null,
+            maybeThreshold: null,
+            currentVerdict,
+            priceImpact: 'Critical issues prevent this from being recommended at any price.'
+        };
+    }
+
+    // Calculate base score without price
+    let baseScoreWithoutPrice: number;
+    let priceWeight: number;
+
+    if (safetyScore !== null && Number.isFinite(safetyScore)) {
+        // With safety score
+        const otherWeights = SCORE_WEIGHTS.reliability + SCORE_WEIGHTS.longevity + SCORE_WEIGHTS.safety;
+        baseScoreWithoutPrice = (
+            reliabilityScore * SCORE_WEIGHTS.reliability +
+            longevityScore * SCORE_WEIGHTS.longevity +
+            safetyScore * SCORE_WEIGHTS.safety
+        );
+        priceWeight = SCORE_WEIGHTS.price;
+    } else {
+        // Without safety score (redistribute weights)
+        const weightWithoutSafety = SCORE_WEIGHTS.reliability + SCORE_WEIGHTS.longevity + SCORE_WEIGHTS.price;
+        const reliabilityWeight = SCORE_WEIGHTS.reliability / weightWithoutSafety;
+        const longevityWeight = SCORE_WEIGHTS.longevity / weightWithoutSafety;
+        priceWeight = SCORE_WEIGHTS.price / weightWithoutSafety;
+        baseScoreWithoutPrice = (
+            reliabilityScore * reliabilityWeight +
+            longevityScore * longevityWeight
+        ) * weightWithoutSafety / (1 - priceWeight);
+    }
+
+    // Function to find price for a target overall score
+    const findPriceForScore = (targetScore: number): number | null => {
+        // targetScore = baseScoreWithoutPrice + priceScore * priceWeight - penalty
+        // priceScore * priceWeight = targetScore - baseScoreWithoutPrice + penalty
+        // priceScore = (targetScore - baseScoreWithoutPrice + penalty) / priceWeight
+        const requiredPriceScore = (targetScore + penalty - baseScoreWithoutPrice) / priceWeight;
+
+        // Price score is clamped 1-10
+        if (requiredPriceScore > 10) return null; // Impossible
+        if (requiredPriceScore < 1) return null;  // Already achieved at any price
+
+        // Convert price score back to actual price
+        // Score 7+ means price <= fairPriceLow
+        // Score 7 = at fairPriceLow
+        // Score 4 = at fairPriceHigh
+        // Score 10 = at 85% of fairPriceLow
+        // Score 1 = at 120% of fairPriceHigh
+        if (requiredPriceScore >= 7) {
+            // Price needs to be below fairPriceLow
+            // score = 7 + (discount / 0.15) * 3
+            // discount = (score - 7) * 0.15 / 3
+            const discount = (requiredPriceScore - 7) * 0.15 / 3;
+            return Math.round(fairPriceLow * (1 - discount));
+        } else if (requiredPriceScore >= 4) {
+            // Price is in fair range
+            // score = 7 - (position * 3)
+            // position = (7 - score) / 3
+            const position = (7 - requiredPriceScore) / 3;
+            const range = fairPriceHigh - fairPriceLow;
+            return Math.round(fairPriceLow + position * range);
+        } else {
+            // Price is above fair range (score < 4)
+            // This is already a bad deal, threshold not useful
+            return null;
+        }
+    };
+
+    const buyThreshold = findPriceForScore(RECOMMENDATION_THRESHOLDS.buy);
+    const maybeThreshold = findPriceForScore(RECOMMENDATION_THRESHOLDS.maybe);
+
+    // Generate human-readable advice
+    let priceImpact: string;
+
+    if (currentVerdict === 'BUY') {
+        priceImpact = 'Already recommended. Great deal at current price.';
+    } else if (currentVerdict === 'MAYBE') {
+        if (buyThreshold !== null && buyThreshold < currentPrice) {
+            const savings = currentPrice - buyThreshold;
+            priceImpact = `At $${buyThreshold.toLocaleString()} or below, this becomes a BUY. Negotiate $${savings.toLocaleString()} off.`;
+        } else if (buyThreshold !== null) {
+            priceImpact = `Price would need to be $${buyThreshold.toLocaleString()} for a BUY recommendation.`;
+        } else {
+            priceImpact = 'Other factors (reliability, longevity) limit this vehicle regardless of price.';
+        }
+    } else { // PASS
+        if (maybeThreshold !== null && maybeThreshold < currentPrice) {
+            const savings = currentPrice - maybeThreshold;
+            priceImpact = `At $${maybeThreshold.toLocaleString()} or below, this becomes worth considering. Currently ${Math.round((savings / currentPrice) * 100)}% overpriced.`;
+        } else {
+            priceImpact = 'Significant issues make this difficult to recommend at any realistic price.';
+        }
+    }
+
+    return {
+        buyThreshold,
+        maybeThreshold,
+        currentVerdict,
+        priceImpact
     };
 }

@@ -6,7 +6,8 @@ import {
     calculateReliabilityScore,
     calculateLongevityScore,
     calculatePriceScore,
-    calculateOverallScore
+    calculateOverallScore,
+    calculatePriceThresholds
 } from '@/lib/scoring';
 import {
     detectRedFlags,
@@ -27,6 +28,14 @@ import {
 } from '@/lib/lifespan-factors';
 import { mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
+import { assessSellerRisk, type SellerType } from '@/lib/seller-risk';
+import { generateNegotiationStrategy } from '@/lib/negotiation-advisor';
+import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
+import { generateInspectionChecklist } from '@/lib/inspection-checklist';
+import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
+
+// Seller type enum for validation
+const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
 
 const AnalyzeListingSchema = z.object({
     listingText: z.string()
@@ -35,6 +44,7 @@ const AnalyzeListingSchema = z.object({
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice).optional(),
     mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage).optional(),
     location: z.string().max(100).optional(), // State code or name for climate region
+    sellerType: SellerTypeEnum.optional(),
 });
 
 // Helper to map AI usage pattern to DrivingConditions type
@@ -88,7 +98,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { listingText, location } = result.data;
+        const { listingText, location, sellerType } = result.data;
         let { askingPrice, mileage } = result.data;
 
         // 2. AI Analysis to extract info
@@ -234,6 +244,72 @@ export async function POST(request: Request) {
         // Combine with AI suggested questions
         const allQuestions = Array.from(new Set([...questions, ...aiResult.suggestedQuestions]));
 
+        // New feature calculations
+        const relData = getReliabilityData(make, model);
+
+        // Seller Risk Assessment
+        const sellerRisk = assessSellerRisk(
+            (sellerType as SellerType) || 'unknown',
+            listingText
+        );
+
+        // Negotiation Strategy (only if we have price data)
+        const negotiationStrategy = (askingPrice !== undefined && priceEstimate && mileage !== undefined)
+            ? generateNegotiationStrategy(
+                askingPrice,
+                priceEstimate.low,
+                priceEstimate.high,
+                relData?.knownIssues || [],
+                allRedFlags,
+                mileage,
+                year
+            )
+            : null;
+
+        // Maintenance Cost Projection (only if we have mileage)
+        const maintenanceCosts = (mileage !== undefined)
+            ? calculateMaintenanceCosts(
+                make,
+                model,
+                year,
+                mileage,
+                relData?.knownIssues || []
+            )
+            : null;
+
+        // Inspection Checklist
+        const inspectionChecklist = generateInspectionChecklist(
+            make,
+            model,
+            year,
+            relData?.knownIssues || [],
+            allRedFlags
+        );
+
+        // Warranty Value (detect from listing)
+        const warrantyInfo: WarrantyInfo = detectWarrantyFromListing(listingText);
+        const warrantyValue = calculateWarrantyValue(warrantyInfo, make);
+
+        // Price Thresholds (only if we have all required data)
+        const priceThresholds = (
+            askingPrice !== undefined &&
+            priceEstimate &&
+            reliabilityScore > 0 &&
+            longevityResult &&
+            overallResult
+        )
+            ? calculatePriceThresholds(
+                askingPrice,
+                priceEstimate.low,
+                priceEstimate.high,
+                reliabilityScore,
+                longevityResult.score,
+                safetyResult?.score ?? null,
+                allRedFlags,
+                overallResult.recommendation
+            )
+            : null;
+
         return NextResponse.json({
             success: true,
             vehicle: {
@@ -290,7 +366,14 @@ export async function POST(request: Request) {
                 confidence: overallResult?.confidence || 0.5,
                 summary: overallResult?.summary || aiResult.overallImpression,
                 questionsForSeller: allQuestions
-            }
+            },
+            // New features
+            sellerRisk,
+            negotiationStrategy,
+            maintenanceCosts,
+            inspectionChecklist,
+            warrantyValue,
+            priceThresholds
         });
 
     } catch (error) {

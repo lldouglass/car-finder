@@ -145,6 +145,99 @@ const LOW_PATTERNS = [
     },
 ];
 
+// --- Fee/Scam Detection Patterns ---
+
+const FEE_PATTERNS_HIGH = [
+    {
+        pattern: /price\s*(after|with)\s*\$?\d+.*down/i,
+        message: 'Price requires down payment',
+        advice: 'Advertised price should not require down payment. This is deceptive pricing.',
+        type: 'deceptive_pricing',
+        questionToAsk: 'What is the actual out-the-door price with no down payment?'
+    },
+    {
+        pattern: /market\s*adjustment/i,
+        message: 'Market adjustment markup',
+        advice: 'This is pure profit padding. Walk away or negotiate removal.',
+        type: 'suspicious_fee',
+        questionToAsk: 'Will you remove the market adjustment?'
+    },
+    {
+        pattern: /add(itional|ed)?\s*(dealer|mandatory)\s*(mark-?up|premium)/i,
+        message: 'Dealer markup on vehicle',
+        advice: 'Additional dealer markup above MSRP is negotiable. Be prepared to walk.',
+        type: 'suspicious_fee'
+    },
+];
+
+const FEE_PATTERNS_MEDIUM = [
+    {
+        pattern: /destination\s*(fee|charge)/i,
+        message: 'Destination fee on used car',
+        advice: 'Destination fees only apply to new cars. This is a bogus charge.',
+        type: 'suspicious_fee',
+        questionToAsk: 'Why is there a destination fee on a used car?'
+    },
+    {
+        pattern: /reconditioning\s*(fee|charge)/i,
+        message: 'Reconditioning fee',
+        advice: 'Reconditioning is part of normal dealer prep. Negotiate removal.',
+        type: 'suspicious_fee',
+        questionToAsk: 'Can you itemize what reconditioning was done?'
+    },
+    {
+        pattern: /dealer\s*(prep|preparation)\s*(fee|charge)/i,
+        message: 'Dealer prep fee',
+        advice: 'Dealer prep is standard cost of doing business. Refuse to pay.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /(paint|fabric)\s*protection\s*(fee|package)/i,
+        message: 'Paint/fabric protection add-on',
+        advice: 'These add-ons are rarely worth the cost. Decline or negotiate removal.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /nitrogen\s*(tire|fill)/i,
+        message: 'Nitrogen tire fill charge',
+        advice: 'Nitrogen offers minimal benefit for most drivers. Air is free.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /vin\s*etch(ing)?/i,
+        message: 'VIN etching fee',
+        advice: 'VIN etching costs $20-30 at most. Dealers charge $200+. Decline.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /admin(istration|istrative)?\s*(fee|charge)/i,
+        message: 'Administrative fee',
+        advice: 'Administrative fees are often negotiable. Ask for itemized breakdown.',
+        type: 'suspicious_fee'
+    },
+];
+
+const FEE_PATTERNS_LOW = [
+    {
+        pattern: /doc(ument(ation)?)?\s*fee.*\$[5-9]\d\d/i,
+        message: 'Excessive documentation fee',
+        advice: 'Doc fees over $500 are excessive. Average is $100-300 depending on state.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /doc(ument(ation)?)?\s*fee.*\$[1-9]\d{3,}/i,
+        message: 'Very high documentation fee',
+        advice: 'Doc fees over $1000 are extremely high. Negotiate or walk away.',
+        type: 'suspicious_fee'
+    },
+    {
+        pattern: /processing\s*(fee|charge)/i,
+        message: 'Processing fee',
+        advice: 'Processing fees are common but negotiable. Get itemized costs.',
+        type: 'suspicious_fee'
+    },
+];
+
 const POSITIVE_PATTERNS = [
     { pattern: /one\s*owner/i, message: 'Single owner vehicle' },
     { pattern: /maintenance\s*records?/i, message: 'Maintenance records available' },
@@ -181,6 +274,11 @@ export function detectRedFlags(listingText: string): RedFlag[] {
     check(HIGH_PATTERNS, 'high');
     check(MEDIUM_PATTERNS, 'medium');
     check(LOW_PATTERNS, 'low');
+
+    // Fee/Scam detection patterns
+    check(FEE_PATTERNS_HIGH, 'high');
+    check(FEE_PATTERNS_MEDIUM, 'medium');
+    check(FEE_PATTERNS_LOW, 'low');
 
     return flags;
 }

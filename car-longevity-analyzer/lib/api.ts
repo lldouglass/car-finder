@@ -1,16 +1,113 @@
 // API Types based on route responses
 
+export type SellerType = 'cpo' | 'franchise_same' | 'franchise_other' | 'independent_lot' | 'private' | 'auction' | 'unknown';
+
 export interface VinAnalysisRequest {
     vin: string;
     mileage: number;
     askingPrice: number;
     listingText?: string;
+    sellerType?: SellerType;
 }
 
 export interface ListingAnalysisRequest {
     listingText: string;
     askingPrice?: number;
     mileage?: number;
+    sellerType?: SellerType;
+}
+
+// Seller Risk types
+export interface SellerRiskResult {
+    sellerType: SellerType;
+    riskLevel: 'low' | 'medium' | 'high' | 'variable';
+    riskScore: number;
+    advice: string[];
+    protections: string[];
+    warnings: string[];
+    negotiationTips: string[];
+}
+
+// Negotiation types
+export interface NegotiationPoint {
+    category: 'price' | 'condition' | 'market' | 'issues' | 'history' | 'timing';
+    point: string;
+    leverage: 'strong' | 'moderate' | 'weak';
+    suggestedReduction: number;
+    script?: string;
+}
+
+export interface NegotiationStrategy {
+    overallLeverage: 'strong' | 'moderate' | 'weak' | 'none';
+    suggestedOffer: number;
+    walkAwayPrice: number;
+    points: NegotiationPoint[];
+    openingStatement: string;
+    closingTactics: string[];
+    warningsForBuyer: string[];
+}
+
+// Maintenance Cost types
+export interface UpcomingMaintenance {
+    item: string;
+    mileageRange: string;
+    estimatedCost: { low: number; high: number };
+    urgency: 'due_now' | 'upcoming' | 'future';
+}
+
+export interface MaintenanceCostEstimate {
+    estimatedAnnualCost: { low: number; high: number };
+    category: 'economy' | 'standard' | 'premium' | 'luxury';
+    categoryLabel: string;
+    upcomingMaintenance: UpcomingMaintenance[];
+    knownIssueRisks: { issue: string; probability: string; cost: { low: number; high: number }; mileageRange: string }[];
+    fiveYearProjection: { low: number; high: number };
+    costFactors: string[];
+}
+
+// Inspection Checklist types
+export interface InspectionItem {
+    category: string;
+    item: string;
+    priority: 'critical' | 'important' | 'recommended';
+    reason?: string;
+    whatToLookFor: string;
+    redFlagSigns: string[];
+}
+
+export interface InspectionChecklist {
+    vehicleSpecificItems: InspectionItem[];
+    standardItems: InspectionItem[];
+    testDriveChecklist: string[];
+    documentsToRequest: string[];
+    toolsNeeded: string[];
+    estimatedInspectionTime: string;
+}
+
+// Warranty Value types
+export type WarrantyType = 'factory_full' | 'factory_powertrain' | 'cpo' | 'third_party' | 'none' | 'unknown';
+
+export interface WarrantyInfo {
+    type: WarrantyType;
+    monthsRemaining?: number;
+    milesRemaining?: number;
+}
+
+export interface WarrantyValueResult {
+    estimatedValue: { low: number; high: number };
+    valueExplanation: string;
+    recommendation: string;
+    coverageQuality: 'excellent' | 'good' | 'limited' | 'none';
+    equivalentExtendedWarrantyCost: { low: number; high: number };
+    warrantyTips: string[];
+}
+
+// Price Thresholds types
+export interface PriceThresholds {
+    buyThreshold: number | null;
+    maybeThreshold: number | null;
+    currentVerdict: 'BUY' | 'MAYBE' | 'PASS';
+    priceImpact: string;
 }
 
 export interface Vehicle {
@@ -123,6 +220,13 @@ export interface AnalysisResponse {
     recommendation?: Recommendation;
     safetyRating?: SafetyRating | null;
     lifespanAnalysis?: LifespanAnalysis;
+    // New features
+    sellerRisk?: SellerRiskResult;
+    negotiationStrategy?: NegotiationStrategy;
+    maintenanceCosts?: MaintenanceCostEstimate;
+    inspectionChecklist?: InspectionChecklist;
+    warrantyValue?: WarrantyValueResult;
+    priceThresholds?: PriceThresholds;
 }
 
 export class APIError extends Error {
