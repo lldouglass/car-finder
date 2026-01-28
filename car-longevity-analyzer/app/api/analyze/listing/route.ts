@@ -16,7 +16,7 @@ import {
 } from '@/lib/red-flags';
 import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
-import { estimateFairPrice } from '@/lib/pricing';
+import { estimateFairPriceWithApi, isPricingApiConfigured } from '@/lib/pricing-api';
 import { INPUT_LIMITS, VEHICLE_CONSTANTS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
 import {
     calculateAdjustedLifespan,
@@ -28,11 +28,11 @@ import {
 } from '@/lib/lifespan-factors';
 import { mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
-import { assessSellerRisk, type SellerType } from '@/lib/seller-risk';
 import { generateNegotiationStrategy } from '@/lib/negotiation-advisor';
 import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
 import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
+import { extractKnownIssues } from '@/lib/complaint-analyzer';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -164,21 +164,46 @@ export async function POST(request: Request) {
             safetyResult = calculateSafetyScore(safetyRatings, complaints, year);
         }
 
+        // Extract known issues from NHTSA complaints (for lifespan adjustment)
+        const knownIssues = extractKnownIssues(complaints);
+
         // Longevity with adjusted lifespan
         if (mileage !== undefined) {
-            const relData = getReliabilityData(make, model);
-            const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
+            const relDataForLifespan = getReliabilityData(make, model);
+            const baseLifespan = relDataForLifespan ? relDataForLifespan.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
 
-            // Calculate adjusted lifespan based on factors
-            lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
+            // Also get curated known issues from reliability database (e.g., Theta II engine)
+            // and filter to those affecting this model year
+            const curatedIssues = (relDataForLifespan?.knownIssues || [])
+                .filter(issue => !issue.affectedYears || issue.affectedYears.includes(year))
+                .map(issue => ({
+                    severity: issue.severity.toUpperCase() as 'MINOR' | 'MODERATE' | 'MAJOR' | 'CRITICAL',
+                    component: issue.component,
+                }));
+
+            // Combine both sources of known issues for lifespan calculation
+            const allKnownIssuesForLifespan = [
+                ...knownIssues.map(i => ({ severity: i.severity, component: i.component })),
+                ...curatedIssues,
+            ];
+
+            // Calculate adjusted lifespan based on factors and known issues
+            lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors, allKnownIssuesForLifespan);
             const expectedLifespan = lifespanAnalysis.adjustedLifespan;
 
             longevityResult = calculateLongevityScore(expectedLifespan, mileage);
         }
 
         // Price
+        let priceSource: 'api' | 'formula' | null = null;
+        let priceConfidence: string | null = null;
+        let priceSampleSize: number | null = null;
         if (askingPrice !== undefined && mileage !== undefined && extracted?.make) {
-            priceEstimate = estimateFairPrice(make, model, year, mileage);
+            const priceEstimateResult = await estimateFairPriceWithApi(make, model, year, mileage);
+            priceEstimate = { low: priceEstimateResult.low, high: priceEstimateResult.high };
+            priceSource = priceEstimateResult.source;
+            priceConfidence = priceEstimateResult.confidence || null;
+            priceSampleSize = priceEstimateResult.sampleSize || null;
             priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
         }
 
@@ -246,12 +271,6 @@ export async function POST(request: Request) {
 
         // New feature calculations
         const relData = getReliabilityData(make, model);
-
-        // Seller Risk Assessment
-        const sellerRisk = assessSellerRisk(
-            (sellerType as SellerType) || 'unknown',
-            listingText
-        );
 
         // Negotiation Strategy (only if we have price data)
         const negotiationStrategy = (askingPrice !== undefined && priceEstimate && mileage !== undefined)
@@ -344,7 +363,10 @@ export async function POST(request: Request) {
                 fairPriceLow: priceEstimate?.low,
                 fairPriceHigh: priceEstimate?.high,
                 dealQuality: priceResult.dealQuality,
-                analysis: priceResult.analysis
+                analysis: priceResult.analysis,
+                source: priceSource,
+                confidence: priceConfidence,
+                sampleSize: priceSampleSize,
             } : null,
             safety: safetyResult ? {
                 score: safetyResult.score,
@@ -361,6 +383,7 @@ export async function POST(request: Request) {
                 extractedLifespanFactors: aiResult.lifespanFactors,
             },
             redFlags: allRedFlags,
+            knownIssues,
             recommendation: {
                 verdict: overallResult?.recommendation || 'MAYBE', // Default if incomplete
                 confidence: overallResult?.confidence || 0.5,
@@ -368,7 +391,6 @@ export async function POST(request: Request) {
                 questionsForSeller: allQuestions
             },
             // New features
-            sellerRisk,
             negotiationStrategy,
             maintenanceCosts,
             inspectionChecklist,

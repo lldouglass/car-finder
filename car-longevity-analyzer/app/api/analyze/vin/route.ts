@@ -15,13 +15,12 @@ import {
 } from '@/lib/red-flags';
 import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
-import { estimateFairPrice } from '@/lib/pricing';
+import { estimateFairPriceWithApi, isPricingApiConfigured } from '@/lib/pricing-api';
 import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
 import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-factors';
 import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
-import { assessSellerRisk, type SellerType } from '@/lib/seller-risk';
 import { generateNegotiationStrategy } from '@/lib/negotiation-advisor';
 import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
 import { generateInspectionChecklist } from '@/lib/inspection-checklist';
@@ -97,6 +96,24 @@ export async function POST(request: Request) {
         const relData = getReliabilityData(vehicle.make, vehicle.model);
         const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
 
+        // Extract known issues from NHTSA complaints
+        const knownIssues = extractKnownIssues(complaints);
+
+        // Also get curated known issues from reliability database (e.g., Theta II engine)
+        // and filter to those affecting this model year
+        const curatedIssues = (relData?.knownIssues || [])
+            .filter(issue => !issue.affectedYears || issue.affectedYears.includes(vehicle.year))
+            .map(issue => ({
+                severity: issue.severity.toUpperCase() as 'MINOR' | 'MODERATE' | 'MAJOR' | 'CRITICAL',
+                component: issue.component,
+            }));
+
+        // Combine both sources of known issues for lifespan calculation
+        const allKnownIssuesForLifespan = [
+            ...knownIssues.map(i => ({ severity: i.severity, component: i.component })),
+            ...curatedIssues,
+        ];
+
         const vinFactors = mapVinToLifespanFactors(vehicle, vehicle.transmissionStyle);
         const climateRegion = getClimateRegion(location);
 
@@ -106,7 +123,9 @@ export async function POST(request: Request) {
             climateRegion
         );
 
-        const lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors);
+        // Pass known issues to lifespan calculation so critical issues (like Theta 2 engine)
+        // reduce expected lifespan appropriately
+        const lifespanAnalysis = calculateAdjustedLifespan(baseLifespan, lifespanFactors, allKnownIssuesForLifespan);
         const expectedLifespan = lifespanAnalysis.adjustedLifespan;
 
         // Calculate reliability using dynamic system
@@ -131,7 +150,7 @@ export async function POST(request: Request) {
 
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
 
-        const priceEstimate = estimateFairPrice(vehicle.make, vehicle.model, vehicle.year, mileage);
+        const priceEstimate = await estimateFairPriceWithApi(vehicle.make, vehicle.model, vehicle.year, mileage, vin);
         const priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
 
         const safetyScoreResult = calculateSafetyScore(safetyRatingData, complaints, vehicle.year);
@@ -155,15 +174,6 @@ export async function POST(request: Request) {
             { make: vehicle.make, model: vehicle.model, year: vehicle.year },
             redFlags,
             recalls
-        );
-
-        // New feature calculations
-        const knownIssues = extractKnownIssues(complaints);
-
-        // Seller Risk Assessment
-        const sellerRisk = assessSellerRisk(
-            (sellerType as SellerType) || 'unknown',
-            listingText
         );
 
         // Negotiation Strategy
@@ -302,7 +312,12 @@ export async function POST(request: Request) {
                 fairPriceLow: priceEstimate.low,
                 fairPriceHigh: priceEstimate.high,
                 dealQuality: priceResult.dealQuality,
-                analysis: priceResult.analysis
+                analysis: priceResult.analysis,
+                source: priceEstimate.source,
+                confidence: priceEstimate.confidence,
+                sampleSize: priceEstimate.sampleSize,
+                apiError: (priceEstimate as any).apiError,
+                _debug: (priceEstimate as any)._debug,
             },
             safety: {
                 score: safetyScoreResult.score,
@@ -337,7 +352,6 @@ export async function POST(request: Request) {
                 questionsForSeller: questions
             },
             // New features
-            sellerRisk,
             negotiationStrategy,
             maintenanceCosts,
             inspectionChecklist,

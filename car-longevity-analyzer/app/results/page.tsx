@@ -34,14 +34,11 @@ import {
   CheckCircle,
   XCircle,
   HelpCircle,
-  Clock,
-  Target,
   MessageCircle,
   AlertCircle,
   Info,
   Wrench,
   Activity,
-  Store,
   TrendingDown,
   Clipboard,
   BadgeCheck,
@@ -50,7 +47,6 @@ import {
   Flame,
   CarFront,
   Ambulance,
-  Calculator,
 } from 'lucide-react';
 import type { RedFlag, ComponentIssue, AppliedFactor, LifespanAnalysis, ReliabilityAnalysis, MaintenanceCostSummaryApi, MaintenanceProjectionApi } from '@/lib/api';
 
@@ -62,67 +58,6 @@ function formatNumber(num: number | null | undefined): string {
 function formatCurrency(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
   return `$${num.toLocaleString()}`;
-}
-
-function getScoreColor(s: number) {
-  if (s >= 7) return 'text-green-600 dark:text-green-400';
-  if (s >= 5) return 'text-yellow-600 dark:text-yellow-400';
-  return 'text-red-600 dark:text-red-400';
-}
-
-interface ScoreCardProps {
-  score: number | null;
-  label: string;
-  icon: React.ReactNode;
-  children?: React.ReactNode;
-}
-
-function ScoreCard({ score, label, icon, children }: ScoreCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const scoreValue = score?.toFixed(1) ?? '--';
-
-  return (
-    <Card className="overflow-hidden">
-      <CardContent className="pt-6 pb-4">
-        <div className="flex items-center justify-center mb-2" aria-hidden="true">
-          {icon}
-        </div>
-        <div
-          className="text-center"
-          role="meter"
-          aria-valuenow={score ?? undefined}
-          aria-valuemin={0}
-          aria-valuemax={10}
-          aria-label={`${label} score: ${scoreValue} out of 10`}
-        >
-          <div className={`text-3xl font-bold ${score !== null ? getScoreColor(score) : 'text-muted-foreground'}`}>
-            {scoreValue}
-          </div>
-          <div className="text-sm font-medium text-foreground">{label}</div>
-        </div>
-
-        {children && (
-          <>
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="w-full mt-3 flex items-center justify-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
-              aria-expanded={isExpanded}
-            >
-              <Calculator className="size-3" />
-              {isExpanded ? 'Hide calculation' : 'How calculated?'}
-              {isExpanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-            </button>
-
-            {isExpanded && (
-              <div className="mt-3 pt-3 border-t text-xs space-y-2">
-                {children}
-              </div>
-            )}
-          </>
-        )}
-      </CardContent>
-    </Card>
-  );
 }
 
 function VerdictBadge({ verdict }: { verdict: string }) {
@@ -330,7 +265,6 @@ function ResultsContent() {
     componentIssues,
     maintenanceCost,
     // New features
-    sellerRisk,
     negotiationStrategy,
     maintenanceCosts,
     inspectionChecklist,
@@ -350,7 +284,6 @@ function ResultsContent() {
   const hasLifespanAnalysis = lifespanAnalysis && lifespanAnalysis.appliedFactors;
   const hasMaintenanceData = maintenanceCost && maintenanceCost.projections && maintenanceCost.projections.length > 0;
   // New feature flags
-  const hasSellerRisk = sellerRisk && sellerRisk.sellerType !== 'unknown';
   const hasNegotiationStrategy = negotiationStrategy && negotiationStrategy.points.length > 0;
   const hasMaintenanceCosts = maintenanceCosts !== null && maintenanceCosts !== undefined;
   const hasInspectionChecklist = inspectionChecklist !== null && inspectionChecklist !== undefined;
@@ -414,174 +347,6 @@ function ResultsContent() {
               </CardContent>
             ) : null}
           </Card>
-
-          {/* Scores Grid */}
-          <section aria-labelledby="scores-heading" className="mb-6">
-            <h2 id="scores-heading" className="sr-only">Vehicle Scores</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {/* Overall Score */}
-              <ScoreCard
-                score={scores?.overall ?? null}
-                label="Overall"
-                icon={<Target className="size-5 text-muted-foreground" />}
-              >
-                <div className="space-y-1.5">
-                  <div className="font-medium text-foreground">Weighted Average:</div>
-                  <div className="flex justify-between">
-                    <span>Reliability (35%)</span>
-                    <span className="font-mono">{((scores?.reliability ?? 0) * 0.35).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Longevity (35%)</span>
-                    <span className="font-mono">{((scores?.longevity ?? 0) * 0.35).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Value (30%)</span>
-                    <span className="font-mono">{((scores?.priceValue ?? 0) * 0.30).toFixed(2)}</span>
-                  </div>
-                  {redFlags && redFlags.length > 0 && (
-                    <div className="flex justify-between text-red-600">
-                      <span>Red flag penalty</span>
-                      <span>−{redFlags.reduce((sum, f) => {
-                        const sev = f.severity?.toLowerCase();
-                        if (sev === 'critical') return sum + 5.0;
-                        if (sev === 'high') return sum + 1.0;
-                        if (sev === 'medium') return sum + 0.5;
-                        return sum + 0.25;
-                      }, 0).toFixed(1)}</span>
-                    </div>
-                  )}
-                  <div className="pt-1.5 border-t mt-1.5">
-                    <div className="text-muted-foreground">
-                      BUY ≥7.5 · MAYBE ≥5.0 · PASS &lt;5.0
-                    </div>
-                  </div>
-                </div>
-              </ScoreCard>
-
-              {/* Reliability Score */}
-              <ScoreCard
-                score={scores?.reliability ?? null}
-                label="Reliability"
-                icon={<Shield className="size-5 text-muted-foreground" />}
-              >
-                <div className="space-y-1.5">
-                  {reliabilityAnalysis ? (
-                    <>
-                      <div className="flex justify-between">
-                        <span>Base score</span>
-                        <span className="font-mono">{reliabilityAnalysis.baseScore.toFixed(1)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Year adjustment</span>
-                        <span className={`font-mono ${reliabilityAnalysis.yearAdjustment >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {reliabilityAnalysis.yearAdjustment >= 0 ? '+' : ''}{reliabilityAnalysis.yearAdjustment.toFixed(1)}
-                        </span>
-                      </div>
-                      {reliabilityAnalysis.isYearToAvoid && (
-                        <div className="text-red-600 flex items-center gap-1 mt-1">
-                          <AlertTriangle className="size-3" />
-                          Known problem year
-                        </div>
-                      )}
-                      {!reliabilityAnalysis.inDatabase && (
-                        <div className="text-muted-foreground mt-1">
-                          Vehicle not in database, using default score
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-muted-foreground">
-                      Based on {vehicle?.make} {vehicle?.model} historical data
-                    </div>
-                  )}
-                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
-                    Weight: 35% of overall
-                  </div>
-                </div>
-              </ScoreCard>
-
-              {/* Longevity Score */}
-              <ScoreCard
-                score={scores?.longevity ?? null}
-                label="Longevity"
-                icon={<Clock className="size-5 text-muted-foreground" />}
-              >
-                <div className="space-y-1.5">
-                  {lifespanAnalysis ? (
-                    <>
-                      <div className="flex justify-between">
-                        <span>Base lifespan</span>
-                        <span className="font-mono">{formatNumber(lifespanAnalysis.baseLifespan)} mi</span>
-                      </div>
-                      {lifespanAnalysis.appliedFactors.length > 0 && (
-                        <>
-                          <div className="font-medium text-foreground mt-2">Adjustments:</div>
-                          {lifespanAnalysis.appliedFactors.slice(0, 4).map((factor, i) => (
-                            <div key={i} className="flex justify-between">
-                              <span className="truncate pr-2">{factor.value}</span>
-                              <span className={`font-mono ${factor.impact === 'positive' ? 'text-green-600' : factor.impact === 'negative' ? 'text-red-600' : ''}`}>
-                                {factor.multiplier > 1 ? '+' : ''}{((factor.multiplier - 1) * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                          ))}
-                          {lifespanAnalysis.appliedFactors.length > 4 && (
-                            <div className="text-muted-foreground">+{lifespanAnalysis.appliedFactors.length - 4} more factors</div>
-                          )}
-                        </>
-                      )}
-                      <div className="flex justify-between font-medium pt-1.5 border-t mt-1.5">
-                        <span>Adjusted</span>
-                        <span className="font-mono">{formatNumber(lifespanAnalysis.adjustedLifespan)} mi</span>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-muted-foreground">
-                      Based on remaining useful life
-                    </div>
-                  )}
-                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
-                    Weight: 35% of overall
-                  </div>
-                </div>
-              </ScoreCard>
-
-              {/* Value Score */}
-              <ScoreCard
-                score={scores?.priceValue ?? null}
-                label="Value"
-                icon={<DollarSign className="size-5 text-muted-foreground" />}
-              >
-                <div className="space-y-1.5">
-                  {pricing ? (
-                    <>
-                      <div className="flex justify-between">
-                        <span>Asking</span>
-                        <span className="font-mono">{formatCurrency(pricing.askingPrice)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Fair range</span>
-                        <span className="font-mono text-[10px]">{formatCurrency(pricing.fairPriceLow)}-{formatCurrency(pricing.fairPriceHigh)}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>Deal quality</span>
-                        <Badge variant={pricing.dealQuality === 'GREAT' || pricing.dealQuality === 'GOOD' ? 'default' : pricing.dealQuality === 'FAIR' ? 'secondary' : 'destructive'} className="text-[10px]">
-                          {pricing.dealQuality}
-                        </Badge>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-muted-foreground">
-                      Price vs fair market value
-                    </div>
-                  )}
-                  <div className="pt-1.5 border-t mt-1.5 text-muted-foreground">
-                    Weight: 30% of overall
-                  </div>
-                </div>
-              </ScoreCard>
-            </div>
-          </section>
 
           {/* Details Grid */}
           <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -658,7 +423,18 @@ function ResultsContent() {
                       <span className="font-medium text-lg">{formatCurrency(pricing.askingPrice)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Fair Price Range</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Fair Price Range</span>
+                        {pricing.source && (
+                          <span className={`text-xs px-1.5 py-0.5 rounded ${
+                            pricing.source === 'api'
+                              ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                              : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                          }`}>
+                            {pricing.source === 'api' ? 'Market Data' : 'Estimated'}
+                          </span>
+                        )}
+                      </div>
                       <span className="font-medium">
                         {formatCurrency(pricing.fairPriceLow)} - {formatCurrency(pricing.fairPriceHigh)}
                       </span>
@@ -811,57 +587,6 @@ function ResultsContent() {
             </Card>
           )}
 
-          {/* Seller Risk Assessment */}
-          {hasSellerRisk && sellerRisk && (
-            <Card className="mb-6" role="region" aria-labelledby="seller-risk-heading">
-              <CardHeader>
-                <CardTitle id="seller-risk-heading" className="text-lg flex items-center gap-2">
-                  <Store className="size-5 text-indigo-500" aria-hidden="true" />
-                  Seller Risk Assessment
-                </CardTitle>
-                <CardDescription>
-                  Risk Level:{' '}
-                  <span className={
-                    sellerRisk.riskLevel === 'low' ? 'text-green-600 font-medium' :
-                    sellerRisk.riskLevel === 'medium' ? 'text-yellow-600 font-medium' :
-                    sellerRisk.riskLevel === 'high' ? 'text-red-600 font-medium' :
-                    'text-muted-foreground'
-                  }>
-                    {sellerRisk.riskLevel.toUpperCase()}
-                  </span>
-                  {' '}(Score: {sellerRisk.riskScore}/10)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {sellerRisk.protections.length > 0 && (
-                  <div>
-                    <p className="font-medium text-sm text-green-600 dark:text-green-400 mb-1">Buyer Protections:</p>
-                    <ul className="text-sm space-y-1">
-                      {sellerRisk.protections.slice(0, 3).map((item, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <CheckCircle className="size-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {sellerRisk.warnings.length > 0 && (
-                  <div>
-                    <p className="font-medium text-sm text-yellow-600 dark:text-yellow-400 mb-1">Watch Out For:</p>
-                    <ul className="text-sm space-y-1">
-                      {sellerRisk.warnings.slice(0, 3).map((item, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <AlertTriangle className="size-4 text-yellow-500 mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
           {/* Maintenance Costs */}
           {hasMaintenanceCosts && maintenanceCosts && (
@@ -981,13 +706,13 @@ function ResultsContent() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {inspectionChecklist.vehicleSpecificItems.length > 0 && (
+                {inspectionChecklist.vehicleSpecificItems.length > 0 ? (
                   <div>
                     <p className="font-medium text-sm mb-2 text-red-600 dark:text-red-400">
                       Vehicle-Specific Checks ({inspectionChecklist.vehicleSpecificItems.length}):
                     </p>
                     <ul className="text-sm space-y-2">
-                      {inspectionChecklist.vehicleSpecificItems.slice(0, 5).map((item, i) => (
+                      {inspectionChecklist.vehicleSpecificItems.map((item, i) => (
                         <li key={i} className="p-2 bg-red-50 dark:bg-red-950 rounded">
                           <div className="flex items-center gap-2 mb-1">
                             <Badge className={
@@ -1003,31 +728,9 @@ function ResultsContent() {
                       ))}
                     </ul>
                   </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No vehicle-specific inspection items identified for this vehicle.</p>
                 )}
-
-                <div>
-                  <p className="font-medium text-sm mb-2">Documents to Request:</p>
-                  <ul className="text-sm grid grid-cols-2 gap-1">
-                    {inspectionChecklist.documentsToRequest.map((doc, i) => (
-                      <li key={i} className="flex items-center gap-1 text-muted-foreground">
-                        <CheckCircle className="size-3" />
-                        <span>{doc}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-medium text-sm mb-2">Test Drive Checklist:</p>
-                  <ul className="text-sm space-y-1">
-                    {inspectionChecklist.testDriveChecklist.slice(0, 5).map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                        <span className="text-primary">{i + 1}.</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </CardContent>
             </Card>
           )}
