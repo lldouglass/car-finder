@@ -87,6 +87,37 @@ export interface ComponentIssue {
     sampleComplaints: string[];
 }
 
+export interface MaintenanceItemApi {
+    id: string;
+    name: string;
+    component: string;
+    category: string;
+    severity: 'critical' | 'major' | 'moderate' | 'minor';
+    description: string;
+    warningSymptoms?: string[];
+}
+
+export interface MaintenanceProjectionApi {
+    item: MaintenanceItemApi;
+    urgency: 'past_due' | 'due_now' | 'upcoming';
+    milesUntilDue: number;
+    progressThroughWindow: number;
+    adjustedCostLow: number;
+    adjustedCostHigh: number;
+}
+
+export interface MaintenanceCostSummaryApi {
+    projections: MaintenanceProjectionApi[];
+    pastDueCount: number;
+    dueNowCount: number;
+    upcomingCount: number;
+    immediateRepairCostLow: number;
+    immediateRepairCostHigh: number;
+    upcomingCostLow: number;
+    upcomingCostHigh: number;
+    maintenanceHealthScore: number;
+}
+
 export interface AIConcern {
     issue: string;
     severity: string;
@@ -118,6 +149,7 @@ export interface AnalysisResponse {
     pricing?: Pricing | null;
     knownIssues?: string[];
     componentIssues?: ComponentIssue[];
+    maintenanceCost?: MaintenanceCostSummaryApi;
     recalls?: Recall[];
     redFlags?: RedFlag[];
     aiAnalysis?: AIAnalysis;

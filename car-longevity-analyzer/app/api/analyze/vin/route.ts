@@ -18,6 +18,7 @@ import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
 import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-factors';
 import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
+import { calculateMaintenanceProjections } from '@/lib/maintenance-data';
 
 // Schema for request validation
 const AnalyzeVinSchema = z.object({
@@ -186,7 +187,15 @@ export async function POST(request: Request) {
             .sort((a, b) => b.count - a.count)
             .slice(0, 10); // Limit to top 10 components
 
-        // 8. Response
+        // 8. Calculate Maintenance Projections
+        const maintenanceCost = calculateMaintenanceProjections(
+            vehicle.make,
+            vehicle.model,
+            vehicle.year,
+            mileage
+        );
+
+        // 9. Response
         return NextResponse.json({
             success: true,
             vehicle,
@@ -224,6 +233,7 @@ export async function POST(request: Request) {
                 analysis: priceResult.analysis
             },
             componentIssues,
+            maintenanceCost,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5), // Limit size
             redFlags,
             recommendation: {

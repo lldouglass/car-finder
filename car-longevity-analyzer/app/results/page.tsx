@@ -19,6 +19,7 @@ import {
   AIAnalysisUnavailable,
   VehicleNotIdentified,
   NoComponentIssues,
+  NoMaintenanceData,
 } from '@/components/empty-states';
 import {
   Car,
@@ -43,7 +44,7 @@ import {
   ChevronUp,
   Calculator,
 } from 'lucide-react';
-import type { RedFlag, ComponentIssue, AppliedFactor, LifespanAnalysis, ReliabilityAnalysis } from '@/lib/api';
+import type { RedFlag, ComponentIssue, AppliedFactor, LifespanAnalysis, ReliabilityAnalysis, MaintenanceCostSummaryApi, MaintenanceProjectionApi } from '@/lib/api';
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
@@ -176,6 +177,83 @@ function DealQualityBadge({ quality }: { quality: string }) {
   );
 }
 
+function UrgencyBadge({ urgency }: { urgency: 'past_due' | 'due_now' | 'upcoming' }) {
+  const config: Record<string, { className: string; label: string }> = {
+    past_due: { className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200', label: 'Past Due' },
+    due_now: { className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', label: 'Due Now' },
+    upcoming: { className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', label: 'Upcoming' },
+  };
+  const c = config[urgency] || config.upcoming;
+  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.className}`}>{c.label}</span>;
+}
+
+function SeverityIcon({ severity }: { severity: 'critical' | 'major' | 'moderate' | 'minor' }) {
+  const colors: Record<string, string> = {
+    critical: 'text-red-500',
+    major: 'text-orange-500',
+    moderate: 'text-yellow-500',
+    minor: 'text-blue-500',
+  };
+  return <AlertCircle className={`size-4 ${colors[severity] || colors.moderate}`} aria-hidden="true" />;
+}
+
+function MaintenanceItem({ projection }: { projection: MaintenanceProjectionApi }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { item, urgency, milesUntilDue, adjustedCostLow, adjustedCostHigh } = projection;
+
+  return (
+    <div className={`border rounded-lg p-4 ${urgency === 'past_due' ? 'border-red-200 bg-red-50 dark:bg-red-950/30' : urgency === 'due_now' ? 'border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30' : ''}`}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2 flex-1">
+          <SeverityIcon severity={item.severity} />
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-sm">{item.name}</span>
+              <UrgencyBadge urgency={urgency} />
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {milesUntilDue <= 0 ? (
+                <span className="text-red-600">{Math.abs(milesUntilDue).toLocaleString()} miles overdue</span>
+              ) : (
+                <span>Due in {milesUntilDue.toLocaleString()} miles</span>
+              )}
+              <span className="mx-2">•</span>
+              <span>{formatCurrency(adjustedCostLow)} - {formatCurrency(adjustedCostHigh)}</span>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-xs text-primary hover:text-primary/80"
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div className="mt-3 pt-3 border-t text-xs space-y-2">
+          <p className="text-muted-foreground">{item.description}</p>
+          {item.warningSymptoms && item.warningSymptoms.length > 0 && (
+            <div>
+              <p className="font-medium text-foreground">Warning signs:</p>
+              <ul className="list-disc list-inside text-muted-foreground mt-1">
+                {item.warningSymptoms.map((symptom, i) => (
+                  <li key={i}>{symptom}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="flex items-center gap-4 pt-1">
+            <span className="text-muted-foreground">Category: {item.category}</span>
+            <span className="text-muted-foreground">Component: {item.component}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RedFlagItem({ flag, index }: { flag: RedFlag; index: number }) {
   const severityColors: Record<string, string> = {
     critical: 'border-red-500 bg-red-50 dark:bg-red-950',
@@ -228,7 +306,7 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, lifespanAnalysis, reliabilityAnalysis, pricing, redFlags, recalls, componentIssues, recommendation, aiAnalysis } = result;
+  const { vehicle, scores, longevity, lifespanAnalysis, reliabilityAnalysis, pricing, redFlags, recalls, componentIssues, maintenanceCost, recommendation, aiAnalysis } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
@@ -238,6 +316,7 @@ function ResultsContent() {
   const hasComponentIssues = componentIssues && componentIssues.length > 0;
   const hasQuestions = recommendation?.questionsForSeller && recommendation.questionsForSeller.length > 0;
   const hasAIAnalysis = aiAnalysis && !aiAnalysis.concerns?.some(c => c.issue === 'AI Analysis Unavailable');
+  const hasMaintenanceData = maintenanceCost && maintenanceCost.projections && maintenanceCost.projections.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
@@ -710,6 +789,62 @@ function ResultsContent() {
                 </div>
               ) : (
                 <NoComponentIssues />
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Maintenance Projections */}
+          <Card className="mb-6" role="region" aria-labelledby="maintenance-heading">
+            <CardHeader>
+              <CardTitle id="maintenance-heading" className="text-lg flex items-center gap-2">
+                <Wrench className="size-5 text-blue-500" aria-hidden="true" />
+                Maintenance Projections
+                {hasMaintenanceData && maintenanceCost.pastDueCount + maintenanceCost.dueNowCount > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {maintenanceCost.pastDueCount + maintenanceCost.dueNowCount} items need attention
+                  </Badge>
+                )}
+              </CardTitle>
+              <CardDescription>Known maintenance items for this make/model/year at current mileage</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {hasMaintenanceData ? (
+                <div className="space-y-4">
+                  {/* Cost Summary */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-muted rounded-lg">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold">{maintenanceCost.maintenanceHealthScore}/10</div>
+                      <div className="text-xs text-muted-foreground">Health Score</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-red-600">
+                        {maintenanceCost.pastDueCount + maintenanceCost.dueNowCount}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Items Due</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold">
+                        {formatCurrency(maintenanceCost.immediateRepairCostLow)}-{formatCurrency(maintenanceCost.immediateRepairCostHigh)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Immediate Costs</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold">
+                        {formatCurrency(maintenanceCost.upcomingCostLow)}-{formatCurrency(maintenanceCost.upcomingCostHigh)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Upcoming Costs</div>
+                    </div>
+                  </div>
+
+                  {/* Maintenance Items */}
+                  <div className="space-y-3" role="list" aria-label="Maintenance items">
+                    {maintenanceCost.projections.map((projection, index) => (
+                      <MaintenanceItem key={index} projection={projection} />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <NoMaintenanceData />
               )}
             </CardContent>
           </Card>
