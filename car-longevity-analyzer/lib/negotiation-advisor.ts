@@ -21,8 +21,6 @@ export interface NegotiationStrategy {
     walkAwayPrice: number;
     points: NegotiationPoint[];
     openingStatement: string;
-    closingTactics: string[];
-    warningsForBuyer: string[];
 }
 
 /**
@@ -302,13 +300,12 @@ export function generateNegotiationStrategy(
     const isGoodDeal = askingPrice <= fairPriceLow;
     const isFairDeal = askingPrice <= fairMid;
 
-    // Generate all negotiation points
+    // Generate vehicle-specific negotiation points only
     const allPoints: NegotiationPoint[] = [
         ...generatePricePoints(askingPrice, fairPriceLow, fairPriceHigh),
         ...generateIssuePoints(knownIssues, mileage, year),
         ...generateRedFlagPoints(redFlags),
-        ...generateMileagePoints(mileage, year),
-        ...generateTimingPoints()
+        ...generateMileagePoints(mileage, year)
     ];
 
     // Sort by leverage (strong first)
@@ -370,9 +367,7 @@ export function generateNegotiationStrategy(
         suggestedOffer: Math.round(suggestedOffer),
         walkAwayPrice: Math.round(walkAwayPrice),
         points: isGoodDeal ? [] : allPoints.slice(0, 6), // No points needed for good deals
-        openingStatement,
-        closingTactics: generateClosingTactics(overallLeverage),
-        warningsForBuyer: generateWarnings(redFlags)
+        openingStatement
     };
 }
 

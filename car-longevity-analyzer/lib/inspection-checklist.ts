@@ -30,10 +30,6 @@ export interface InspectionItem {
 
 export interface InspectionChecklist {
     vehicleSpecificItems: InspectionItem[];
-    standardItems: InspectionItem[];
-    testDriveChecklist: string[];
-    documentsToRequest: string[];
-    toolsNeeded: string[];
     estimatedInspectionTime: string;
 }
 
@@ -422,10 +418,6 @@ export function generateInspectionChecklist(
 
     return {
         vehicleSpecificItems,
-        standardItems: STANDARD_INSPECTION_ITEMS,
-        testDriveChecklist: STANDARD_TEST_DRIVE_CHECKLIST,
-        documentsToRequest: STANDARD_DOCUMENTS,
-        toolsNeeded: TOOLS_NEEDED,
         estimatedInspectionTime: estimatedTime
     };
 }
@@ -434,10 +426,6 @@ export function generateInspectionChecklist(
  * Get a condensed summary of critical inspection items
  */
 export function getCriticalInspectionSummary(checklist: InspectionChecklist): string[] {
-    const criticalItems = [
-        ...checklist.vehicleSpecificItems.filter(i => i.priority === 'critical'),
-        ...checklist.standardItems.filter(i => i.priority === 'critical')
-    ];
-
+    const criticalItems = checklist.vehicleSpecificItems.filter(i => i.priority === 'critical');
     return criticalItems.slice(0, 8).map(i => i.item);
 }
