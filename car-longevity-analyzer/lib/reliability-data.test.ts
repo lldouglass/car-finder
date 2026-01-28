@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getReliabilityData, RELIABILITY_DATA } from './reliability-data';
+import { getReliabilityData, RELIABILITY_DATA, KnownIssue } from './reliability-data';
 
 describe('getReliabilityData', () => {
     describe('exact matching', () => {
@@ -173,6 +173,78 @@ describe('getReliabilityData', () => {
             const silverado = getReliabilityData('Chevrolet', 'Silverado');
             expect(f150?.expectedLifespanMiles).toBeGreaterThanOrEqual(250000);
             expect(silverado?.expectedLifespanMiles).toBeGreaterThanOrEqual(250000);
+        });
+    });
+
+    describe('known issues', () => {
+        it('Nissan Altima has CVT transmission known issues', () => {
+            const altima = getReliabilityData('Nissan', 'Altima');
+            expect(altima?.knownIssues).toBeDefined();
+            expect(altima?.knownIssues?.length).toBeGreaterThan(0);
+            const cvtIssue = altima?.knownIssues?.find(i => i.component === 'transmission');
+            expect(cvtIssue).toBeDefined();
+            expect(cvtIssue?.severity).toBe('critical');
+        });
+
+        it('Ford Focus has PowerShift DCT known issues', () => {
+            const focus = getReliabilityData('Ford', 'Focus');
+            expect(focus?.knownIssues).toBeDefined();
+            const dctIssue = focus?.knownIssues?.find(i =>
+                i.description.toLowerCase().includes('powershift') ||
+                i.description.toLowerCase().includes('dct')
+            );
+            expect(dctIssue).toBeDefined();
+            expect(dctIssue?.component).toBe('transmission');
+        });
+
+        it('Subaru Outback has head gasket known issues', () => {
+            const outback = getReliabilityData('Subaru', 'Outback');
+            expect(outback?.knownIssues).toBeDefined();
+            const headGasketIssue = outback?.knownIssues?.find(i =>
+                i.description.toLowerCase().includes('head gasket')
+            );
+            expect(headGasketIssue).toBeDefined();
+            expect(headGasketIssue?.component).toBe('engine');
+        });
+
+        it('Hyundai Sonata has Theta II engine known issues', () => {
+            const sonata = getReliabilityData('Hyundai', 'Sonata');
+            expect(sonata?.knownIssues).toBeDefined();
+            const engineIssue = sonata?.knownIssues?.find(i =>
+                i.description.toLowerCase().includes('theta')
+            );
+            expect(engineIssue).toBeDefined();
+            expect(engineIssue?.severity).toBe('critical');
+        });
+
+        it('known issues have valid structure', () => {
+            const vehiclesWithIssues = RELIABILITY_DATA.filter(v => v.knownIssues && v.knownIssues.length > 0);
+            expect(vehiclesWithIssues.length).toBeGreaterThan(0);
+
+            for (const vehicle of vehiclesWithIssues) {
+                for (const issue of vehicle.knownIssues!) {
+                    // Check required fields
+                    expect(issue.description).toBeDefined();
+                    expect(issue.description.length).toBeGreaterThan(0);
+                    expect(issue.repairCost.low).toBeLessThanOrEqual(issue.repairCost.high);
+                    expect(issue.mileageRange.start).toBeLessThanOrEqual(issue.mileageRange.end);
+                    expect(['minor', 'moderate', 'major', 'critical']).toContain(issue.severity);
+                    expect(['engine', 'transmission', 'electrical', 'suspension', 'brakes',
+                            'body', 'interior', 'fuel', 'cooling', 'exhaust', 'steering', 'hvac'])
+                        .toContain(issue.component);
+                }
+            }
+        });
+
+        it('repair costs are reasonable', () => {
+            const vehiclesWithIssues = RELIABILITY_DATA.filter(v => v.knownIssues && v.knownIssues.length > 0);
+
+            for (const vehicle of vehiclesWithIssues) {
+                for (const issue of vehicle.knownIssues!) {
+                    expect(issue.repairCost.low).toBeGreaterThanOrEqual(0);
+                    expect(issue.repairCost.high).toBeLessThanOrEqual(20000);
+                }
+            }
         });
     });
 });

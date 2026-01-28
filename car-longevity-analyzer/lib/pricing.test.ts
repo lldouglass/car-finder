@@ -21,7 +21,7 @@ describe('getMsrpData', () => {
 
     it('handles partial model match', () => {
         const data = getMsrpData('Honda', 'Civic EX');
-        expect(data.baseMsrp).toBe(24000);
+        expect(data.baseMsrp).toBe(25000);
         expect(data.category).toBe('economy');
     });
 

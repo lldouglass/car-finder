@@ -19,6 +19,9 @@ import {
   AIAnalysisUnavailable,
   VehicleNotIdentified,
 } from '@/components/empty-states';
+import { SafetyRatingsDisplay, NoSafetyRatings } from '@/components/safety-ratings-display';
+import { KnownIssuesDisplay } from '@/components/known-issues-display';
+import { LifespanFactorsDisplay } from '@/components/lifespan-factors-display';
 import {
   Car,
   ArrowLeft,
@@ -34,9 +37,10 @@ import {
   MessageCircle,
   AlertCircle,
   Info,
+  Wrench,
+  Activity,
 } from 'lucide-react';
-import type { RedFlag, ComponentIssue, SafetyResult } from '@/lib/api';
-import { VehicleHistoryCard } from '@/components/vehicle-history-card';
+import type { RedFlag } from '@/lib/api';
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
@@ -107,36 +111,6 @@ function VerdictBadge({ verdict }: { verdict: string }) {
   );
 }
 
-function StarRating({ rating, label }: { rating: number | null; label: string }) {
-  if (rating === null) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">{label}:</span>
-        <span className="text-sm text-muted-foreground">Not Rated</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">{label}:</span>
-      <div className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <svg
-            key={star}
-            className={`size-4 ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 fill-gray-300'}`}
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        ))}
-      </div>
-      <span className="text-sm font-medium">{rating}/5</span>
-    </div>
-  );
-}
-
 function DealQualityBadge({ quality }: { quality: string }) {
   const colors: Record<string, string> = {
     GREAT: 'bg-green-500',
@@ -164,7 +138,7 @@ function DealQualityBadge({ quality }: { quality: string }) {
   );
 }
 
-function RedFlagItem({ flag, index }: { flag: RedFlag; index: number }) {
+function RedFlagItem({ flag }: { flag: RedFlag }) {
   const severityColors: Record<string, string> = {
     critical: 'border-red-500 bg-red-50 dark:bg-red-950',
     high: 'border-orange-500 bg-orange-50 dark:bg-orange-950',
@@ -216,7 +190,7 @@ function ResultsContent() {
     return <ResultsSkeleton />;
   }
 
-  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis, componentIssues, safety } = result;
+  const { vehicle, scores, longevity, pricing, redFlags, recalls, recommendation, aiAnalysis, safetyRating, knownIssues, lifespanAnalysis } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
@@ -225,7 +199,8 @@ function ResultsContent() {
   const hasRecalls = recalls && recalls.length > 0;
   const hasQuestions = recommendation?.questionsForSeller && recommendation.questionsForSeller.length > 0;
   const hasAIAnalysis = aiAnalysis && !aiAnalysis.concerns?.some(c => c.issue === 'AI Analysis Unavailable');
-  const hasComponentIssues = componentIssues && componentIssues.length > 0;
+  const hasKnownIssues = knownIssues && knownIssues.length > 0;
+  const hasLifespanAnalysis = lifespanAnalysis && lifespanAnalysis.appliedFactors;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
@@ -289,7 +264,7 @@ function ResultsContent() {
           {/* Scores Grid */}
           <section aria-labelledby="scores-heading" className="mb-6">
             <h2 id="scores-heading" className="sr-only">Vehicle Scores</h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4" role="list">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4" role="list">
               <Card role="listitem">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-center mb-2" aria-hidden="true">
@@ -298,14 +273,14 @@ function ResultsContent() {
                   <ScoreDisplay
                     score={scores?.overall ?? null}
                     label="Overall"
-                    description="Combined score based on reliability, longevity, safety, and value"
+                    description="Combined score based on reliability, longevity, and value"
                   />
                 </CardContent>
               </Card>
               <Card role="listitem">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <Gauge className="size-5 text-muted-foreground" />
+                    <Shield className="size-5 text-muted-foreground" />
                   </div>
                   <ScoreDisplay
                     score={scores?.reliability ?? null}
@@ -323,18 +298,6 @@ function ResultsContent() {
                     score={scores?.longevity ?? null}
                     label="Longevity"
                     description="Estimated remaining useful life"
-                  />
-                </CardContent>
-              </Card>
-              <Card role="listitem">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-center mb-2" aria-hidden="true">
-                    <Shield className="size-5 text-muted-foreground" />
-                  </div>
-                  <ScoreDisplay
-                    score={scores?.safety ?? null}
-                    label="Safety"
-                    description="Based on crash test ratings and incident data"
                   />
                 </CardContent>
               </Card>
@@ -359,7 +322,7 @@ function ResultsContent() {
             <Card role="region" aria-labelledby="longevity-heading">
               <CardHeader>
                 <CardTitle id="longevity-heading" className="text-lg flex items-center gap-2">
-                  <Clock className="size-5" aria-hidden="true" />
+                  <Gauge className="size-5" aria-hidden="true" />
                   Longevity Analysis
                 </CardTitle>
               </CardHeader>
@@ -448,116 +411,53 @@ function ResultsContent() {
             </Card>
           </div>
 
-          {/* Safety Details */}
-          {safety && (
-            <Card className="mb-6" role="region" aria-labelledby="safety-heading">
+          {/* Safety Ratings & Known Issues Grid */}
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            {/* Safety Ratings */}
+            <Card role="region" aria-labelledby="safety-heading">
               <CardHeader>
                 <CardTitle id="safety-heading" className="text-lg flex items-center gap-2">
-                  <Shield className="size-5" aria-hidden="true" />
-                  Safety Details
+                  <Shield className="size-5 text-blue-500" aria-hidden="true" />
+                  Safety Ratings
                 </CardTitle>
-                <CardDescription>
-                  NHTSA crash test ratings and incident data
-                  {safety.confidence && (
-                    <Badge variant="outline" className="ml-2">
-                      {safety.confidence} confidence
-                    </Badge>
-                  )}
-                </CardDescription>
+                <CardDescription>NHTSA crash test results</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Crash Test Ratings */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm flex items-center gap-2">
-                      Crash Test Ratings
-                      {!safety.hasCrashTestData && (
-                        <Badge variant="secondary" className="text-xs">No data</Badge>
-                      )}
-                    </h4>
-                    {safety.hasCrashTestData ? (
-                      <div className="space-y-2">
-                        <StarRating rating={safety.breakdown.crashTestRatings.overall} label="Overall" />
-                        <StarRating rating={safety.breakdown.crashTestRatings.frontal} label="Frontal" />
-                        <StarRating rating={safety.breakdown.crashTestRatings.side} label="Side" />
-                        <StarRating rating={safety.breakdown.crashTestRatings.rollover} label="Rollover" />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No NHTSA crash test data available for this vehicle.
-                        This may be due to the vehicle's age or limited testing.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Incident Data */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm">Reported Incidents (NHTSA Complaints)</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className={`p-3 rounded-lg ${safety.breakdown.incidents.deaths > 0 ? 'bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800' : 'bg-muted'}`}>
-                        <div className={`text-2xl font-bold ${safety.breakdown.incidents.deaths > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>
-                          {safety.breakdown.incidents.deaths}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Fatalities</div>
-                      </div>
-                      <div className={`p-3 rounded-lg ${safety.breakdown.incidents.injuries > 0 ? 'bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800' : 'bg-muted'}`}>
-                        <div className={`text-2xl font-bold ${safety.breakdown.incidents.injuries > 0 ? 'text-orange-600 dark:text-orange-400' : ''}`}>
-                          {safety.breakdown.incidents.injuries}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Injuries</div>
-                      </div>
-                      <div className={`p-3 rounded-lg ${safety.breakdown.incidents.fires > 0 ? 'bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800' : 'bg-muted'}`}>
-                        <div className={`text-2xl font-bold ${safety.breakdown.incidents.fires > 0 ? 'text-yellow-600 dark:text-yellow-400' : ''}`}>
-                          {safety.breakdown.incidents.fires}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Fires</div>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted">
-                        <div className="text-2xl font-bold">
-                          {safety.breakdown.incidents.crashes}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Crashes</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {safetyRating ? (
+                  <SafetyRatingsDisplay safetyRating={safetyRating} />
+                ) : (
+                  <NoSafetyRatings />
+                )}
               </CardContent>
             </Card>
-          )}
 
-          {/* Component Issues from NHTSA */}
-          {hasComponentIssues && (
-            <Card className="mb-6" role="region" aria-labelledby="component-issues-heading">
+            {/* Known Issues */}
+            <Card role="region" aria-labelledby="issues-heading">
               <CardHeader>
-                <CardTitle id="component-issues-heading" className="text-lg flex items-center gap-2">
-                  <AlertCircle className="size-5 text-orange-500" aria-hidden="true" />
-                  Known Component Issues
+                <CardTitle id="issues-heading" className="text-lg flex items-center gap-2">
+                  <Wrench className="size-5 text-orange-500" aria-hidden="true" />
+                  Known Issues {hasKnownIssues && `(${knownIssues.length})`}
                 </CardTitle>
-                <CardDescription>Common problems reported to NHTSA for this make/model/year</CardDescription>
+                <CardDescription>Common problems from NHTSA complaints</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3" role="list" aria-label="List of component issues">
-                  {componentIssues.map((issue, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800"
-                      role="listitem"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{issue.component}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {issue.complaintCount} complaints
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">{issue.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Data from NHTSA complaint database. More complaints may indicate common issues to watch for.
-                </p>
+                <KnownIssuesDisplay issues={knownIssues || []} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Lifespan Factors */}
+          {hasLifespanAnalysis && (
+            <Card className="mb-6" role="region" aria-labelledby="lifespan-factors-heading">
+              <CardHeader>
+                <CardTitle id="lifespan-factors-heading" className="text-lg flex items-center gap-2">
+                  <Activity className="size-5 text-purple-500" aria-hidden="true" />
+                  Lifespan Analysis
+                </CardTitle>
+                <CardDescription>How vehicle factors affect expected lifespan</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LifespanFactorsDisplay lifespanAnalysis={lifespanAnalysis} />
               </CardContent>
             </Card>
           )}
@@ -575,7 +475,7 @@ function ResultsContent() {
               {hasRedFlags ? (
                 <div className="space-y-3" role="list" aria-label="List of red flags">
                   {redFlags.map((flag, index) => (
-                    <RedFlagItem key={index} flag={flag} index={index} />
+                    <RedFlagItem key={index} flag={flag} />
                   ))}
                 </div>
               ) : (
@@ -598,62 +498,12 @@ function ResultsContent() {
               </CardHeader>
               <CardContent>
                 {hasAIAnalysis ? (
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">{aiAnalysis.impression}</p>
-
-                    {/* Inconsistencies - most important for lie detection */}
-                    {aiAnalysis.inconsistencies && aiAnalysis.inconsistencies.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="font-medium text-sm flex items-center gap-2">
-                          <AlertTriangle className="size-4 text-orange-500" aria-hidden="true" />
-                          Inconsistencies Detected
-                        </p>
-                        <div role="list" aria-label="Detected inconsistencies" className="space-y-2">
-                          {aiAnalysis.inconsistencies.map((inc, index) => (
-                            <div
-                              key={index}
-                              className={`text-sm p-3 rounded border-l-4 ${
-                                inc.severity === 'high' ? 'bg-red-50 dark:bg-red-950 border-red-500' :
-                                inc.severity === 'medium' ? 'bg-orange-50 dark:bg-orange-950 border-orange-500' :
-                                'bg-yellow-50 dark:bg-yellow-950 border-yellow-500'
-                              }`}
-                              role="listitem"
-                            >
-                              <span className="font-medium">{inc.description}</span>
-                              <p className="text-muted-foreground text-xs mt-1">{inc.details}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Suspicious Patterns */}
-                    {aiAnalysis.suspiciousPatterns && aiAnalysis.suspiciousPatterns.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="font-medium text-sm flex items-center gap-2">
-                          <AlertCircle className="size-4 text-yellow-500" aria-hidden="true" />
-                          Suspicious Language Detected
-                        </p>
-                        <div role="list" aria-label="Suspicious patterns" className="space-y-2">
-                          {aiAnalysis.suspiciousPatterns.map((pattern, index) => (
-                            <div
-                              key={index}
-                              className="text-sm p-3 bg-yellow-50 dark:bg-yellow-950 rounded border-l-4 border-yellow-400"
-                              role="listitem"
-                            >
-                              <span className="font-medium italic">"{pattern.phrase}"</span>
-                              <p className="text-muted-foreground text-xs mt-1">{pattern.explanation}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* General Concerns */}
+                  <>
+                    <p className="text-muted-foreground mb-4">{aiAnalysis.impression}</p>
                     {aiAnalysis.concerns && aiAnalysis.concerns.length > 0 && (
                       <div className="space-y-2">
-                        <p className="font-medium text-sm">Other Concerns:</p>
-                        <div role="list" aria-label="AI identified concerns" className="space-y-2">
+                        <p className="font-medium text-sm">AI Concerns:</p>
+                        <div role="list" aria-label="AI identified concerns">
                           {aiAnalysis.concerns.map((concern, index) => (
                             <div key={index} className="text-sm p-2 bg-muted rounded" role="listitem">
                               <span className="font-medium">{concern.issue}</span>
@@ -663,7 +513,7 @@ function ResultsContent() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </>
                 ) : (
                   <AIAnalysisUnavailable />
                 )}
@@ -701,9 +551,6 @@ function ResultsContent() {
               )}
             </CardContent>
           </Card>
-
-          {/* Vehicle History Report (Paid Feature) */}
-          <VehicleHistoryCard vin={vehicle?.vin} />
 
           {/* Questions for Seller */}
           <Card className="mb-6" role="region" aria-labelledby="questions-heading">

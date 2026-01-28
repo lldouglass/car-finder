@@ -14,7 +14,6 @@ export interface ListingAnalysisRequest {
 }
 
 export interface Vehicle {
-    vin?: string;
     year: number | null;
     make: string | null;
     model: string | null;
@@ -25,32 +24,7 @@ export interface Scores {
     reliability: number | null;
     longevity: number | null;
     priceValue: number | null;
-    safety: number | null;
     overall: number | null;
-}
-
-export interface SafetyBreakdown {
-    crashTestRatings: {
-        overall: number | null;
-        frontal: number | null;
-        side: number | null;
-        rollover: number | null;
-    };
-    incidents: {
-        deaths: number;
-        injuries: number;
-        fires: number;
-        crashes: number;
-    };
-    crashTestScore: number | null;
-    incidentScore: number;
-}
-
-export interface SafetyResult {
-    score: number;
-    breakdown: SafetyBreakdown;
-    confidence: 'high' | 'medium' | 'low';
-    hasCrashTestData: boolean;
 }
 
 export interface Longevity {
@@ -80,39 +54,16 @@ export interface Recall {
     date: string;
 }
 
-export interface ComponentIssue {
-    component: string;
-    complaintCount: number;
-    severityScore: number;
-    description: string;
-}
-
 export interface AIConcern {
     issue: string;
     severity: string;
     explanation: string;
 }
 
-export interface AIInconsistency {
-    type: string;
-    description: string;
-    severity: string;
-    details: string;
-}
-
-export interface AISuspiciousPattern {
-    type: string;
-    phrase: string;
-    explanation: string;
-    severity: string;
-}
-
 export interface AIAnalysis {
     trustworthiness: number;
     impression: string;
     concerns: AIConcern[];
-    inconsistencies?: AIInconsistency[];
-    suspiciousPatterns?: AISuspiciousPattern[];
 }
 
 export interface Recommendation {
@@ -122,50 +73,39 @@ export interface Recommendation {
     questionsForSeller: string[];
 }
 
-// Vehicle History Types (VinAudit/NMVTIS)
-export interface TitleRecord {
-    state: string;
-    date: string;
-    odometer: number;
-    titleType: string;
+// Safety Ratings from NHTSA crash tests
+export interface SafetyRating {
+    overallRating: string;
+    frontalCrashRating: string;
+    sideCrashRating: string;
+    rolloverRating: string;
+    complaintsCount: number;
+    recallsCount: number;
 }
 
-export interface OdometerRecord {
-    date: string;
-    reading: number;
-    source?: string;
+// Known issues derived from NHTSA complaints
+export interface KnownIssue {
+    component: string;
+    severity: 'MINOR' | 'MODERATE' | 'MAJOR' | 'CRITICAL';
+    complaintCount: number;
+    description: string;
+    hasSafetyIncidents: boolean;
 }
 
-export interface VehicleHistory {
-    vin: string;
-    titleRecords: TitleRecord[];
-    titleBrands: string[];
-    odometerRecords: OdometerRecord[];
-    odometerDiscrepancy: boolean;
-    theftRecord: boolean;
-    totalLoss: boolean;
-    fetchedAt: string;
+// Lifespan adjustment factors for display
+export interface AppliedFactor {
+    category: string;
+    value: string;
+    multiplier: number;
+    impact: 'positive' | 'negative' | 'neutral';
 }
 
-export interface HistoryAnalysis {
-    hasCriticalIssue: boolean;
-    hasHighRiskIssue: boolean;
-    issues: Array<{
-        type: string;
-        severity: 'critical' | 'high' | 'medium';
-        description: string;
-    }>;
-    recommendation: string;
-}
-
-export interface VehicleHistoryResponse {
-    success: boolean;
-    history?: VehicleHistory;
-    analysis?: HistoryAnalysis;
-    cached?: boolean;
-    remainingCalls?: number;
-    error?: string;
-    featureAvailable?: boolean;
+export interface LifespanAnalysis {
+    baseLifespan: number;
+    adjustedLifespan: number;
+    totalMultiplier: number;
+    appliedFactors: AppliedFactor[];
+    confidence: 'high' | 'medium' | 'low';
 }
 
 export interface AnalysisResponse {
@@ -176,13 +116,13 @@ export interface AnalysisResponse {
     scores?: Scores;
     longevity?: Longevity | null;
     pricing?: Pricing | null;
-    safety?: SafetyResult | null;
-    knownIssues?: string[];
-    componentIssues?: ComponentIssue[];
+    knownIssues?: KnownIssue[];
     recalls?: Recall[];
     redFlags?: RedFlag[];
     aiAnalysis?: AIAnalysis;
     recommendation?: Recommendation;
+    safetyRating?: SafetyRating | null;
+    lifespanAnalysis?: LifespanAnalysis;
 }
 
 export class APIError extends Error {
@@ -314,54 +254,5 @@ export async function analyzeByListing(data: ListingAnalysisRequest): Promise<An
             throw error;
         }
         throw new NetworkError();
-    }
-}
-
-/**
- * Fetches vehicle history (NMVTIS data) for a VIN.
- * This is a paid feature - each lookup costs $1-2.
- */
-export async function fetchVehicleHistory(vin: string): Promise<VehicleHistoryResponse> {
-    try {
-        const response = await fetchWithTimeout(`/api/history/${encodeURIComponent(vin)}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-        });
-
-        const result: VehicleHistoryResponse = await response.json();
-
-        if (!response.ok || !result.success) {
-            // Return the error response without throwing (let caller handle)
-            return result;
-        }
-
-        return result;
-    } catch (error) {
-        if (error instanceof APIError) {
-            return {
-                success: false,
-                error: error.message,
-            };
-        }
-        return {
-            success: false,
-            error: 'Network error. Please check your connection and try again.',
-        };
-    }
-}
-
-/**
- * Checks if vehicle history lookup is available.
- */
-export async function isHistoryLookupAvailable(): Promise<boolean> {
-    try {
-        const response = await fetch('/api/history/check', {
-            method: 'HEAD',
-        });
-        return response.headers.get('X-Feature-Available') === 'true';
-    } catch {
-        return false;
     }
 }
