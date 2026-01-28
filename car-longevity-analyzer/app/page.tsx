@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -9,15 +10,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAnalysis } from '@/lib/analysis-context';
+import { useHistory } from '@/lib/history-context';
 import { useToast } from '@/components/ui/toast';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { AnalyzingOverlay } from '@/components/results-skeleton';
-import { analyzeByVin, analyzeByListing, APIError } from '@/lib/api';
-import { Car, Search, FileText, Loader2, AlertCircle, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { analyzeByVin, analyzeByListing, APIError, type SellerType } from '@/lib/api';
+import { Car, Search, FileText, Loader2, AlertCircle, RefreshCw, WifiOff, History, Scale } from 'lucide-react';
 
 function HomeContent() {
   const router = useRouter();
   const { setResult, isLoading, setIsLoading, error, setError } = useAnalysis();
+  const { saveAnalysis, historyCount } = useHistory();
   const { addToast } = useToast();
 
   // VIN form state
@@ -28,6 +31,7 @@ function HomeContent() {
 
   // Listing form state
   const [listingText, setListingText] = useState('');
+  const [listingUrl, setListingUrl] = useState('');
   const [listingPrice, setListingPrice] = useState('');
   const [listingMileage, setListingMileage] = useState('');
   const [listingSellerType, setListingSellerType] = useState('');
@@ -51,7 +55,7 @@ function HomeContent() {
       vin: vin.toUpperCase(),
       mileage: parseInt(mileage, 10),
       askingPrice: parseInt(askingPrice, 10),
-      sellerType: sellerType || undefined,
+      sellerType: (sellerType || undefined) as SellerType | undefined,
     };
 
     setLastSubmission({ type: 'vin', data });
@@ -59,8 +63,13 @@ function HomeContent() {
     try {
       const result = await analyzeByVin(data);
       setResult(result);
+      // Save to history
+      const historyId = saveAnalysis(result, {
+        type: 'vin',
+        vin: data.vin,
+      });
       addToast('Analysis complete!', 'success');
-      router.push('/results');
+      router.push(`/results?id=${historyId}`);
     } catch (err) {
       const message = err instanceof APIError ? err.message : 'An unexpected error occurred';
       const retryable = err instanceof APIError ? err.isRetryable : false;
@@ -80,9 +89,10 @@ function HomeContent() {
 
     const data = {
       listingText,
+      listingUrl: listingUrl || undefined,
       askingPrice: listingPrice ? parseInt(listingPrice, 10) : undefined,
       mileage: listingMileage ? parseInt(listingMileage, 10) : undefined,
-      sellerType: listingSellerType || undefined,
+      sellerType: (listingSellerType || undefined) as SellerType | undefined,
     };
 
     setLastSubmission({ type: 'listing', data });
@@ -90,8 +100,14 @@ function HomeContent() {
     try {
       const result = await analyzeByListing(data);
       setResult(result);
+      // Save to history
+      const historyId = saveAnalysis(result, {
+        type: 'listing',
+        listingUrl: listingUrl || undefined,
+        listingText,
+      });
       addToast('Analysis complete!', 'success');
-      router.push('/results');
+      router.push(`/results?id=${historyId}`);
     } catch (err) {
       const message = err instanceof APIError ? err.message : 'An unexpected error occurred';
       const retryable = err instanceof APIError ? err.isRetryable : false;
@@ -149,6 +165,23 @@ function HomeContent() {
 
         {/* Header */}
         <header className="text-center mb-8">
+          {/* Quick links */}
+          {historyCount > 0 && (
+            <div className="flex justify-center gap-2 mb-4">
+              <Link href="/history">
+                <Button variant="outline" size="sm">
+                  <History className="size-4 mr-1.5" />
+                  History ({historyCount})
+                </Button>
+              </Link>
+              <Link href="/compare">
+                <Button variant="outline" size="sm">
+                  <Scale className="size-4 mr-1.5" />
+                  Compare
+                </Button>
+              </Link>
+            </div>
+          )}
           <div className="flex justify-center mb-4" aria-hidden="true">
             <div className="rounded-full bg-primary/10 p-4">
               <Car className="size-10 text-primary" />
@@ -384,6 +417,27 @@ function HomeContent() {
                       />
                       <p id="listing-help" className="text-xs text-muted-foreground mt-1">
                         Copy and paste the entire listing from Craigslist, Facebook Marketplace, etc.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="listingUrl"
+                        className="block text-sm font-medium mb-1.5"
+                      >
+                        Listing URL (optional)
+                      </label>
+                      <Input
+                        id="listingUrl"
+                        type="url"
+                        placeholder="https://craigslist.org/cars/..."
+                        value={listingUrl}
+                        onChange={(e) => setListingUrl(e.target.value)}
+                        disabled={isLoading}
+                        aria-describedby="listing-url-help"
+                      />
+                      <p id="listing-url-help" className="text-xs text-muted-foreground mt-1">
+                        Save the link to easily return to the listing later
                       </p>
                     </div>
 

@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAnalysis } from '@/lib/analysis-context';
+import { useHistory } from '@/lib/history-context';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { ResultsSkeleton } from '@/components/results-skeleton';
 import {
@@ -51,6 +52,8 @@ import {
   CarFront,
   Ambulance,
   Calculator,
+  History,
+  Scale,
 } from 'lucide-react';
 import type { RedFlag, ComponentIssue, AppliedFactor, LifespanAnalysis, ReliabilityAnalysis, MaintenanceCostSummaryApi, MaintenanceProjectionApi } from '@/lib/api';
 
@@ -298,7 +301,14 @@ function RedFlagItem({ flag }: { flag: RedFlag }) {
 
 function ResultsContent() {
   const router = useRouter();
-  const { result, isLoading } = useAnalysis();
+  const searchParams = useSearchParams();
+  const { result: contextResult, isLoading } = useAnalysis();
+  const { getAnalysis, historyCount } = useHistory();
+
+  // Get analysis from history if ID is in URL, otherwise use context
+  const historyId = searchParams.get('id');
+  const historyItem = historyId ? getAnalysis(historyId) : null;
+  const result = historyItem?.analysis || contextResult;
 
   useEffect(() => {
     if (!result && !isLoading) {
@@ -1267,14 +1277,32 @@ function ResultsContent() {
             </CardContent>
           </Card>
 
-          {/* Back button */}
-          <div className="text-center">
+          {/* Action buttons */}
+          <div className="flex flex-wrap justify-center gap-3">
             <Link href="/">
               <Button variant="outline" size="lg" aria-label="Analyze another vehicle">
                 <ArrowLeft className="size-4 mr-2" aria-hidden="true" />
-                Analyze Another Vehicle
+                Analyze Another
               </Button>
             </Link>
+            {historyCount > 0 && (
+              <>
+                <Link href="/history">
+                  <Button variant="outline" size="lg">
+                    <History className="size-4 mr-2" aria-hidden="true" />
+                    History ({historyCount})
+                  </Button>
+                </Link>
+                {historyCount >= 2 && (
+                  <Link href="/compare">
+                    <Button variant="secondary" size="lg">
+                      <Scale className="size-4 mr-2" aria-hidden="true" />
+                      Compare Vehicles
+                    </Button>
+                  </Link>
+                )}
+              </>
+            )}
           </div>
         </main>
       </div>

@@ -12,6 +12,7 @@ export interface VinAnalysisRequest {
 
 export interface ListingAnalysisRequest {
     listingText: string;
+    listingUrl?: string;
     askingPrice?: number;
     mileage?: number;
     sellerType?: SellerType;
