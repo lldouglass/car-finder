@@ -48,59 +48,99 @@ function formatCurrency(num: number | null | undefined): string {
   return `$${num.toLocaleString()}`;
 }
 
+const DEAL_QUALITY_CONFIG: Record<string, { color: string; label: string }> = {
+  GREAT: { color: 'bg-green-500', label: 'Great deal - below market value' },
+  GOOD: { color: 'bg-green-400', label: 'Good deal - competitive price' },
+  FAIR: { color: 'bg-yellow-500', label: 'Fair price - within market range' },
+  HIGH: { color: 'bg-orange-500', label: 'High price - above market average' },
+  OVERPRICED: { color: 'bg-red-500', label: 'Overpriced - significantly above market' },
+};
+
 function DealQualityBadge({ quality }: { quality: string }) {
-  const colors: Record<string, string> = {
-    GREAT: 'bg-green-500',
-    GOOD: 'bg-green-400',
-    FAIR: 'bg-yellow-500',
-    HIGH: 'bg-orange-500',
-    OVERPRICED: 'bg-red-500',
-  };
-
-  const labels: Record<string, string> = {
-    GREAT: 'Great deal - below market value',
-    GOOD: 'Good deal - competitive price',
-    FAIR: 'Fair price - within market range',
-    HIGH: 'High price - above market average',
-    OVERPRICED: 'Overpriced - significantly above market',
-  };
-
+  const config = DEAL_QUALITY_CONFIG[quality] || { color: 'bg-gray-500', label: quality };
   return (
-    <Badge
-      className={`${colors[quality] || 'bg-gray-500'} text-white`}
-      aria-label={labels[quality] || quality}
-    >
+    <Badge className={`${config.color} text-white`} aria-label={config.label}>
       {quality}
     </Badge>
   );
 }
 
+const URGENCY_CONFIG: Record<string, { className: string; label: string }> = {
+  past_due: { className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200', label: 'Past Due' },
+  due_now: { className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', label: 'Due Now' },
+  upcoming: { className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', label: 'Upcoming' },
+};
+
 function UrgencyBadge({ urgency }: { urgency: 'past_due' | 'due_now' | 'upcoming' }) {
-  const config: Record<string, { className: string; label: string }> = {
-    past_due: { className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200', label: 'Past Due' },
-    due_now: { className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', label: 'Due Now' },
-    upcoming: { className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', label: 'Upcoming' },
-  };
-  const c = config[urgency] || config.upcoming;
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.className}`}>{c.label}</span>;
+  const { className, label } = URGENCY_CONFIG[urgency] || URGENCY_CONFIG.upcoming;
+  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${className}`}>{label}</span>;
 }
 
+const SEVERITY_COLORS: Record<string, string> = {
+  critical: 'text-red-500',
+  major: 'text-orange-500',
+  moderate: 'text-yellow-500',
+  minor: 'text-blue-500',
+};
+
 function SeverityIcon({ severity }: { severity: 'critical' | 'major' | 'moderate' | 'minor' }) {
-  const colors: Record<string, string> = {
-    critical: 'text-red-500',
-    major: 'text-orange-500',
-    moderate: 'text-yellow-500',
-    minor: 'text-blue-500',
-  };
-  return <AlertCircle className={`size-4 ${colors[severity] || colors.moderate}`} aria-hidden="true" />;
+  return <AlertCircle className={`size-4 ${SEVERITY_COLORS[severity] || SEVERITY_COLORS.moderate}`} aria-hidden="true" />;
+}
+
+const MAINTENANCE_URGENCY_STYLES: Record<string, string> = {
+  past_due: 'border-red-200 bg-red-50 dark:bg-red-950/30',
+  due_now: 'border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30',
+  upcoming: '',
+};
+
+const LEVERAGE_COLORS: Record<string, string> = {
+  strong: 'bg-green-500',
+  moderate: 'bg-yellow-500',
+  weak: 'bg-gray-500',
+};
+
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: 'bg-red-500',
+  important: 'bg-yellow-500',
+  standard: 'bg-gray-500',
+};
+
+function getLeverageColor(leverage: string): string {
+  return LEVERAGE_COLORS[leverage] || LEVERAGE_COLORS.weak;
+}
+
+function getPriorityColor(priority: string): string {
+  return PRIORITY_COLORS[priority] || PRIORITY_COLORS.standard;
+}
+
+const LEVERAGE_TEXT_COLORS: Record<string, string> = {
+  strong: 'text-green-600 font-medium',
+  moderate: 'text-yellow-600 font-medium',
+  weak: 'text-muted-foreground',
+};
+
+function getLeverageTextColor(leverage: string): string {
+  return LEVERAGE_TEXT_COLORS[leverage] || LEVERAGE_TEXT_COLORS.weak;
+}
+
+const COVERAGE_QUALITY_COLORS: Record<string, string> = {
+  excellent: 'text-green-600 font-medium',
+  good: 'text-blue-600 font-medium',
+  fair: 'text-muted-foreground',
+  none: 'text-muted-foreground',
+};
+
+function getCoverageQualityColor(quality: string): string {
+  return COVERAGE_QUALITY_COLORS[quality] || COVERAGE_QUALITY_COLORS.none;
 }
 
 function MaintenanceItem({ projection }: { projection: MaintenanceProjectionApi }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { item, urgency, milesUntilDue, adjustedCostLow, adjustedCostHigh } = projection;
+  const urgencyStyle = MAINTENANCE_URGENCY_STYLES[urgency] || '';
 
   return (
-    <div className={`border rounded-lg p-4 ${urgency === 'past_due' ? 'border-red-200 bg-red-50 dark:bg-red-950/30' : urgency === 'due_now' ? 'border-yellow-200 bg-yellow-50 dark:bg-yellow-950/30' : ''}`}>
+    <div className={`border rounded-lg p-4 ${urgencyStyle}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-2 flex-1">
           <SeverityIcon severity={item.severity} />
@@ -152,31 +192,25 @@ function MaintenanceItem({ projection }: { projection: MaintenanceProjectionApi 
   );
 }
 
+const RED_FLAG_CONFIG: Record<string, { border: string; Icon: typeof AlertCircle; iconColor: string }> = {
+  critical: { border: 'border-red-500 bg-red-50 dark:bg-red-950', Icon: AlertCircle, iconColor: 'text-red-500' },
+  high: { border: 'border-orange-500 bg-orange-50 dark:bg-orange-950', Icon: AlertTriangle, iconColor: 'text-orange-500' },
+  medium: { border: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950', Icon: AlertTriangle, iconColor: 'text-yellow-500' },
+  low: { border: 'border-blue-500 bg-blue-50 dark:bg-blue-950', Icon: Info, iconColor: 'text-blue-500' },
+};
+
 function RedFlagItem({ flag }: { flag: RedFlag }) {
-  const severityColors: Record<string, string> = {
-    critical: 'border-red-500 bg-red-50 dark:bg-red-950',
-    high: 'border-orange-500 bg-orange-50 dark:bg-orange-950',
-    medium: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950',
-    low: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
-  };
-
-  const severityIcons: Record<string, React.ReactNode> = {
-    critical: <AlertCircle className="size-4 text-red-500" aria-hidden="true" />,
-    high: <AlertTriangle className="size-4 text-orange-500" aria-hidden="true" />,
-    medium: <AlertTriangle className="size-4 text-yellow-500" aria-hidden="true" />,
-    low: <Info className="size-4 text-blue-500" aria-hidden="true" />,
-  };
-
   const severity = flag.severity?.toLowerCase() || 'medium';
+  const { border, Icon, iconColor } = RED_FLAG_CONFIG[severity] || RED_FLAG_CONFIG.medium;
 
   return (
     <div
-      className={`border-l-4 p-3 rounded-r ${severityColors[severity] || severityColors.medium}`}
+      className={`border-l-4 p-3 rounded-r ${border}`}
       role="listitem"
       aria-label={`${severity} severity: ${flag.message}`}
     >
       <div className="flex items-center gap-2">
-        {severityIcons[severity] || severityIcons.medium}
+        <Icon className={`size-4 ${iconColor}`} aria-hidden="true" />
         <span className="font-medium text-sm">{flag.message}</span>
       </div>
       {flag.advice && (
@@ -409,11 +443,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             </CardTitle>
             <CardDescription>
               Overall Leverage:{' '}
-              <span className={
-                negotiationStrategy.overallLeverage === 'strong' ? 'text-green-600 font-medium' :
-                negotiationStrategy.overallLeverage === 'moderate' ? 'text-yellow-600 font-medium' :
-                'text-muted-foreground'
-              }>
+              <span className={getLeverageTextColor(negotiationStrategy.overallLeverage)}>
                 {negotiationStrategy.overallLeverage.toUpperCase()}
               </span>
             </CardDescription>
@@ -446,10 +476,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <ul className="space-y-2">
                 {negotiationStrategy.points.slice(0, 4).map((point, index) => (
                   <li key={index} className="text-sm flex items-start gap-2">
-                    <Badge className={
-                      point.leverage === 'strong' ? 'bg-green-500' :
-                      point.leverage === 'moderate' ? 'bg-yellow-500' : 'bg-gray-500'
-                    }>
+                    <Badge className={getLeverageColor(point.leverage)}>
                       {point.leverage}
                     </Badge>
                     <span>{point.point}</span>
@@ -532,11 +559,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             </CardTitle>
             <CardDescription>
               Coverage Quality:{' '}
-              <span className={
-                warrantyValue.coverageQuality === 'excellent' ? 'text-green-600 font-medium' :
-                warrantyValue.coverageQuality === 'good' ? 'text-blue-600 font-medium' :
-                'text-muted-foreground'
-              }>
+              <span className={getCoverageQualityColor(warrantyValue.coverageQuality)}>
                 {warrantyValue.coverageQuality.toUpperCase()}
               </span>
             </CardDescription>
@@ -587,10 +610,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 {inspectionChecklist.vehicleSpecificItems.map((item, i) => (
                   <li key={i} className="p-2 bg-red-50 dark:bg-red-950 rounded">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge className={
-                        item.priority === 'critical' ? 'bg-red-500' :
-                        item.priority === 'important' ? 'bg-yellow-500' : 'bg-gray-500'
-                      }>
+                      <Badge className={getPriorityColor(item.priority)}>
                         {item.priority}
                       </Badge>
                       <span className="font-medium">{item.item}</span>
