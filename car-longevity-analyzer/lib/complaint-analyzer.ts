@@ -104,7 +104,6 @@ function extractSampleComplaints(complaints: Complaint[], maxSamples: number = 3
     });
 
     const samples: string[] = [];
-    const maxChars = 250;
 
     for (const complaint of sorted) {
         if (samples.length >= maxSamples) break;
@@ -112,11 +111,8 @@ function extractSampleComplaints(complaints: Complaint[], maxSamples: number = 3
         const summary = complaint.Summary?.trim();
         if (!summary) continue;
 
-        // Truncate long complaints
-        let text = summary;
-        if (text.length > maxChars) {
-            text = text.substring(0, maxChars).replace(/\s+\S*$/, '') + '...';
-        }
+        // Keep full complaint text - don't truncate so users can read everything
+        const text = summary;
 
         // Avoid duplicates (similar complaints)
         const isDuplicate = samples.some(s => {
