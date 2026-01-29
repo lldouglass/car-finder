@@ -19,18 +19,19 @@ export const SAFETY_THRESHOLDS = {
     lowSafetyScore: 5,       // Below 5 = low severity flag
 } as const;
 
-// Red flag score penalties
+// Red flag score penalties - moderate to avoid over-penalizing
+// Most used cars will have some complaints, especially older/high-volume models
 export const RED_FLAG_PENALTIES = {
-    critical: 5.0,
-    high: 1.0,
-    medium: 0.5,
-    low: 0.25,
+    critical: 3.0,  // Salvage title, frame damage, flood damage
+    high: 0.5,      // Fire/serious safety reports
+    medium: 0.2,    // Moderate concerns
+    low: 0.1,       // Minor issues
 } as const;
 
-// Recommendation thresholds
+// Recommendation thresholds - calibrated for realistic used car market
 export const RECOMMENDATION_THRESHOLDS = {
-    buy: 7.5,    // Score >= 7.5 = BUY
-    maybe: 5.0,  // Score >= 5.0 = MAYBE, < 5.0 = PASS
+    buy: 6.5,    // Score >= 6.5 = BUY (good reliable vehicle at fair price)
+    maybe: 4.0,  // Score >= 4.0 = MAYBE (worth considering with inspection)
 } as const;
 
 // Vehicle age and mileage constants

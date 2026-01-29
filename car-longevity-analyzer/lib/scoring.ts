@@ -74,16 +74,17 @@ export function calculateReliabilityScore(
         yearAdjustment = 0.5;
     }
 
-    // 3. Deduct for known issues
-    const issuePenalty = knownIssues.reduce((penalty, issue) => {
+    // 3. Deduct for known issues (capped to avoid excessive penalty from high-volume vehicles)
+    // Popular vehicles will have more complaints simply due to sales volume
+    const issuePenalty = Math.min(3.0, knownIssues.reduce((penalty, issue) => {
         switch (issue.severity) {
-            case 'CRITICAL': return penalty + 2.0;
-            case 'MAJOR': return penalty + 1.2;
-            case 'MODERATE': return penalty + 0.5;
-            case 'MINOR': return penalty + 0.1;
+            case 'CRITICAL': return penalty + 1.0;
+            case 'MAJOR': return penalty + 0.5;
+            case 'MODERATE': return penalty + 0.2;
+            case 'MINOR': return penalty + 0.05;
             default: return penalty;
         }
-    }, 0);
+    }, 0));
 
     const finalScore = baseScore + yearAdjustment - issuePenalty;
     return Math.max(1, Math.min(10, finalScore));

@@ -41,17 +41,29 @@ function normalizeComponent(component: string): string {
 }
 
 /**
- * Calculates severity based on complaint count and safety incidents
+ * Calculates severity based on complaint count and safety incidents.
+ * Thresholds are set to account for vehicle sales volume - popular vehicles
+ * will naturally have more complaints. A 10-year-old vehicle that sold
+ * millions of units will accumulate complaints over time.
  */
 function calculateSeverity(
     complaintCount: number,
     hasSafetyIncidents: boolean,
     hasDeaths: boolean
 ): KnownIssue['severity'] {
-    if (hasDeaths) return 'CRITICAL';
-    if (hasSafetyIncidents && complaintCount >= 10) return 'CRITICAL';
-    if (hasSafetyIncidents || complaintCount >= 50) return 'MAJOR';
-    if (complaintCount >= 20) return 'MODERATE';
+    // CRITICAL: Multiple deaths or very high complaint volume with serious incidents
+    if (hasDeaths && complaintCount >= 20) return 'CRITICAL';
+    if (hasSafetyIncidents && complaintCount >= 100) return 'CRITICAL';
+
+    // MAJOR: Deaths, or significant safety incidents, or high volume
+    if (hasDeaths) return 'MAJOR';
+    if (hasSafetyIncidents && complaintCount >= 25) return 'MAJOR';
+    if (complaintCount >= 100) return 'MAJOR';
+
+    // MODERATE: Some safety concerns or moderate volume
+    if (hasSafetyIncidents || complaintCount >= 40) return 'MODERATE';
+    if (complaintCount >= 15) return 'MINOR';
+
     return 'MINOR';
 }
 

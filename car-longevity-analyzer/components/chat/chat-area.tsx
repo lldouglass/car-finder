@@ -5,7 +5,7 @@ import { useAnalysis } from '@/lib/analysis-context';
 import { ChatInput } from './chat-input';
 import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
-import { AnalysisCard } from './messages/analysis-card';
+import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
 import { Car } from 'lucide-react';
 
@@ -80,7 +80,7 @@ export function ChatArea() {
           {result && !isLoading && (
             <>
               <VehicleHeader result={result} />
-              <AnalysisCard result={result} />
+              <ResultsDisplay result={result} />
             </>
           )}
 
