@@ -171,7 +171,9 @@ export async function getRecalls(make: string, model: string, year: number): Pro
     await delay(API_TIMEOUTS.nhtsaDelay);
     try {
         const encodedMake = encodeURIComponent(make);
-        const encodedModel = encodeURIComponent(model);
+        // Normalize model name to match NHTSA's format
+        const normalizedModel = normalizeModelForNhtsa(model);
+        const encodedModel = encodeURIComponent(normalizedModel);
         const response = await fetch(
             `${NHTSA_SAFETY_API}/recalls/recallsByVehicle?make=${encodedMake}&model=${encodedModel}&modelYear=${year}`
         );
@@ -193,6 +195,36 @@ export async function getRecalls(make: string, model: string, year: number): Pro
 }
 
 /**
+ * Normalizes model name for NHTSA API by stripping trim levels and variants.
+ * NHTSA uses base model names (e.g., "RENEGADE" not "Renegade Latitude 4x4").
+ */
+function normalizeModelForNhtsa(model: string): string {
+    // Common trim level patterns to remove
+    const trimPatterns = [
+        // Drive types
+        /\s+(4x4|4wd|awd|fwd|rwd|2wd|4dr|2dr)\s*/gi,
+        // Common trims
+        /\s+(base|s|se|sel|sxt|sle|slt|lt|ltz|ls|lx|ex|ex-l|touring|sport|limited|premium|platinum|signature|denali|laredo|latitude|longitude|altitude|trailhawk|sahara|rubicon|overland|summit)\s*/gi,
+        // Package/option codes
+        /\s+(pkg|package|plus|pro|max)\s*/gi,
+        // Door/body style at end
+        /\s+(sedan|coupe|hatchback|wagon|suv|crossover|truck|van|convertible)\s*$/gi,
+        // Engine specs
+        /\s+\d+\.\d+l?\s*/gi,
+        // Year ranges or model codes
+        /\s+[a-z]?\d{2,4}[a-z]?\s*$/gi,
+    ];
+
+    let normalized = model;
+    for (const pattern of trimPatterns) {
+        normalized = normalized.replace(pattern, ' ');
+    }
+
+    // Clean up extra spaces and trim
+    return normalized.replace(/\s+/g, ' ').trim();
+}
+
+/**
  * Fetches complaints for a specific vehicle.
  * @param make Vehicle make
  * @param model Vehicle model
@@ -203,7 +235,9 @@ export async function getComplaints(make: string, model: string, year: number): 
     await delay(API_TIMEOUTS.nhtsaDelay);
     try {
         const encodedMake = encodeURIComponent(make);
-        const encodedModel = encodeURIComponent(model);
+        // Normalize model name to match NHTSA's format
+        const normalizedModel = normalizeModelForNhtsa(model);
+        const encodedModel = encodeURIComponent(normalizedModel);
         const response = await fetch(
             `${NHTSA_SAFETY_API}/complaints/complaintsByVehicle?make=${encodedMake}&model=${encodedModel}&modelYear=${year}`
         );
@@ -235,7 +269,9 @@ export async function getSafetyRatings(make: string, model: string, year: number
     await delay(API_TIMEOUTS.nhtsaDelay);
     try {
         const encodedMake = encodeURIComponent(make);
-        const encodedModel = encodeURIComponent(model);
+        // Normalize model name to match NHTSA's format
+        const normalizedModel = normalizeModelForNhtsa(model);
+        const encodedModel = encodeURIComponent(normalizedModel);
         const response = await fetch(
             `${NHTSA_SAFETY_API}/SafetyRatings/modelyear/${year}/make/${encodedMake}/model/${encodedModel}`
         );
