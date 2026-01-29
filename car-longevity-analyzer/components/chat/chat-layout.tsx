@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { ChatArea } from './chat-area';
+import { UpgradeModal } from '@/components/billing/upgrade-modal';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function ChatLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -29,7 +31,7 @@ export function ChatLayout() {
         `}
         aria-label="History sidebar"
       >
-        <Sidebar onClose={() => setSidebarOpen(false)} />
+        <Sidebar onClose={() => setSidebarOpen(false)} onUpgradeClick={() => setUpgradeModalOpen(true)} />
       </aside>
 
       {/* Main content area */}
@@ -48,8 +50,14 @@ export function ChatLayout() {
         </header>
 
         {/* Chat area */}
-        <ChatArea />
+        <ChatArea onUpgradeClick={() => setUpgradeModalOpen(true)} />
       </main>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+      />
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { auth } from '@clerk/nextjs/server';
+import { checkAndIncrementUsage } from '@/lib/usage';
 import { analyzeListingWithAI } from '@/lib/ai-analyzer';
 import { getComplaints, getSafetyRatings } from '@/lib/nhtsa';
 import {
@@ -87,6 +89,31 @@ function generateInconsistencyQuestion(type: string): string {
 
 export async function POST(request: Request) {
     try {
+        // Auth check
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json(
+                { success: false, error: 'Unauthorized' },
+                { status: 401 }
+            );
+        }
+
+        // Usage check
+        const usage = await checkAndIncrementUsage(userId);
+        if (!usage.allowed) {
+            return NextResponse.json({
+                success: false,
+                error: 'Free limit reached',
+                upgrade: true,
+                message: `You have used all ${usage.limit} free analyses this month. Upgrade to Premium for unlimited access.`,
+                usage: {
+                    used: usage.used,
+                    limit: usage.limit,
+                    remaining: usage.remaining,
+                },
+            }, { status: 403 });
+        }
+
         const body = await request.json();
 
         // 1. Validate Input

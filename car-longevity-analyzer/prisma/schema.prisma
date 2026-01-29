@@ -53,6 +53,8 @@ model Analysis {
   recommendation   Recommendation
   redFlags         Json
   createdAt        DateTime       @default(now())
+  userId           String?
+  user             User?          @relation("UserAnalyses", fields: [userId], references: [id])
 }
 
 enum MaintenanceRating {
@@ -79,4 +81,34 @@ enum Recommendation {
   BUY
   MAYBE
   PASS
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+}
+
+model User {
+  id               String   @id @default(cuid())
+  clerkId          String   @unique
+  email            String   @unique
+  plan             Plan     @default(FREE)
+  stripeCustomerId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  usageRecords UsageRecord[]
+  analyses     Analysis[]    @relation("UserAnalyses")
+}
+
+model UsageRecord {
+  id            String   @id @default(cuid())
+  userId        String
+  month         String   // "2026-01"
+  analysisCount Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, month])
 }

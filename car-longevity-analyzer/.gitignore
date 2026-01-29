@@ -68,3 +68,6 @@ ehthumbs.db
 build-output.txt
 test-output.txt
 test-safety.js
+
+# clerk configuration (can include secrets)
+/.clerk/

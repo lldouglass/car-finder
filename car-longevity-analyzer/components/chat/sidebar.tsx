@@ -4,15 +4,17 @@ import { useState } from 'react';
 import { useAnalysis } from '@/lib/analysis-context';
 import { groupHistoryByDate } from '@/lib/history-store';
 import { HistoryItem } from './history-item';
+import { UserHeader } from '@/components/auth/user-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PlusCircle, Search, X, Car } from 'lucide-react';
 
 interface SidebarProps {
   onClose?: () => void;
+  onUpgradeClick?: () => void;
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function Sidebar({ onClose, onUpgradeClick }: SidebarProps) {
   const { history, startNewAnalysis, currentId } = useAnalysis();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -142,8 +144,9 @@ export function Sidebar({ onClose }: SidebarProps) {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-zinc-800 p-3">
+      {/* Footer with User Info */}
+      <div className="border-t border-zinc-800 p-3 space-y-3">
+        <UserHeader onUpgradeClick={onUpgradeClick} />
         <p className="text-xs text-zinc-500 text-center">
           Data from NHTSA & AI analysis
         </p>

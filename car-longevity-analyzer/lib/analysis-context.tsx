@@ -20,6 +20,7 @@ interface AnalysisContextType {
   currentId: string | null;
   isLoading: boolean;
   error: string | null;
+  needsUpgrade: boolean;
 
   // History
   history: ChatHistory[];
@@ -37,6 +38,7 @@ interface AnalysisContextType {
   deleteAnalysis: (id: string) => void;
   startNewAnalysis: () => void;
   setError: (error: string | null) => void;
+  clearNeedsUpgrade: () => void;
 
   // Legacy support
   setResult: (result: AnalysisResponse | null) => void;
@@ -51,6 +53,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsUpgrade, setNeedsUpgrade] = useState(false);
   const [history, setHistory] = useState<ChatHistory[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -78,6 +81,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       sellerType?: string
     ) => {
       setError(null);
+      setNeedsUpgrade(false);
       setIsLoading(true);
       setCurrentId(null);
       setResultState(null);
@@ -115,6 +119,10 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
         setCurrentId(newHistory[0].id); // New item is at the front
       } catch (err) {
         const message = err instanceof APIError ? err.message : 'An unexpected error occurred';
+        // Check if this is an upgrade-needed error (403 status)
+        if (err instanceof APIError && err.status === 403) {
+          setNeedsUpgrade(true);
+        }
         setError(message);
         throw err;
       } finally {
@@ -177,6 +185,11 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     setError(null);
   }, []);
 
+  // Clear needs upgrade flag
+  const clearNeedsUpgrade = useCallback(() => {
+    setNeedsUpgrade(false);
+  }, []);
+
   // Don't render children until hydrated to avoid flash
   if (!isHydrated) {
     return null;
@@ -189,6 +202,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
         currentId,
         isLoading,
         error,
+        needsUpgrade,
         history,
         submitAnalysis,
         loadAnalysis,
@@ -196,6 +210,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
         deleteAnalysis,
         startNewAnalysis,
         setError,
+        clearNeedsUpgrade,
         setResult,
         setIsLoading,
         clearResult,

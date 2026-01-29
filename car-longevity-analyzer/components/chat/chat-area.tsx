@@ -7,10 +7,15 @@ import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { Car } from 'lucide-react';
+import { Car, Crown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export function ChatArea() {
-  const { result, isLoading, error, history, currentId } = useAnalysis();
+interface ChatAreaProps {
+  onUpgradeClick?: () => void;
+}
+
+export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
+  const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Find the current history item to show the input summary
@@ -20,6 +25,14 @@ export function ChatArea() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [result, isLoading]);
+
+  // Show upgrade modal when free limit is reached
+  useEffect(() => {
+    if (needsUpgrade && onUpgradeClick) {
+      onUpgradeClick();
+      clearNeedsUpgrade();
+    }
+  }, [needsUpgrade, onUpgradeClick, clearNeedsUpgrade]);
 
   const hasContent = result || isLoading || error;
 
@@ -71,8 +84,26 @@ export function ChatArea() {
 
           {/* Error state */}
           {error && !isLoading && (
-            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
+            <div className={`rounded-lg p-4 ${
+              error.includes('Free limit') || error.includes('free analyses')
+                ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800'
+                : 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
+            }`}>
+              {error.includes('Free limit') || error.includes('free analyses') ? (
+                <div className="flex flex-col items-center text-center gap-3">
+                  <Crown className="size-8 text-amber-500" />
+                  <p className="text-amber-700 dark:text-amber-400 font-medium">{error}</p>
+                  <Button
+                    onClick={onUpgradeClick}
+                    className="bg-amber-500 hover:bg-amber-600 text-zinc-900"
+                  >
+                    <Crown className="size-4 mr-2" />
+                    Upgrade to Premium
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-red-600 dark:text-red-400">{error}</p>
+              )}
             </div>
           )}
 
