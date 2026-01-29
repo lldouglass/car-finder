@@ -131,12 +131,20 @@ Return a JSON object with:
       description: string,
       severity: "low"|"medium"|"high",
       details: string }]
+
+   IMPORTANT MILEAGE CONTEXT: Average driving is 12,000-15,000 miles per year.
+   - A 10-year-old car with 120,000-150,000 miles is NORMAL, not high mileage.
+   - A 10-year-old car with 80,000 miles is BELOW average - this is GOOD, not concerning.
+   - Only flag mileage if it's SUSPICIOUSLY LOW (e.g., 20k on a 10-year daily driver suggests odometer issues or sitting unused) or VERY HIGH (over 20k/year average).
+
    Examples to check:
-   - mileage_age: A 2015 daily driver with only 20k miles is suspicious
+   - mileage_age: A 2015 daily driver with only 20k miles is suspicious (too low)
    - price_condition: "Perfect condition" but priced 40% below market suggests hidden issues
    - usage_wear: "Highway miles only" but mentions high brake wear doesn't add up
    - owner_age: "One owner" on a 15+ year old vehicle may need verification
    - description_conflict: Contradicting statements within the listing
+
+   DO NOT flag normal or below-average mileage as "high mileage" - that's incorrect.
 
 4. suspiciousPatterns: Look for deceptive language patterns:
    [{ type: "vague_damage"|"pressure_tactics"|"deflection"|"missing_info"|"defensive_language"|"too_good",
@@ -168,6 +176,8 @@ Return a JSON object with:
 }
 
 Be skeptical but fair. Flag genuine concerns but don't be paranoid about normal listings.
+DO NOT penalize vehicles for having normal or below-average mileage for their age.
+Remember: 12-15k miles/year is average. 80k miles on a 10-year-old car is BELOW average and good.
 
 Output PURE JSON ONLY. No markdown blocks.
 `;
