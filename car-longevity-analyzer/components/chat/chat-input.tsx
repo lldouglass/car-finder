@@ -11,7 +11,11 @@ import { Send, Loader2 } from 'lucide-react';
 // VIN pattern: 17 alphanumeric characters, no I, O, or Q
 const VIN_PATTERN = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
-export function ChatInput() {
+interface ChatInputProps {
+  large?: boolean;
+}
+
+export function ChatInput({ large = false }: ChatInputProps) {
   const { submitAnalysis, isLoading } = useAnalysis();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -29,9 +33,10 @@ export function ChatInput() {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+      const maxHeight = large ? 300 : 200;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }
-  }, [input]);
+  }, [input, large]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -86,7 +91,7 @@ export function ChatInput() {
           onKeyDown={handleKeyDown}
           placeholder={isVin ? 'VIN detected! Enter mileage and price below.' : 'Enter a VIN or paste a listing...'}
           disabled={isLoading}
-          className="min-h-[52px] max-h-[200px] pr-12 resize-none"
+          className={`pr-12 resize-none ${large ? 'min-h-[120px] max-h-[300px] text-base' : 'min-h-[52px] max-h-[200px]'}`}
           aria-label="Vehicle input"
         />
 
