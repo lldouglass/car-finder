@@ -225,3 +225,5 @@ Edit `lib/constants.ts`:
 
 **Optional:**
 - `OPENAI_API_KEY` - Enables AI-powered listing analysis
+
+**NEVER TOUCH THE .env FILE**

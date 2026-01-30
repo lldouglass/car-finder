@@ -67,14 +67,24 @@ const SafetyRatingVariantSchema = z.object({
 
 const SafetyRatingDetailSchema = z.object({
     OverallRating: z.string().optional().default('Not Rated'),
-    FrontalCrashRating: z.string().optional().default('Not Rated'),
-    SideCrashRating: z.string().optional().default('Not Rated'),
+    OverallFrontCrashRating: z.string().optional().default('Not Rated'),
+    OverallSideCrashRating: z.string().optional().default('Not Rated'),
     RolloverRating: z.string().optional().default('Not Rated'),
     NHTSAElectronicStabilityControl: z.string().optional().default(''),
     ComplaintsCount: z.number().optional().default(0),
     RecallsCount: z.number().optional().default(0),
     InvestigationCount: z.number().optional().default(0),
-});
+}).transform((data) => ({
+    // Normalize field names for the rest of the app
+    OverallRating: data.OverallRating,
+    FrontalCrashRating: data.OverallFrontCrashRating,
+    SideCrashRating: data.OverallSideCrashRating,
+    RolloverRating: data.RolloverRating,
+    NHTSAElectronicStabilityControl: data.NHTSAElectronicStabilityControl,
+    ComplaintsCount: data.ComplaintsCount,
+    RecallsCount: data.RecallsCount,
+    InvestigationCount: data.InvestigationCount,
+}));
 
 // Export types derived from schemas
 export type VehicleDetails = {
@@ -92,7 +102,7 @@ export type VehicleDetails = {
 
 export type Recall = z.infer<typeof RecallSchema>;
 export type Complaint = z.output<typeof ComplaintSchema>;
-export type SafetyRating = z.infer<typeof SafetyRatingDetailSchema>;
+export type SafetyRating = z.output<typeof SafetyRatingDetailSchema>;
 
 /**
  * Decodes a VIN to get vehicle details.

@@ -1,13 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const isProtectedRoute = createRouteMatcher([
-  '/api/analyze/(.*)',
-  '/api/user/(.*)',
-  '/api/checkout(.*)',
+// Pages that require authentication (will redirect to sign-in)
+const isProtectedPage = createRouteMatcher([
+  '/dashboard(.*)',
+  '/settings(.*)',
+]);
+
+// API routes handle their own auth and return JSON 401
+// Don't use auth.protect() for these - it redirects to sign-in instead of returning JSON
+const isApiRoute = createRouteMatcher([
+  '/api/(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
+  // Only use auth.protect() for pages, not API routes
+  // API routes check auth manually and return proper JSON responses
+  if (isProtectedPage(req) && !isApiRoute(req)) {
     await auth.protect();
   }
 });

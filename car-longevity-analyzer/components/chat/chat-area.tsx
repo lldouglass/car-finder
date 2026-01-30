@@ -16,14 +16,16 @@ interface ChatAreaProps {
 
 export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
   const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const resultsTopRef = useRef<HTMLDivElement>(null);
 
   // Find the current history item to show the input summary
   const currentItem = currentId ? history.find((h) => h.id === currentId) : null;
 
-  // Scroll to bottom when new content appears
+  // Scroll to top of results when analysis completes
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (result && !isLoading) {
+      resultsTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [result, isLoading]);
 
   // Show upgrade modal when free limit is reached
@@ -110,12 +112,11 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
           {/* Analysis results */}
           {result && !isLoading && (
             <>
+              <div ref={resultsTopRef} />
               <VehicleHeader result={result} />
               <ResultsDisplay result={result} />
             </>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
       </div>
 
