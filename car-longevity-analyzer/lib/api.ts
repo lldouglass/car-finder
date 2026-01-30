@@ -154,6 +154,9 @@ export interface Pricing {
     fairPriceHigh: number;
     dealQuality: 'GREAT' | 'GOOD' | 'FAIR' | 'HIGH' | 'OVERPRICED';
     analysis: string;
+    source?: 'api' | 'calculated';
+    confidence?: 'high' | 'medium' | 'low';
+    sampleSize?: number;
 }
 
 export interface RedFlag {
@@ -248,22 +251,6 @@ export interface KnownIssue {
     sampleComplaints: string[];  // 2-3 actual complaint summaries from NHTSA
 }
 
-// Lifespan adjustment factors for display
-export interface AppliedFactor {
-    category: string;
-    value: string;
-    multiplier: number;
-    impact: 'positive' | 'negative' | 'neutral';
-}
-
-export interface LifespanAnalysis {
-    baseLifespan: number;
-    adjustedLifespan: number;
-    totalMultiplier: number;
-    appliedFactors: AppliedFactor[];
-    confidence: 'high' | 'medium' | 'low';
-}
-
 export interface AnalysisResponse {
     success: boolean;
     error?: string;
@@ -282,7 +269,6 @@ export interface AnalysisResponse {
     aiAnalysis?: AIAnalysis;
     recommendation?: Recommendation;
     safetyRating?: SafetyRating | null;
-    lifespanAnalysis?: LifespanAnalysis;
     // New features
     negotiationStrategy?: NegotiationStrategy;
     maintenanceCosts?: MaintenanceCostEstimate;
@@ -422,5 +408,76 @@ export async function analyzeByListing(data: ListingAnalysisRequest): Promise<An
             throw error;
         }
         throw new NetworkError();
+    }
+}
+
+// Vehicle History Types and API
+export interface VehicleHistory {
+    vin: string;
+    titleRecords: Array<{
+        state: string;
+        date: string;
+        brand?: string;
+    }>;
+    titleBrands: string[];
+    odometerRecords: Array<{
+        date: string;
+        reading: number;
+        source?: string;
+    }>;
+    odometerDiscrepancy: boolean;
+    theftRecord: boolean;
+    totalLoss: boolean;
+    fetchedAt: Date;
+}
+
+export interface HistoryAnalysis {
+    hasCriticalIssue: boolean;
+    hasHighRiskIssue: boolean;
+    issues: Array<{
+        type: string;
+        severity: 'critical' | 'high' | 'medium';
+        description: string;
+    }>;
+    recommendation: string;
+}
+
+export interface VehicleHistoryResponse {
+    success: boolean;
+    history?: VehicleHistory;
+    analysis?: HistoryAnalysis;
+    error?: string;
+    cached?: boolean;
+    remainingCalls?: number;
+    featureAvailable?: boolean;
+}
+
+export async function fetchVehicleHistory(vin: string): Promise<VehicleHistoryResponse> {
+    try {
+        const response = await fetchWithTimeout(`/api/history/${encodeURIComponent(vin)}`, {
+            method: 'GET',
+        });
+
+        const result: VehicleHistoryResponse = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                error: result.error || getErrorMessage(response.status, 'Failed to fetch vehicle history'),
+            };
+        }
+
+        return result;
+    } catch (error) {
+        if (error instanceof APIError) {
+            return {
+                success: false,
+                error: error.message,
+            };
+        }
+        return {
+            success: false,
+            error: 'Network error. Please check your connection.',
+        };
     }
 }

@@ -12,6 +12,7 @@ import {
     calculatePriceThresholds
 } from '@/lib/scoring';
 import {
+    type RedFlag,
     detectRedFlags,
     detectPriceAnomaly,
     generateQuestionsForSeller
@@ -262,7 +263,7 @@ export async function POST(request: Request) {
             advice: sp.explanation
         }));
 
-        let allRedFlags = [...regexRedFlags, ...aiConcernFlags, ...inconsistencyFlags, ...suspiciousFlags];
+        let allRedFlags: RedFlag[] = [...regexRedFlags, ...aiConcernFlags, ...inconsistencyFlags, ...suspiciousFlags];
 
         // Price anomaly check
         if (priceResult && askingPrice !== undefined && priceEstimate) {
@@ -273,7 +274,11 @@ export async function POST(request: Request) {
         // Safety red flags
         if (safetyResult) {
             const safetyRedFlags = detectSafetyRedFlags(safetyResult, complaints);
-            allRedFlags.push(...safetyRedFlags);
+            // Map SafetyRedFlag to RedFlag (provide default advice if missing)
+            allRedFlags.push(...safetyRedFlags.map(f => ({
+                ...f,
+                advice: f.advice || 'Review this safety concern carefully before purchasing.'
+            })));
         }
 
         // Overall Score (now includes safety when available)

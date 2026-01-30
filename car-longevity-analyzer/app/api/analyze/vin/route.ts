@@ -11,6 +11,7 @@ import {
 } from '@/lib/scoring';
 import { calculateDynamicReliability } from '@/lib/dynamic-reliability';
 import {
+    type RedFlag,
     detectRedFlags,
     detectPriceAnomaly,
     generateQuestionsForSeller
@@ -182,12 +183,16 @@ export async function POST(request: Request) {
 
         const safetyScoreResult = calculateSafetyScore(safetyRatingData, complaints, vehicle.year);
 
-        const redFlags = listingText ? detectRedFlags(listingText) : [];
+        const redFlags: RedFlag[] = listingText ? detectRedFlags(listingText) : [];
         const priceRedFlag = detectPriceAnomaly(askingPrice, priceEstimate.low, priceEstimate.high);
         if (priceRedFlag) redFlags.push(priceRedFlag);
 
         const safetyRedFlags = detectSafetyRedFlags(safetyScoreResult, complaints);
-        redFlags.push(...safetyRedFlags);
+        // Map SafetyRedFlag to RedFlag (provide default advice if missing)
+        redFlags.push(...safetyRedFlags.map(f => ({
+            ...f,
+            advice: f.advice || 'Review this safety concern carefully before purchasing.'
+        })));
 
         const overallResult = calculateOverallScore(
             reliabilityScore,
@@ -355,13 +360,7 @@ export async function POST(request: Request) {
             knownIssues,
             componentIssues,
             maintenanceCost,
-            reliabilityBreakdown: reliabilityResult.breakdown,
-            reliabilityAnalysis: {
-                baseScore: reliabilityBaseScore,
-                yearAdjustment: reliabilityYearAdjustment,
-                isYearToAvoid,
-                inDatabase: !!relData,
-            },
+            reliabilityBreakdown: reliabilityResult.factors,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             safetyRating: safetyRatingData ? {
                 overallRating: safetyRatingData.OverallRating,

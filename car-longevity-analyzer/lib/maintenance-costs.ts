@@ -228,7 +228,7 @@ function calculateKnownIssueRisks(
 
         // Check if mileage is in the risk window
         const { start, end } = issue.mileageRange;
-        let probability: string;
+        let probability = '';
         let shouldInclude = false;
 
         if (currentMileage >= start && currentMileage <= end) {

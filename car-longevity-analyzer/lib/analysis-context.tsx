@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { AnalysisResponse, analyzeByVin, analyzeByListing, APIError } from './api';
+import { AnalysisResponse, analyzeByVin, analyzeByListing, APIError, type SellerType } from './api';
 import {
   ChatHistory,
   loadHistory,
@@ -94,14 +94,14 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             vin: input.toUpperCase(),
             mileage: mileage || 0,
             askingPrice: price || 0,
-            sellerType: sellerType as AnalysisResponse['vehicle'] extends undefined ? never : string,
+            sellerType: sellerType as SellerType | undefined,
           });
         } else {
           analysisResult = await analyzeByListing({
             listingText: input,
             mileage,
             askingPrice: price,
-            sellerType: sellerType as AnalysisResponse['vehicle'] extends undefined ? never : string,
+            sellerType: sellerType as SellerType | undefined,
           });
         }
 
