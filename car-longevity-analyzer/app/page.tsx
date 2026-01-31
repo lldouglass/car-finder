@@ -17,18 +17,20 @@ import { Car, Search, FileText, Loader2, AlertCircle, RefreshCw, Wifi, WifiOff }
 
 function HomeContent() {
   const router = useRouter();
-  const { setResult, isLoading, setIsLoading, error, setError } = useAnalysis();
+  const { setResult, isLoading, setIsLoading, error, setError, formState, updateFormState, clearFormState } = useAnalysis();
   const { addToast } = useToast();
 
-  // VIN form state
-  const [vin, setVin] = useState('');
-  const [mileage, setMileage] = useState('');
-  const [askingPrice, setAskingPrice] = useState('');
+  // Form state from context (persisted to sessionStorage)
+  const { vin, mileage, askingPrice, listingText, listingPrice, listingMileage, activeTab } = formState;
 
-  // Listing form state
-  const [listingText, setListingText] = useState('');
-  const [listingPrice, setListingPrice] = useState('');
-  const [listingMileage, setListingMileage] = useState('');
+  // Helper to update individual form fields
+  const setVin = (value: string) => updateFormState({ vin: value });
+  const setMileage = (value: string) => updateFormState({ mileage: value });
+  const setAskingPrice = (value: string) => updateFormState({ askingPrice: value });
+  const setListingText = (value: string) => updateFormState({ listingText: value });
+  const setListingPrice = (value: string) => updateFormState({ listingPrice: value });
+  const setListingMileage = (value: string) => updateFormState({ listingMileage: value });
+  const setActiveTab = (value: 'vin' | 'listing') => updateFormState({ activeTab: value });
 
   // Track last submission for retry
   const [lastSubmission, setLastSubmission] = useState<{
@@ -56,6 +58,7 @@ function HomeContent() {
     try {
       const result = await analyzeByVin(data);
       setResult(result);
+      clearFormState();
       addToast('Analysis complete!', 'success');
       router.push('/results');
     } catch (err) {
@@ -86,6 +89,7 @@ function HomeContent() {
     try {
       const result = await analyzeByListing(data);
       setResult(result);
+      clearFormState();
       addToast('Analysis complete!', 'success');
       router.push('/results');
     } catch (err) {
@@ -202,7 +206,7 @@ function HomeContent() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="vin" className="w-full">
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'vin' | 'listing')} className="w-full">
                 <TabsList className="w-full mb-6" aria-label="Analysis method">
                   <TabsTrigger
                     value="vin"
