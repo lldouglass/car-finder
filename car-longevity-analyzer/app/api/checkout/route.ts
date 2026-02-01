@@ -31,6 +31,10 @@ export async function POST() {
   } catch (error) {
     console.error('Checkout Error:', error);
 
+    // Log key prefix for debugging (safe - only shows sk_test_ or sk_live_)
+    const keyPrefix = process.env.STRIPE_SECRET_KEY?.substring(0, 8) || 'NOT_SET';
+    console.error('Stripe key prefix:', keyPrefix);
+
     // Handle Stripe-specific errors
     if (error instanceof Error && error.message.includes('PREMIUM_PRICE_ID')) {
       return NextResponse.json(
@@ -39,10 +43,11 @@ export async function POST() {
       );
     }
 
-    // Return actual error message for debugging
+    // Return actual error message for debugging with key type hint
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const keyType = keyPrefix.startsWith('sk_live') ? 'live' : keyPrefix.startsWith('sk_test') ? 'test' : 'invalid';
     return NextResponse.json(
-      { success: false, error: `Checkout failed: ${errorMessage}` },
+      { success: false, error: `Checkout failed (${keyType} key): ${errorMessage}` },
       { status: 500 }
     );
   }
