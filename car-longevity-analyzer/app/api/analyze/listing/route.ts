@@ -133,9 +133,31 @@ export async function POST(request: Request) {
         const aiResult = await analyzeListingWithAI(listingText);
         const extracted = aiResult.extractedVehicle;
 
+        // Log AI extraction results for debugging
+        console.log('[Listing Analysis] AI extraction:', {
+            isFallback: aiResult.isFallback,
+            extractedVehicle: extracted ? {
+                year: extracted.year,
+                make: extracted.make,
+                model: extracted.model,
+                mileage: extracted.mileage,
+                price: extracted.price,
+            } : null,
+            trustworthinessScore: aiResult.trustworthinessScore,
+        });
+
         // Fill gaps from AI if not provided in body
         if (askingPrice === undefined && extracted?.price) askingPrice = extracted.price;
         if (mileage === undefined && extracted?.mileage) mileage = extracted.mileage;
+
+        // Log final values after merging
+        console.log('[Listing Analysis] Final values:', {
+            askingPrice,
+            mileage,
+            make: extracted?.make || 'Unknown',
+            model: extracted?.model || 'Unknown',
+            year: extracted?.year,
+        });
 
         const make = extracted?.make || 'Unknown';
         const model = extracted?.model || 'Unknown';
@@ -361,6 +383,16 @@ export async function POST(request: Request) {
             )
             : null;
 
+        // Log response summary for debugging blank cards
+        console.log('[Listing Analysis] Response summary:', {
+            hasVehicle: !!(extracted?.make && extracted?.model),
+            hasLongevity: !!longevityResult,
+            hasPricing: !!priceResult,
+            hasSafetyRating: !!safetyResult,
+            overallScore: overallResult?.score || null,
+            redFlagsCount: allRedFlags.length,
+        });
+
         return NextResponse.json({
             success: true,
             vehicle: {
@@ -406,6 +438,18 @@ export async function POST(request: Request) {
                 confidence: safetyResult.confidence,
                 hasCrashTestData: safetyResult.hasCrashTestData,
             } : null,
+            safetyRating: safetyRatings ? {
+                overallRating: safetyRatings.OverallRating,
+                frontalCrashRating: safetyRatings.FrontalCrashRating,
+                sideCrashRating: safetyRatings.SideCrashRating,
+                rolloverRating: safetyRatings.RolloverRating,
+                frontCrashDriversideRating: safetyRatings.FrontCrashDriversideRating,
+                frontCrashPassengersideRating: safetyRatings.FrontCrashPassengersideRating,
+                sideCrashDriversideRating: safetyRatings.SideCrashDriversideRating,
+                sideCrashPassengersideRating: safetyRatings.SideCrashPassengersideRating,
+                complaintsCount: safetyRatings.ComplaintsCount,
+                recallsCount: safetyRatings.RecallsCount,
+            } : null,
             aiAnalysis: {
                 trustworthiness: aiResult.trustworthinessScore,
                 impression: aiResult.overallImpression,
@@ -431,7 +475,11 @@ export async function POST(request: Request) {
         });
 
     } catch (error) {
-        console.error("Listing Analysis Error:", error);
+        // Log detailed error info for debugging
+        console.error("[Listing Analysis] Error:", {
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+        });
 
         // Handle JSON parse errors
         if (error instanceof SyntaxError) {

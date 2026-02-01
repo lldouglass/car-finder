@@ -237,6 +237,11 @@ export interface SafetyRating {
     frontalCrashRating: string;
     sideCrashRating: string;
     rolloverRating: string;
+    // Individual component ratings (when overall is "Not Rated")
+    frontCrashDriversideRating?: string;
+    frontCrashPassengersideRating?: string;
+    sideCrashDriversideRating?: string;
+    sideCrashPassengersideRating?: string;
     complaintsCount: number;
     recallsCount: number;
 }

@@ -367,6 +367,11 @@ export async function POST(request: Request) {
                 frontalCrashRating: safetyRatingData.FrontalCrashRating,
                 sideCrashRating: safetyRatingData.SideCrashRating,
                 rolloverRating: safetyRatingData.RolloverRating,
+                // Individual component ratings (when overall is "Not Rated")
+                frontCrashDriversideRating: safetyRatingData.FrontCrashDriversideRating,
+                frontCrashPassengersideRating: safetyRatingData.FrontCrashPassengersideRating,
+                sideCrashDriversideRating: safetyRatingData.SideCrashDriversideRating,
+                sideCrashPassengersideRating: safetyRatingData.SideCrashPassengersideRating,
                 complaintsCount: safetyRatingData.ComplaintsCount,
                 recallsCount: safetyRatingData.RecallsCount,
             } : null,

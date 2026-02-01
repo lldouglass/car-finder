@@ -1,22 +1,31 @@
 'use client';
 
 import React from 'react';
-import { Star, Shield, AlertTriangle } from 'lucide-react';
+import { Star, Shield, AlertTriangle, Info } from 'lucide-react';
 import type { SafetyRating } from '@/lib/api';
 
 interface SafetyRatingsDisplayProps {
     safetyRating: SafetyRating;
 }
 
-function StarRating({ rating, label }: { rating: string; label: string }) {
+function isValidRating(rating: string | undefined): boolean {
+    if (!rating || rating === 'Not Rated') return false;
+    const num = parseInt(rating, 10);
+    return !isNaN(num) && num >= 1 && num <= 5;
+}
+
+function StarRating({ rating, label, sublabel }: { rating: string; label: string; sublabel?: string }) {
     const numericRating = parseInt(rating, 10);
-    const isRated = !isNaN(numericRating) && rating !== 'Not Rated';
+    const isRated = isValidRating(rating);
     const stars = isRated ? numericRating : 0;
     const maxStars = 5;
 
     return (
         <div className="flex items-center justify-between py-2">
-            <span className="text-sm text-muted-foreground">{label}</span>
+            <div>
+                <span className="text-sm text-muted-foreground">{label}</span>
+                {sublabel && <span className="text-xs text-muted-foreground/70 ml-1">({sublabel})</span>}
+            </div>
             <div className="flex items-center gap-1" role="img" aria-label={isRated ? `${stars} out of ${maxStars} stars` : 'Not rated'}>
                 {isRated ? (
                     <>
@@ -39,7 +48,16 @@ function StarRating({ rating, label }: { rating: string; label: string }) {
 
 export function SafetyRatingsDisplay({ safetyRating }: SafetyRatingsDisplayProps) {
     const overallNumeric = parseInt(safetyRating.overallRating, 10);
-    const hasOverallRating = !isNaN(overallNumeric) && safetyRating.overallRating !== 'Not Rated';
+    const hasOverallRating = isValidRating(safetyRating.overallRating);
+
+    // Check if we have any valid crash test ratings
+    const hasFrontalRating = isValidRating(safetyRating.frontalCrashRating);
+    const hasSideRating = isValidRating(safetyRating.sideCrashRating);
+    const hasRolloverRating = isValidRating(safetyRating.rolloverRating);
+    const hasAnyRating = hasFrontalRating || hasSideRating || hasRolloverRating;
+
+    // Check if we're using component ratings (individual driver/passenger) instead of overall
+    const usingComponentRatings = !hasOverallRating && hasAnyRating;
 
     return (
         <div className="space-y-4">
@@ -62,12 +80,37 @@ export function SafetyRatingsDisplay({ safetyRating }: SafetyRatingsDisplayProps
                 </div>
             )}
 
+            {/* Note when using component ratings */}
+            {usingComponentRatings && (
+                <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-sm">
+                    <Info className="size-4 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+                    <p className="text-blue-700 dark:text-blue-300">
+                        NHTSA tested this vehicle but didn&apos;t assign overall category ratings.
+                        Showing driver-side test results instead.
+                    </p>
+                </div>
+            )}
+
             {/* Individual Ratings */}
-            <div className="divide-y divide-border">
-                <StarRating rating={safetyRating.frontalCrashRating} label="Frontal Crash" />
-                <StarRating rating={safetyRating.sideCrashRating} label="Side Crash" />
-                <StarRating rating={safetyRating.rolloverRating} label="Rollover" />
-            </div>
+            {hasAnyRating ? (
+                <div className="divide-y divide-border">
+                    <StarRating
+                        rating={safetyRating.frontalCrashRating}
+                        label="Frontal Crash"
+                        sublabel={usingComponentRatings ? "driver" : undefined}
+                    />
+                    <StarRating
+                        rating={safetyRating.sideCrashRating}
+                        label="Side Crash"
+                        sublabel={usingComponentRatings ? "driver" : undefined}
+                    />
+                    <StarRating rating={safetyRating.rolloverRating} label="Rollover" />
+                </div>
+            ) : (
+                <div className="text-center py-4 text-muted-foreground">
+                    <p className="text-sm">No crash test ratings available</p>
+                </div>
+            )}
 
             {/* Additional Stats */}
             {(safetyRating.complaintsCount > 0 || safetyRating.recallsCount > 0) && (

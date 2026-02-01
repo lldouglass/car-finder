@@ -70,21 +70,44 @@ const SafetyRatingDetailSchema = z.object({
     OverallFrontCrashRating: z.string().optional().default('Not Rated'),
     OverallSideCrashRating: z.string().optional().default('Not Rated'),
     RolloverRating: z.string().optional().default('Not Rated'),
+    // Individual component ratings (fallback when Overall is "Not Rated")
+    FrontCrashDriversideRating: z.string().optional().default('Not Rated'),
+    FrontCrashPassengersideRating: z.string().optional().default('Not Rated'),
+    SideCrashDriversideRating: z.string().optional().default('Not Rated'),
+    SideCrashPassengersideRating: z.string().optional().default('Not Rated'),
     NHTSAElectronicStabilityControl: z.string().optional().default(''),
     ComplaintsCount: z.number().optional().default(0),
     RecallsCount: z.number().optional().default(0),
     InvestigationCount: z.number().optional().default(0),
-}).transform((data) => ({
-    // Normalize field names for the rest of the app
-    OverallRating: data.OverallRating,
-    FrontalCrashRating: data.OverallFrontCrashRating,
-    SideCrashRating: data.OverallSideCrashRating,
-    RolloverRating: data.RolloverRating,
-    NHTSAElectronicStabilityControl: data.NHTSAElectronicStabilityControl,
-    ComplaintsCount: data.ComplaintsCount,
-    RecallsCount: data.RecallsCount,
-    InvestigationCount: data.InvestigationCount,
-}));
+}).transform((data) => {
+    // Helper to check if a rating is valid (not "Not Rated" and is a number)
+    const isValidRating = (r: string) => r !== 'Not Rated' && !isNaN(parseInt(r, 10));
+
+    // Use overall rating if available, otherwise fall back to driver-side component rating
+    const frontalRating = isValidRating(data.OverallFrontCrashRating)
+        ? data.OverallFrontCrashRating
+        : data.FrontCrashDriversideRating;
+    const sideRating = isValidRating(data.OverallSideCrashRating)
+        ? data.OverallSideCrashRating
+        : data.SideCrashDriversideRating;
+
+    return {
+        // Normalize field names for the rest of the app
+        OverallRating: data.OverallRating,
+        FrontalCrashRating: frontalRating,
+        SideCrashRating: sideRating,
+        RolloverRating: data.RolloverRating,
+        // Include individual ratings for detailed display
+        FrontCrashDriversideRating: data.FrontCrashDriversideRating,
+        FrontCrashPassengersideRating: data.FrontCrashPassengersideRating,
+        SideCrashDriversideRating: data.SideCrashDriversideRating,
+        SideCrashPassengersideRating: data.SideCrashPassengersideRating,
+        NHTSAElectronicStabilityControl: data.NHTSAElectronicStabilityControl,
+        ComplaintsCount: data.ComplaintsCount,
+        RecallsCount: data.RecallsCount,
+        InvestigationCount: data.InvestigationCount,
+    };
+});
 
 // Export types derived from schemas
 export type VehicleDetails = {

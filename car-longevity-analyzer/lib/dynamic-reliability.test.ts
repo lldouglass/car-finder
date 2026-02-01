@@ -52,6 +52,7 @@ const createMockComplaints = (count: number, options?: {
         Fire: options?.withFires || false,
         Injuries: options?.withInjuries ? 1 : 0,
         Deaths: options?.withDeaths ? 1 : 0,
+        Vin: undefined,
     }));
 };
 

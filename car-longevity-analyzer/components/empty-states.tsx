@@ -82,22 +82,40 @@ export function NoRedFlags() {
     );
 }
 
-export function NoPriceData() {
+interface NoPriceDataProps {
+    reason?: 'no_mileage' | 'no_price' | 'no_vehicle' | 'api_error';
+}
+
+export function NoPriceData({ reason }: NoPriceDataProps = {}) {
+    const descriptions: Record<string, string> = {
+        no_mileage: 'Mileage is required to estimate fair market value. Please provide the vehicle mileage.',
+        no_price: 'Asking price not detected. Please enter the asking price manually.',
+        no_vehicle: 'Could not identify vehicle make/model to lookup market prices.',
+        api_error: 'Market pricing data temporarily unavailable.',
+    };
     return (
         <EmptyState
             icon={<DollarSign className="size-5 text-muted-foreground" />}
             title="Price Analysis Unavailable"
-            description="Insufficient data to estimate fair market value."
+            description={reason ? descriptions[reason] : 'Mileage and price are required to estimate fair market value.'}
         />
     );
 }
 
-export function NoLongevityData() {
+interface NoLongevityDataProps {
+    reason?: 'no_mileage' | 'no_vehicle';
+}
+
+export function NoLongevityData({ reason }: NoLongevityDataProps = {}) {
+    const descriptions: Record<string, string> = {
+        no_mileage: 'Current mileage is required to calculate remaining lifespan. Please provide the vehicle mileage.',
+        no_vehicle: 'Could not identify vehicle make/model to lookup lifespan data.',
+    };
     return (
         <EmptyState
             icon={<HelpCircle className="size-5 text-muted-foreground" />}
             title="Longevity Data Unavailable"
-            description="Mileage or lifespan data not available for analysis."
+            description={reason ? descriptions[reason] : 'Mileage is required to calculate remaining vehicle lifespan.'}
         />
     );
 }
@@ -126,12 +144,22 @@ export function NoQuestionsGenerated() {
     );
 }
 
-export function AIAnalysisUnavailable() {
+interface AIAnalysisUnavailableProps {
+    reason?: 'api_key' | 'parse_error' | 'rate_limit' | 'timeout';
+}
+
+export function AIAnalysisUnavailable({ reason }: AIAnalysisUnavailableProps = {}) {
+    const descriptions: Record<string, string> = {
+        api_key: 'AI service not configured. Basic analysis is shown.',
+        parse_error: 'AI response could not be processed. Basic analysis is shown.',
+        rate_limit: 'AI service temporarily unavailable due to high demand.',
+        timeout: 'AI analysis timed out. Please try again.',
+    };
     return (
         <EmptyState
             icon={<AlertTriangle className="size-5 text-yellow-600" />}
             title="AI Analysis Unavailable"
-            description="Advanced AI analysis could not be performed. Basic checks are shown."
+            description={reason ? descriptions[reason] : 'Advanced AI analysis could not be performed. Basic checks are shown.'}
         />
     );
 }

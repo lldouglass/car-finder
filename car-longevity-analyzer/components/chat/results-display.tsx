@@ -220,8 +220,38 @@ function RedFlagItem({ flag }: { flag: RedFlag }) {
   );
 }
 
+// Debug component to show data status (only in development)
+function DataStatusDebug({ result }: { result: AnalysisResponse }) {
+  if (process.env.NODE_ENV !== 'development') return null;
+
+  const { vehicle, longevity, pricing, safetyRating, scores, aiAnalysis } = result;
+
+  const status = {
+    vehicle: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : 'Not identified',
+    mileage: longevity?.estimatedRemainingMiles !== undefined ? 'Present' : 'Missing',
+    price: pricing?.askingPrice !== undefined ? `$${pricing.askingPrice}` : 'Missing',
+    safety: safetyRating ? 'Present' : 'Missing',
+    aiAnalysis: aiAnalysis?.trustworthiness !== undefined ? `Score: ${aiAnalysis.trustworthiness}` : 'Missing',
+    overall: scores?.overall !== undefined && scores.overall !== null ? scores.overall.toFixed(1) : 'Not calculated',
+  };
+
+  return (
+    <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg text-xs">
+      <p className="font-bold text-yellow-800 dark:text-yellow-200 mb-2">Debug: Data Status</p>
+      <div className="grid grid-cols-2 gap-1 text-yellow-700 dark:text-yellow-300">
+        {Object.entries(status).map(([key, value]) => (
+          <div key={key}>
+            <span className="font-medium">{key}:</span> {value}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const {
+    vehicle,
     longevity,
     pricing,
     redFlags,
@@ -239,6 +269,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     priceThresholds,
   } = result;
 
+  const hasVehicleData = vehicle && vehicle.make && vehicle.model;
   const hasLongevityData = longevity && longevity.estimatedRemainingMiles !== undefined;
   const hasPricingData = pricing && pricing.askingPrice !== undefined;
   const hasRedFlags = redFlags && redFlags.length > 0;
@@ -256,6 +287,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   return (
     <div className="space-y-6">
+      {/* Debug info in development */}
+      <DataStatusDebug result={result} />
+
       {/* Longevity & Price Grid */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Longevity Details */}
@@ -310,7 +344,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </div>
               </div>
             ) : (
-              <NoLongevityData />
+              <NoLongevityData reason={!hasVehicleData ? 'no_vehicle' : 'no_mileage'} />
             )}
           </CardContent>
         </Card>
@@ -356,7 +390,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 )}
               </div>
             ) : (
-              <NoPriceData />
+              <NoPriceData reason={!hasVehicleData ? 'no_vehicle' : !longevity ? 'no_mileage' : 'no_price'} />
             )}
           </CardContent>
         </Card>
