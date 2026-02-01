@@ -4,7 +4,10 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing STRIPE_SECRET_KEY environment variable');
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Trim whitespace/newlines that may have been accidentally copied
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY.trim();
+
+export const stripe = new Stripe(stripeSecretKey);
 
 /**
  * Create a Stripe Checkout session for Premium subscription.
