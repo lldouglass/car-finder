@@ -39,8 +39,10 @@ export async function POST() {
       );
     }
 
+    // Return actual error message for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { success: false, error: 'Failed to create checkout session' },
+      { success: false, error: `Checkout failed: ${errorMessage}` },
       { status: 500 }
     );
   }
