@@ -256,6 +256,24 @@ export interface KnownIssue {
     sampleComplaints: string[];  // 2-3 actual complaint summaries from NHTSA
 }
 
+// Survival Analysis types (Weibull-based probability model)
+export type SurvivalRiskLevel = 'safe' | 'moderate' | 'risky' | 'unlikely';
+
+export interface SurvivalMilestone {
+    additionalMiles: number;
+    totalMiles: number;
+    probability: number;  // 0-1
+    riskLevel: SurvivalRiskLevel;
+}
+
+export interface SurvivalAnalysis {
+    milestones: SurvivalMilestone[];
+    expectedAdditionalMiles: number;  // Median (50th percentile)
+    confidenceRange: { low: number; high: number };  // 25th-75th percentile
+    modelConfidence: 'high' | 'medium' | 'low';
+    warnings: string[];
+}
+
 export interface AnalysisResponse {
     success: boolean;
     error?: string;
@@ -280,6 +298,7 @@ export interface AnalysisResponse {
     inspectionChecklist?: InspectionChecklist;
     warrantyValue?: WarrantyValueResult;
     priceThresholds?: PriceThresholds;
+    survivalAnalysis?: SurvivalAnalysis;
 }
 
 export class APIError extends Error {
