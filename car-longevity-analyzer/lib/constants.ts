@@ -81,7 +81,7 @@ export const RATE_LIMIT_DEFAULTS = {
 export const LIFESPAN_ADJUSTMENT_LIMITS = {
     minMultiplier: 0.5,  // Floor at 50% of base lifespan
     maxMultiplier: 1.5,  // Cap at 150% of base lifespan
-    defaultLifespan: 200000, // Default lifespan when vehicle not in database
+    defaultLifespan: 130000, // Default lifespan when vehicle not in database (calibrated to real-world data)
 } as const;
 
 // HTTP status codes with user-friendly messages
