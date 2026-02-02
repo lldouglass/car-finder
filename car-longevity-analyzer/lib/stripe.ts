@@ -13,7 +13,7 @@ export const stripe = new Stripe(stripeSecretKey);
  * Create a Stripe Checkout session for Premium subscription.
  */
 export async function createCheckoutSession(clerkId: string, email: string) {
-  const priceId = process.env.PREMIUM_PRICE_ID;
+  const priceId = process.env.PREMIUM_PRICE_ID?.trim();
 
   if (!priceId) {
     throw new Error('Missing PREMIUM_PRICE_ID environment variable');
@@ -57,7 +57,7 @@ export async function createCustomerPortal(customerId: string) {
  * Verify Stripe webhook signature.
  */
 export function constructWebhookEvent(body: string, signature: string) {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
   if (!webhookSecret) {
     throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable');
