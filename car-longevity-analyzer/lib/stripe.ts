@@ -10,6 +10,28 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY.trim();
 export const stripe = new Stripe(stripeSecretKey);
 
 /**
+ * Get the application URL for Stripe redirects.
+ * Handles missing env var, trimming, and protocol normalization.
+ */
+function getAppUrl(): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (!url) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('NEXT_PUBLIC_APP_URL not set in production - using fallback');
+    }
+    return 'http://localhost:3000';
+  }
+
+  // Ensure URL has protocol
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+
+  return url;
+}
+
+/**
  * Create a Stripe Checkout session for Premium subscription.
  */
 export async function createCheckoutSession(clerkId: string, email: string) {
@@ -19,7 +41,7 @@ export async function createCheckoutSession(clerkId: string, email: string) {
     throw new Error('Missing PREMIUM_PRICE_ID environment variable');
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = getAppUrl();
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -43,7 +65,7 @@ export async function createCheckoutSession(clerkId: string, email: string) {
  * Create a Stripe Customer Portal session for managing subscription.
  */
 export async function createCustomerPortal(customerId: string) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = getAppUrl();
 
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
