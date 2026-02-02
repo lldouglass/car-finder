@@ -155,8 +155,9 @@ export interface Pricing {
     dealQuality: 'GREAT' | 'GOOD' | 'FAIR' | 'HIGH' | 'OVERPRICED';
     analysis: string;
     source?: 'api' | 'calculated';
-    confidence?: 'high' | 'medium' | 'low';
+    confidence?: 'high' | 'medium' | 'low' | 'very_low';
     sampleSize?: number;
+    warnings?: string[];
 }
 
 export interface RedFlag {

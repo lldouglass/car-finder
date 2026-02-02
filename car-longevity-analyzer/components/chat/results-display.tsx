@@ -7,6 +7,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { SafetyRatingsDisplay, NoSafetyRatings } from '@/components/safety-ratings-display';
 import { KnownIssuesDisplay } from '@/components/known-issues-display';
 import { LifespanFactorsDisplay } from '@/components/lifespan-factors-display';
+import { SurvivalAnalysisDisplay } from '@/components/survival-analysis-display';
 import {
   NoRecallsFound,
   NoRedFlags,
@@ -27,6 +28,7 @@ import {
   Wrench,
   Activity,
   TrendingDown,
+  TrendingUp,
   Clipboard,
   BadgeCheck,
   ChevronDown,
@@ -48,19 +50,58 @@ function formatCurrency(num: number | null | undefined): string {
   return `$${num.toLocaleString()}`;
 }
 
-const DEAL_QUALITY_CONFIG: Record<string, { color: string; label: string }> = {
-  GREAT: { color: 'bg-green-500', label: 'Great deal - below market value' },
-  GOOD: { color: 'bg-green-400', label: 'Good deal - competitive price' },
-  FAIR: { color: 'bg-yellow-500', label: 'Fair price - within market range' },
-  HIGH: { color: 'bg-orange-500', label: 'High price - above market average' },
-  OVERPRICED: { color: 'bg-red-500', label: 'Overpriced - significantly above market' },
+const DEAL_QUALITY_CONFIG: Record<string, { color: string; label: string; displayText: string }> = {
+  GREAT: { color: 'bg-green-500', label: 'Great deal - below market value', displayText: 'Great Deal' },
+  GOOD: { color: 'bg-green-400', label: 'Good deal - competitive price', displayText: 'Good Deal' },
+  FAIR: { color: 'bg-yellow-500', label: 'Fair price - within market range', displayText: 'Fair Price' },
+  HIGH: { color: 'bg-orange-500', label: 'High price - above market average', displayText: 'Overpriced' },
+  OVERPRICED: { color: 'bg-red-500', label: 'Overpriced - significantly above market', displayText: 'Way Overpriced' },
 };
 
+const PRICE_CONFIDENCE_CONFIG: Record<string, { color: string; bgColor: string; label: string; description: string }> = {
+  high: {
+    color: 'text-green-700 dark:text-green-300',
+    bgColor: 'bg-green-100 dark:bg-green-900',
+    label: 'High',
+    description: 'Based on known vehicle data and market trends',
+  },
+  medium: {
+    color: 'text-yellow-700 dark:text-yellow-300',
+    bgColor: 'bg-yellow-100 dark:bg-yellow-900',
+    label: 'Medium',
+    description: 'Some estimation involved - verify with market research',
+  },
+  low: {
+    color: 'text-orange-700 dark:text-orange-300',
+    bgColor: 'bg-orange-100 dark:bg-orange-900',
+    label: 'Low',
+    description: 'Limited data available - use as rough estimate only',
+  },
+  very_low: {
+    color: 'text-red-700 dark:text-red-300',
+    bgColor: 'bg-red-100 dark:bg-red-900',
+    label: 'Very Low',
+    description: 'Significant uncertainty - independent valuation recommended',
+  },
+};
+
+function PriceConfidenceBadge({ confidence }: { confidence: string }) {
+  const config = PRICE_CONFIDENCE_CONFIG[confidence] || PRICE_CONFIDENCE_CONFIG.medium;
+  return (
+    <span
+      className={`text-xs px-1.5 py-0.5 rounded font-medium ${config.bgColor} ${config.color}`}
+      title={config.description}
+    >
+      {config.label} Confidence
+    </span>
+  );
+}
+
 function DealQualityBadge({ quality }: { quality: string }) {
-  const config = DEAL_QUALITY_CONFIG[quality] || { color: 'bg-gray-500', label: quality };
+  const config = DEAL_QUALITY_CONFIG[quality] || { color: 'bg-gray-500', label: quality, displayText: quality };
   return (
     <Badge className={`${config.color} text-white`} aria-label={config.label}>
-      {quality}
+      {config.displayText}
     </Badge>
   );
 }
@@ -267,6 +308,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     inspectionChecklist,
     warrantyValue,
     priceThresholds,
+    survivalAnalysis,
   } = result;
 
   const hasVehicleData = vehicle && vehicle.make && vehicle.model;
@@ -284,6 +326,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const hasInspectionChecklist = inspectionChecklist !== null && inspectionChecklist !== undefined;
   const hasWarrantyValue = warrantyValue && warrantyValue.coverageQuality !== 'none';
   const hasPriceThresholds = priceThresholds !== null && priceThresholds !== undefined;
+  const hasSurvivalAnalysis = survivalAnalysis && survivalAnalysis.milestones && survivalAnalysis.milestones.length > 0;
 
   return (
     <div className="space-y-6">
@@ -355,6 +398,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             <CardTitle id="pricing-heading" className="text-lg flex items-center gap-2">
               <DollarSign className="size-5" aria-hidden="true" />
               Price Analysis
+              {hasPricingData && pricing.confidence && (
+                <PriceConfidenceBadge confidence={pricing.confidence} />
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -387,6 +433,16 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </div>
                 {pricing.analysis && (
                   <p className="text-sm text-muted-foreground">{pricing.analysis}</p>
+                )}
+                {pricing.warnings && pricing.warnings.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {pricing.warnings.map((warning, index) => (
+                      <p key={index} className="text-xs text-muted-foreground flex items-start gap-1">
+                        <Info className="size-3 mt-0.5 shrink-0" aria-hidden="true" />
+                        {warning}
+                      </p>
+                    ))}
+                  </div>
                 )}
               </div>
             ) : (
@@ -443,6 +499,22 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </CardHeader>
           <CardContent>
             <LifespanFactorsDisplay lifespanAnalysis={lifespanAnalysis} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Survival Probability Analysis */}
+      {hasSurvivalAnalysis && survivalAnalysis && (
+        <Card role="region" aria-labelledby="survival-analysis-heading">
+          <CardHeader>
+            <CardTitle id="survival-analysis-heading" className="text-lg flex items-center gap-2">
+              <TrendingUp className="size-5 text-blue-500" aria-hidden="true" />
+              Survival Probability
+            </CardTitle>
+            <CardDescription>Probability of reaching mileage milestones</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SurvivalAnalysisDisplay survivalAnalysis={survivalAnalysis} />
           </CardContent>
         </Card>
       )}

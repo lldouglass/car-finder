@@ -1,15 +1,37 @@
 /**
- * Vehicle pricing estimation utilities.
+ * Vehicle Pricing Estimation Module
  *
- * NEW APPROACH:
- * - Cars 0-10 years: Depreciation model with inflation-adjusted MSRP
- * - Cars 10+ years: Market-based bracket system (mileage + condition)
- *
- * The old approach was fundamentally broken because:
- * 1. It used current MSRP for old cars (wrong starting point)
- * 2. Depreciation curves don't apply to 20+ year old cars
- * 3. "Expected mileage" made old low-mileage cars overpriced
+ * Provides fair market price estimation using:
+ * - Dynamic MSRP estimation from VIN attributes
+ * - Research-backed depreciation curves by vehicle category
+ * - EV-specific depreciation model
+ * - Regional pricing adjustments
+ * - Model-specific reliability adjustments
+ * - Confidence scoring system
  */
+
+import {
+    estimateMsrp,
+    isElectricVehicle,
+    type VinAttributes,
+    type MsrpEstimate,
+    type DepreciationCategory,
+} from './msrp-estimator';
+import {
+    calculateRegionalAdjustment,
+    type RegionalAdjustment,
+} from './regional-pricing';
+import {
+    DEPRECIATION_CURVES,
+    POST_10_YEAR_DEPRECIATION,
+    BRAND_AVERAGE_RELIABILITY,
+    RELIABILITY_PRICE_ADJUSTMENT_FACTOR,
+    CONFIDENCE_RANGE_MARGINS,
+    RANGE_EXPANSION_FACTORS,
+    MILEAGE_ADJUSTMENT,
+} from './constants';
+
+export type PriceConfidence = 'high' | 'medium' | 'low' | 'very_low';
 
 export interface PriceEstimate {
     low: number;
@@ -17,131 +39,46 @@ export interface PriceEstimate {
     midpoint: number;
 }
 
-export interface MsrpData {
-    baseMsrp: number;
-    category: 'economy' | 'midsize' | 'luxury' | 'truck' | 'suv';
+export interface DetailedPriceEstimate extends PriceEstimate {
+    confidence: PriceConfidence;
+    msrpEstimate: MsrpEstimate;
+    regionalAdjustment?: RegionalAdjustment;
+    depreciationCategory: DepreciationCategory | 'ev';
+    factors: {
+        baseValue: number;
+        depreciationRetention: number;
+        mileageAdjustment: number;
+        reliabilityAdjustment: number;
+        regionalAdjustment: number;
+    };
+    warnings: string[];
 }
 
-// Average annual inflation rate for adjusting historical MSRPs
-const ANNUAL_INFLATION = 0.03; // 3% per year
-
-/**
- * Mileage brackets for older vehicles (10+ years)
- * Values are multipliers applied to base value
- */
-const MILEAGE_BRACKETS = [
-    { maxMiles: 50000, multiplier: 1.25, label: 'very low' },
-    { maxMiles: 75000, multiplier: 1.10, label: 'low' },
-    { maxMiles: 100000, multiplier: 1.00, label: 'average' },
-    { maxMiles: 125000, multiplier: 0.85, label: 'above average' },
-    { maxMiles: 150000, multiplier: 0.70, label: 'high' },
-    { maxMiles: 175000, multiplier: 0.55, label: 'very high' },
-    { maxMiles: 200000, multiplier: 0.40, label: 'extreme' },
-    { maxMiles: Infinity, multiplier: 0.25, label: 'salvage territory' },
-];
-
-/**
- * Base values for older vehicles (10+ years) by category
- * These represent typical values for a 10-year-old vehicle with ~100k miles
- */
-const OLDER_CAR_BASE_VALUES: Record<MsrpData['category'], number> = {
-    economy: 6000,
-    midsize: 8000,
-    suv: 10000,
-    truck: 12000,
-    luxury: 12000, // Luxury depreciates fast but has a floor
-};
-
-/**
- * Brand value multipliers for older cars
- * Reliable brands hold value better in the used market
- */
-const BRAND_VALUE_MULTIPLIERS: Record<string, number> = {
-    // Premium (excellent reliability, high demand)
-    'toyota': 1.35,
-    'lexus': 1.30,
-    'honda': 1.30,
-
-    // Above average
-    'mazda': 1.15,
-    'subaru': 1.15,
-    'acura': 1.10,
-
-    // Average
-    'hyundai': 1.00,
-    'kia': 1.00,
-    'ford': 0.95,
-    'chevrolet': 0.95,
-    'gmc': 1.00,
-    'ram': 1.05,
-    'nissan': 0.90,
-
-    // Below average (reliability concerns or oversupply)
-    'dodge': 0.85,
-    'chrysler': 0.80,
-    'jeep': 0.90,
-    'volkswagen': 0.85,
-    'mitsubishi': 0.80,
-
-    // Luxury (fast depreciation)
-    'bmw': 0.75,
-    'mercedes-benz': 0.75,
-    'mercedes': 0.75,
-    'audi': 0.75,
-    'infiniti': 0.70,
-    'cadillac': 0.65,
-    'lincoln': 0.65,
-    'jaguar': 0.60,
-    'land rover': 0.60,
-    'volvo': 0.80,
-
-    // Electric/newer brands
-    'tesla': 1.10,
-    'rivian': 1.00,
-};
-
-/**
- * Age decay for older vehicles
- * After 10 years, value continues to decline but at a slower rate
- */
-function getAgeDecayMultiplier(age: number): number {
-    if (age <= 10) return 1.0;
-    if (age <= 15) return 0.85;
-    if (age <= 20) return 0.65;
-    if (age <= 25) return 0.50;
-    if (age <= 30) return 0.35;
-    return 0.25; // 30+ years - collector or beater territory
-}
-
-/**
- * MSRP database - current MSRPs for reference
- * For older cars, we'll adjust these for inflation
- */
-const MSRP_DATABASE: Record<string, MsrpData> = {
+// Legacy MSRP database for direct matches (higher confidence)
+// Kept for backwards compatibility and higher accuracy on known models
+const MSRP_DATABASE: Record<string, { baseMsrp: number; category: DepreciationCategory }> = {
     // TOYOTA
-    'toyota camry': { baseMsrp: 28000, category: 'midsize' },
+    'toyota camry': { baseMsrp: 28000, category: 'mainstream' },
     'toyota corolla': { baseMsrp: 23000, category: 'economy' },
-    'toyota rav4': { baseMsrp: 32000, category: 'suv' },
-    'toyota highlander': { baseMsrp: 42000, category: 'suv' },
-    'toyota tacoma': { baseMsrp: 35000, category: 'truck' },
-    'toyota tundra': { baseMsrp: 48000, category: 'truck' },
-    'toyota 4runner': { baseMsrp: 42000, category: 'suv' },
+    'toyota rav4': { baseMsrp: 32000, category: 'mainstream' },
+    'toyota highlander': { baseMsrp: 42000, category: 'truck_suv' },
+    'toyota tacoma': { baseMsrp: 35000, category: 'truck_suv' },
+    'toyota tundra': { baseMsrp: 48000, category: 'truck_suv' },
+    'toyota 4runner': { baseMsrp: 42000, category: 'truck_suv' },
     'toyota prius': { baseMsrp: 28000, category: 'economy' },
-    'toyota avalon': { baseMsrp: 38000, category: 'midsize' },
-    'toyota sienna': { baseMsrp: 40000, category: 'suv' },
-    'toyota sequoia': { baseMsrp: 62000, category: 'suv' },
-    'toyota land cruiser': { baseMsrp: 90000, category: 'suv' },
-    'toyota yaris': { baseMsrp: 18000, category: 'economy' },
+    'toyota avalon': { baseMsrp: 38000, category: 'mainstream' },
+    'toyota sienna': { baseMsrp: 40000, category: 'mainstream' },
+    'toyota sequoia': { baseMsrp: 62000, category: 'truck_suv' },
+    'toyota land cruiser': { baseMsrp: 90000, category: 'truck_suv' },
 
     // HONDA
-    'honda accord': { baseMsrp: 29000, category: 'midsize' },
+    'honda accord': { baseMsrp: 29000, category: 'mainstream' },
     'honda civic': { baseMsrp: 25000, category: 'economy' },
-    'honda cr-v': { baseMsrp: 32000, category: 'suv' },
-    'honda pilot': { baseMsrp: 42000, category: 'suv' },
-    'honda odyssey': { baseMsrp: 40000, category: 'suv' },
-    'honda hr-v': { baseMsrp: 26000, category: 'suv' },
-    'honda ridgeline': { baseMsrp: 42000, category: 'truck' },
-    'honda fit': { baseMsrp: 20000, category: 'economy' },
+    'honda cr-v': { baseMsrp: 32000, category: 'mainstream' },
+    'honda pilot': { baseMsrp: 42000, category: 'truck_suv' },
+    'honda odyssey': { baseMsrp: 40000, category: 'mainstream' },
+    'honda hr-v': { baseMsrp: 26000, category: 'mainstream' },
+    'honda ridgeline': { baseMsrp: 42000, category: 'truck_suv' },
 
     // LEXUS
     'lexus es': { baseMsrp: 45000, category: 'luxury' },
@@ -150,98 +87,74 @@ const MSRP_DATABASE: Record<string, MsrpData> = {
     'lexus is': { baseMsrp: 42000, category: 'luxury' },
     'lexus gx': { baseMsrp: 65000, category: 'luxury' },
 
-    // ACURA
-    'acura tlx': { baseMsrp: 45000, category: 'luxury' },
-    'acura mdx': { baseMsrp: 52000, category: 'luxury' },
-    'acura rdx': { baseMsrp: 45000, category: 'luxury' },
-
     // SUBARU
-    'subaru outback': { baseMsrp: 32000, category: 'suv' },
-    'subaru forester': { baseMsrp: 32000, category: 'suv' },
-    'subaru crosstrek': { baseMsrp: 28000, category: 'suv' },
+    'subaru outback': { baseMsrp: 32000, category: 'mainstream' },
+    'subaru forester': { baseMsrp: 32000, category: 'mainstream' },
+    'subaru crosstrek': { baseMsrp: 28000, category: 'mainstream' },
     'subaru impreza': { baseMsrp: 24000, category: 'economy' },
-    'subaru wrx': { baseMsrp: 32000, category: 'midsize' },
 
     // MAZDA
     'mazda mazda3': { baseMsrp: 24000, category: 'economy' },
     'mazda 3': { baseMsrp: 24000, category: 'economy' },
-    'mazda mazda6': { baseMsrp: 28000, category: 'midsize' },
-    'mazda 6': { baseMsrp: 28000, category: 'midsize' },
-    'mazda cx-5': { baseMsrp: 30000, category: 'suv' },
-    'mazda cx-9': { baseMsrp: 40000, category: 'suv' },
-    'mazda miata': { baseMsrp: 30000, category: 'midsize' },
-    'mazda mx-5': { baseMsrp: 30000, category: 'midsize' },
+    'mazda cx-5': { baseMsrp: 30000, category: 'mainstream' },
+    'mazda cx-9': { baseMsrp: 40000, category: 'truck_suv' },
 
     // HYUNDAI
-    'hyundai sonata': { baseMsrp: 27000, category: 'midsize' },
+    'hyundai sonata': { baseMsrp: 27000, category: 'mainstream' },
     'hyundai elantra': { baseMsrp: 22000, category: 'economy' },
-    'hyundai tucson': { baseMsrp: 30000, category: 'suv' },
-    'hyundai santa fe': { baseMsrp: 35000, category: 'suv' },
-    'hyundai palisade': { baseMsrp: 40000, category: 'suv' },
+    'hyundai tucson': { baseMsrp: 30000, category: 'mainstream' },
+    'hyundai santa fe': { baseMsrp: 35000, category: 'mainstream' },
+    'hyundai palisade': { baseMsrp: 40000, category: 'truck_suv' },
 
     // KIA
-    'kia optima': { baseMsrp: 26000, category: 'midsize' },
-    'kia k5': { baseMsrp: 28000, category: 'midsize' },
-    'kia sorento': { baseMsrp: 35000, category: 'suv' },
-    'kia sportage': { baseMsrp: 32000, category: 'suv' },
-    'kia telluride': { baseMsrp: 40000, category: 'suv' },
-    'kia soul': { baseMsrp: 22000, category: 'economy' },
+    'kia k5': { baseMsrp: 28000, category: 'mainstream' },
+    'kia sorento': { baseMsrp: 35000, category: 'mainstream' },
+    'kia sportage': { baseMsrp: 32000, category: 'mainstream' },
+    'kia telluride': { baseMsrp: 40000, category: 'truck_suv' },
 
     // FORD
-    'ford f-150': { baseMsrp: 45000, category: 'truck' },
-    'ford escape': { baseMsrp: 30000, category: 'suv' },
-    'ford fusion': { baseMsrp: 26000, category: 'midsize' },
-    'ford explorer': { baseMsrp: 40000, category: 'suv' },
-    'ford mustang': { baseMsrp: 35000, category: 'midsize' },
-    'ford ranger': { baseMsrp: 35000, category: 'truck' },
-    'ford bronco': { baseMsrp: 38000, category: 'suv' },
+    'ford f-150': { baseMsrp: 45000, category: 'truck_suv' },
+    'ford escape': { baseMsrp: 30000, category: 'mainstream' },
+    'ford explorer': { baseMsrp: 40000, category: 'truck_suv' },
+    'ford mustang': { baseMsrp: 35000, category: 'mainstream' },
+    'ford ranger': { baseMsrp: 35000, category: 'truck_suv' },
+    'ford bronco': { baseMsrp: 38000, category: 'truck_suv' },
 
     // CHEVROLET
-    'chevrolet silverado': { baseMsrp: 45000, category: 'truck' },
-    'chevrolet silverado 1500': { baseMsrp: 45000, category: 'truck' },
-    'chevrolet equinox': { baseMsrp: 30000, category: 'suv' },
-    'chevrolet malibu': { baseMsrp: 26000, category: 'midsize' },
-    'chevrolet tahoe': { baseMsrp: 58000, category: 'suv' },
-    'chevrolet traverse': { baseMsrp: 38000, category: 'suv' },
-    'chevrolet camaro': { baseMsrp: 30000, category: 'midsize' },
-    'chevrolet colorado': { baseMsrp: 35000, category: 'truck' },
+    'chevrolet silverado': { baseMsrp: 45000, category: 'truck_suv' },
+    'chevrolet silverado 1500': { baseMsrp: 45000, category: 'truck_suv' },
+    'chevrolet equinox': { baseMsrp: 30000, category: 'mainstream' },
+    'chevrolet tahoe': { baseMsrp: 58000, category: 'truck_suv' },
+    'chevrolet traverse': { baseMsrp: 38000, category: 'truck_suv' },
 
     // GMC
-    'gmc sierra': { baseMsrp: 48000, category: 'truck' },
-    'gmc sierra 1500': { baseMsrp: 48000, category: 'truck' },
-    'gmc yukon': { baseMsrp: 62000, category: 'suv' },
-    'gmc acadia': { baseMsrp: 40000, category: 'suv' },
-    'gmc terrain': { baseMsrp: 32000, category: 'suv' },
+    'gmc sierra': { baseMsrp: 48000, category: 'truck_suv' },
+    'gmc sierra 1500': { baseMsrp: 48000, category: 'truck_suv' },
+    'gmc yukon': { baseMsrp: 62000, category: 'truck_suv' },
 
     // RAM
-    'ram 1500': { baseMsrp: 45000, category: 'truck' },
-    'ram 2500': { baseMsrp: 55000, category: 'truck' },
+    'ram 1500': { baseMsrp: 45000, category: 'truck_suv' },
+    'ram 2500': { baseMsrp: 55000, category: 'truck_suv' },
 
     // DODGE
-    'dodge charger': { baseMsrp: 35000, category: 'midsize' },
-    'dodge challenger': { baseMsrp: 35000, category: 'midsize' },
-    'dodge durango': { baseMsrp: 42000, category: 'suv' },
+    'dodge charger': { baseMsrp: 35000, category: 'mainstream' },
+    'dodge challenger': { baseMsrp: 35000, category: 'mainstream' },
+    'dodge durango': { baseMsrp: 42000, category: 'truck_suv' },
 
     // JEEP
-    'jeep wrangler': { baseMsrp: 35000, category: 'suv' },
-    'jeep grand cherokee': { baseMsrp: 45000, category: 'suv' },
-    'jeep cherokee': { baseMsrp: 35000, category: 'suv' },
-    'jeep compass': { baseMsrp: 30000, category: 'suv' },
+    'jeep wrangler': { baseMsrp: 35000, category: 'truck_suv' },
+    'jeep grand cherokee': { baseMsrp: 45000, category: 'truck_suv' },
 
     // NISSAN
-    'nissan altima': { baseMsrp: 27000, category: 'midsize' },
-    'nissan rogue': { baseMsrp: 30000, category: 'suv' },
-    'nissan sentra': { baseMsrp: 22000, category: 'economy' },
-    'nissan maxima': { baseMsrp: 40000, category: 'midsize' },
-    'nissan pathfinder': { baseMsrp: 40000, category: 'suv' },
-    'nissan frontier': { baseMsrp: 35000, category: 'truck' },
+    'nissan altima': { baseMsrp: 27000, category: 'mainstream' },
+    'nissan rogue': { baseMsrp: 30000, category: 'mainstream' },
+    'nissan pathfinder': { baseMsrp: 40000, category: 'truck_suv' },
+    'nissan frontier': { baseMsrp: 35000, category: 'truck_suv' },
 
     // VOLKSWAGEN
     'volkswagen jetta': { baseMsrp: 24000, category: 'economy' },
-    'volkswagen passat': { baseMsrp: 30000, category: 'midsize' },
-    'volkswagen tiguan': { baseMsrp: 32000, category: 'suv' },
-    'volkswagen atlas': { baseMsrp: 40000, category: 'suv' },
-    'volkswagen golf': { baseMsrp: 28000, category: 'economy' },
+    'volkswagen tiguan': { baseMsrp: 32000, category: 'mainstream' },
+    'volkswagen atlas': { baseMsrp: 40000, category: 'truck_suv' },
 
     // BMW
     'bmw 3 series': { baseMsrp: 45000, category: 'luxury' },
@@ -261,41 +174,11 @@ const MSRP_DATABASE: Record<string, MsrpData> = {
     'audi q5': { baseMsrp: 48000, category: 'luxury' },
     'audi q7': { baseMsrp: 62000, category: 'luxury' },
 
-    // VOLVO
-    'volvo xc90': { baseMsrp: 58000, category: 'luxury' },
-    'volvo xc60': { baseMsrp: 48000, category: 'luxury' },
-    'volvo xc40': { baseMsrp: 40000, category: 'luxury' },
-    'volvo s60': { baseMsrp: 45000, category: 'luxury' },
-
     // TESLA
-    'tesla model 3': { baseMsrp: 42000, category: 'midsize' },
-    'tesla model y': { baseMsrp: 48000, category: 'suv' },
+    'tesla model 3': { baseMsrp: 42000, category: 'mainstream' },
+    'tesla model y': { baseMsrp: 48000, category: 'mainstream' },
     'tesla model s': { baseMsrp: 85000, category: 'luxury' },
     'tesla model x': { baseMsrp: 95000, category: 'luxury' },
-
-    // CHRYSLER
-    'chrysler pacifica': { baseMsrp: 42000, category: 'suv' },
-    'chrysler 300': { baseMsrp: 38000, category: 'midsize' },
-
-    // BUICK
-    'buick enclave': { baseMsrp: 48000, category: 'luxury' },
-    'buick encore': { baseMsrp: 28000, category: 'luxury' },
-
-    // CADILLAC
-    'cadillac escalade': { baseMsrp: 85000, category: 'luxury' },
-    'cadillac xt5': { baseMsrp: 48000, category: 'luxury' },
-
-    // LINCOLN
-    'lincoln navigator': { baseMsrp: 85000, category: 'luxury' },
-    'lincoln aviator': { baseMsrp: 58000, category: 'luxury' },
-
-    // INFINITI
-    'infiniti q50': { baseMsrp: 45000, category: 'luxury' },
-    'infiniti qx60': { baseMsrp: 52000, category: 'luxury' },
-
-    // MITSUBISHI
-    'mitsubishi outlander': { baseMsrp: 32000, category: 'suv' },
-    'mitsubishi mirage': { baseMsrp: 18000, category: 'economy' },
 
     // PORSCHE
     'porsche 911': { baseMsrp: 115000, category: 'luxury' },
@@ -305,16 +188,12 @@ const MSRP_DATABASE: Record<string, MsrpData> = {
     // LAND ROVER
     'land rover range rover': { baseMsrp: 105000, category: 'luxury' },
     'land rover discovery': { baseMsrp: 62000, category: 'luxury' },
-
-    // JAGUAR
-    'jaguar f-pace': { baseMsrp: 58000, category: 'luxury' },
-    'jaguar xe': { baseMsrp: 48000, category: 'luxury' },
 };
 
 /**
- * Look up MSRP data for a vehicle.
+ * Look up MSRP from database (high confidence if found)
  */
-export function getMsrpData(make: string, model: string): MsrpData {
+function lookupMsrpDatabase(make: string, model: string): { baseMsrp: number; category: DepreciationCategory } | null {
     const key = `${make.toLowerCase()} ${model.toLowerCase()}`;
 
     // Direct match
@@ -329,137 +208,282 @@ export function getMsrpData(make: string, model: string): MsrpData {
         }
     }
 
-    // Default fallback based on make
-    const makeOnly = make.toLowerCase();
-    if (['bmw', 'mercedes-benz', 'mercedes', 'audi', 'lexus', 'porsche', 'jaguar', 'land rover', 'cadillac', 'lincoln'].includes(makeOnly)) {
-        return { baseMsrp: 50000, category: 'luxury' };
-    }
-    if (['ford', 'chevrolet', 'gmc', 'ram', 'toyota', 'nissan'].includes(makeOnly)) {
-        return { baseMsrp: 35000, category: 'truck' };
-    }
-
-    return { baseMsrp: 28000, category: 'midsize' };
+    return null;
 }
 
 /**
- * Get the mileage bracket multiplier
+ * Gets depreciation retention for a given age using the appropriate curve
  */
-function getMileageBracketMultiplier(mileage: number): { multiplier: number; label: string } {
-    for (const bracket of MILEAGE_BRACKETS) {
-        if (mileage <= bracket.maxMiles) {
-            return { multiplier: bracket.multiplier, label: bracket.label };
-        }
+function getDepreciationRetention(
+    age: number,
+    category: DepreciationCategory | 'ev'
+): number {
+    const curve = DEPRECIATION_CURVES[category];
+    const postYearRate = POST_10_YEAR_DEPRECIATION[category];
+
+    if (age <= 0) return 1.0;
+
+    if (age <= 10) {
+        // Use the curve values
+        return curve[age];
     }
-    return { multiplier: 0.25, label: 'salvage territory' };
+
+    // After year 10, apply additional depreciation
+    const year10Value = curve[10];
+    const additionalYears = age - 10;
+    return year10Value * Math.pow(1 - postYearRate, additionalYears);
 }
 
 /**
- * Get brand value multiplier
+ * Calculates mileage adjustment factor
  */
-function getBrandMultiplier(make: string): number {
-    const normalizedMake = make.toLowerCase().trim();
-    return BRAND_VALUE_MULTIPLIERS[normalizedMake] ?? 0.90;
+function calculateMileageAdjustment(mileage: number, age: number): number {
+    const expectedMiles = age * MILEAGE_ADJUSTMENT.expectedPerYear;
+    const mileageDeviation = mileage - expectedMiles;
+
+    // Convert to percentage adjustment
+    // Negative deviation (low mileage) = positive adjustment
+    // Positive deviation (high mileage) = negative adjustment
+    const adjustmentPer10k = MILEAGE_ADJUSTMENT.adjustmentPer10k;
+    const rawAdjustment = -(mileageDeviation / 10000) * adjustmentPer10k;
+
+    // Cap the adjustment
+    return Math.max(
+        -MILEAGE_ADJUSTMENT.maxAdjustment,
+        Math.min(MILEAGE_ADJUSTMENT.maxAdjustment, rawAdjustment)
+    );
 }
 
 /**
- * Estimate fair price for NEWER vehicles (0-10 years old)
- * Uses depreciation model with inflation-adjusted MSRP
+ * Calculates reliability-based price adjustment
+ * Compares model reliability score to brand average
  */
-function estimateNewerCarPrice(
-    msrpData: MsrpData,
+function calculateReliabilityAdjustment(
     make: string,
+    modelReliabilityScore: number | null
+): number {
+    if (modelReliabilityScore === null) return 0;
+
+    const makeLower = make.toLowerCase();
+    const brandAverage = BRAND_AVERAGE_RELIABILITY[makeLower];
+
+    if (!brandAverage) return 0;
+
+    const deviation = modelReliabilityScore - brandAverage;
+    return deviation * RELIABILITY_PRICE_ADJUSTMENT_FACTOR;
+}
+
+/**
+ * Determines overall price confidence
+ */
+function determineOverallConfidence(
+    msrpConfidence: 'high' | 'medium' | 'low',
+    age: number,
+    isEV: boolean,
+    dbMatch: boolean
+): PriceConfidence {
+    // Database match boosts confidence
+    if (dbMatch && age <= 10 && !isEV) {
+        return 'high';
+    }
+
+    // EVs max out at medium confidence due to market volatility
+    if (isEV) {
+        return msrpConfidence === 'low' ? 'low' : 'medium';
+    }
+
+    // Very old vehicles reduce confidence
+    if (age > 20) {
+        return 'low';
+    }
+
+    if (age > 15) {
+        return msrpConfidence === 'high' ? 'medium' : 'low';
+    }
+
+    return msrpConfidence;
+}
+
+/**
+ * Calculates price range margin based on confidence and vehicle characteristics
+ */
+function calculateRangeMargin(
+    confidence: PriceConfidence,
+    isLuxury: boolean,
     age: number,
     mileage: number
-): PriceEstimate {
-    // Adjust MSRP for inflation (work backwards from current MSRP)
-    const inflationAdjustedMsrp = msrpData.baseMsrp / Math.pow(1 + ANNUAL_INFLATION, age);
+): number {
+    let margin = CONFIDENCE_RANGE_MARGINS[confidence];
 
-    // Depreciation curve for newer cars (less aggressive - matches real market better)
-    // Year 1: 15% drop (off the lot), Year 2-3: 10% per year, Year 4+: 8% per year
-    let value = inflationAdjustedMsrp;
-    for (let year = 1; year <= age; year++) {
-        if (year === 1) {
-            value *= 0.85; // 15% first year depreciation
-        } else if (year <= 3) {
-            value *= 0.90; // 10% years 2-3
-        } else {
-            value *= 0.92; // 8% years 4+
-        }
+    // Luxury vehicles have more price variance
+    if (isLuxury) {
+        margin += RANGE_EXPANSION_FACTORS.luxury;
     }
 
-    // Mileage adjustment for newer cars
-    // Expected: 12,000 miles/year
-    const expectedMiles = age * 12000;
-    const mileageDiff = mileage - expectedMiles;
+    // Old vehicles have more condition variance
+    if (age >= 15) {
+        margin += RANGE_EXPANSION_FACTORS.old_vehicle;
+    }
 
-    // 2% adjustment per 10,000 miles difference
-    const mileageAdjustment = (mileageDiff / 10000) * -0.02;
-    const cappedAdjustment = Math.max(-0.20, Math.min(0.15, mileageAdjustment));
-    value *= (1 + cappedAdjustment);
+    // High mileage vehicles have more variance
+    if (mileage >= 150000) {
+        margin += RANGE_EXPANSION_FACTORS.high_mileage;
+    }
 
-    // Brand multiplier
-    value *= getBrandMultiplier(make);
-
-    // Calculate range (±10%)
-    const midpoint = Math.round(value);
-    const low = Math.round(value * 0.90);
-    const high = Math.round(value * 1.10);
-
-    return {
-        low: Math.max(3000, low),
-        high: Math.max(4000, high),
-        midpoint: Math.max(3500, midpoint),
-    };
+    return margin;
 }
 
 /**
- * Estimate fair price for OLDER vehicles (10+ years old)
- * Uses market-based bracket system
+ * Main function: Estimates fair market price with full details
  */
-function estimateOlderCarPrice(
-    msrpData: MsrpData,
+export function estimateFairPriceDetailed(
     make: string,
-    age: number,
-    mileage: number
-): PriceEstimate {
-    // Start with category base value
-    let baseValue = OLDER_CAR_BASE_VALUES[msrpData.category];
+    model: string,
+    year: number,
+    mileage: number,
+    vinAttributes?: Partial<VinAttributes>,
+    state?: string,
+    modelReliabilityScore?: number | null
+): DetailedPriceEstimate {
+    const currentYear = new Date().getFullYear();
+    const age = Math.max(0, currentYear - year);
+    const warnings: string[] = [];
 
-    // Apply brand multiplier (Toyota/Honda worth more than Chrysler)
-    baseValue *= getBrandMultiplier(make);
+    // Try database lookup first
+    const dbMatch = lookupMsrpDatabase(make, model);
 
-    // Apply age decay (cars continue to depreciate after 10 years)
-    baseValue *= getAgeDecayMultiplier(age);
+    // Get MSRP estimate (from database or calculated)
+    let msrpEstimate: MsrpEstimate;
+    let depreciationCategory: DepreciationCategory | 'ev';
+    let baseMsrp: number;
 
-    // Apply mileage bracket multiplier (this is the big one for old cars)
-    const mileageBracket = getMileageBracketMultiplier(mileage);
-    baseValue *= mileageBracket.multiplier;
+    const fuelType = vinAttributes?.fuelType;
+    const isEV = isElectricVehicle(fuelType);
 
-    // Special cases
-    // Trucks and 4Runners hold value exceptionally well
-    if (msrpData.category === 'truck' ||
-        make.toLowerCase() === 'toyota' && ['4runner', 'land cruiser', 'tacoma'].some(m =>
-            make.toLowerCase().includes(m))) {
-        baseValue *= 1.20;
+    if (dbMatch) {
+        // Use database value
+        baseMsrp = dbMatch.baseMsrp;
+        depreciationCategory = isEV ? 'ev' : dbMatch.category;
+        msrpEstimate = {
+            estimatedMsrp: baseMsrp,
+            category: 'unknown', // Not used when from DB
+            depreciationCategory: dbMatch.category,
+            confidence: 'high',
+            source: 'database',
+            factors: {
+                baseCategory: baseMsrp,
+                engineMultiplier: 1,
+                drivetrainMultiplier: 1,
+                brandMultiplier: 1,
+                inflationAdjustment: 1,
+            },
+        };
+    } else {
+        // Calculate from VIN attributes
+        const attributes: VinAttributes = {
+            make,
+            year,
+            bodyClass: vinAttributes?.bodyClass,
+            displacementL: vinAttributes?.displacementL,
+            fuelType: vinAttributes?.fuelType,
+            driveType: vinAttributes?.driveType,
+        };
+
+        msrpEstimate = estimateMsrp(attributes, model);
+        baseMsrp = msrpEstimate.estimatedMsrp;
+        depreciationCategory = isEV ? 'ev' : msrpEstimate.depreciationCategory;
     }
 
-    // Calculate range (±15% for older cars - more variance)
-    const midpoint = Math.round(baseValue);
-    const low = Math.round(baseValue * 0.85);
-    const high = Math.round(baseValue * 1.15);
+    // Apply inflation adjustment for historical MSRP if from database
+    const inflationAdjustedMsrp = dbMatch
+        ? baseMsrp / Math.pow(1.03, age) // Work backwards to get historical MSRP
+        : baseMsrp;
 
-    // Absolute minimum floor
+    // Calculate depreciation
+    const depreciationRetention = getDepreciationRetention(age, depreciationCategory);
+    const depreciatedValue = inflationAdjustedMsrp * depreciationRetention;
+
+    // Calculate mileage adjustment
+    const mileageAdjustment = calculateMileageAdjustment(mileage, age);
+    const mileageAdjustedValue = depreciatedValue * (1 + mileageAdjustment);
+
+    // Calculate reliability adjustment
+    const reliabilityAdjustment = calculateReliabilityAdjustment(make, modelReliabilityScore ?? null);
+    const reliabilityAdjustedValue = mileageAdjustedValue * (1 + reliabilityAdjustment);
+
+    // Calculate regional adjustment
+    let regionalAdjustment: RegionalAdjustment | undefined;
+    let regionalMultiplier = 1.0;
+
+    if (state) {
+        regionalAdjustment = calculateRegionalAdjustment(
+            state,
+            vinAttributes?.bodyClass,
+            vinAttributes?.fuelType,
+            vinAttributes?.driveType
+        );
+        regionalMultiplier = regionalAdjustment.totalMultiplier;
+    }
+
+    const finalValue = reliabilityAdjustedValue * regionalMultiplier;
+
+    // Determine confidence
+    const confidence = determineOverallConfidence(
+        msrpEstimate.confidence,
+        age,
+        isEV,
+        !!dbMatch
+    );
+
+    // Calculate range
+    const isLuxury = depreciationCategory === 'luxury';
+    const rangeMargin = calculateRangeMargin(confidence, isLuxury, age, mileage);
+
+    const midpoint = Math.round(finalValue);
+    const low = Math.round(finalValue * (1 - rangeMargin));
+    const high = Math.round(finalValue * (1 + rangeMargin));
+
+    // Add warnings
+    if (isEV) {
+        warnings.push('EV prices are volatile due to rapid technology changes and new model releases');
+    }
+
+    if (age > 20) {
+        warnings.push('Very old vehicles have high condition variance - price depends heavily on maintenance history');
+    }
+
+    if (mileage > 200000) {
+        warnings.push('Extremely high mileage - mechanical condition is critical');
+    }
+
+    if (!dbMatch && msrpEstimate.confidence === 'low') {
+        warnings.push('Limited vehicle data available - estimate based on category averages');
+    }
+
+    // Ensure minimum values
     const absoluteMin = 1500;
 
     return {
         low: Math.max(absoluteMin, low),
         high: Math.max(absoluteMin + 500, high),
         midpoint: Math.max(absoluteMin + 250, midpoint),
+        confidence,
+        msrpEstimate,
+        regionalAdjustment,
+        depreciationCategory,
+        factors: {
+            baseValue: inflationAdjustedMsrp,
+            depreciationRetention,
+            mileageAdjustment,
+            reliabilityAdjustment,
+            regionalAdjustment: regionalMultiplier,
+        },
+        warnings,
     };
 }
 
 /**
- * Main function: Estimate fair market price for a vehicle
+ * Simplified interface for backwards compatibility
  */
 export function estimateFairPrice(
     make: string,
@@ -467,22 +491,50 @@ export function estimateFairPrice(
     year: number,
     mileage: number
 ): PriceEstimate {
-    const currentYear = new Date().getFullYear();
-    const age = Math.max(0, currentYear - year);
-
-    const msrpData = getMsrpData(make, model);
-
-    // Use different models based on age
-    if (age <= 10) {
-        return estimateNewerCarPrice(msrpData, make, age, mileage);
-    } else {
-        return estimateOlderCarPrice(msrpData, make, age, mileage);
-    }
+    const detailed = estimateFairPriceDetailed(make, model, year, mileage);
+    return {
+        low: detailed.low,
+        high: detailed.high,
+        midpoint: detailed.midpoint,
+    };
 }
 
 /**
- * Get approximate MSRP (convenience function)
+ * Get approximate MSRP (convenience function for backwards compatibility)
  */
 export function getApproximateMsrp(make: string, model: string): number {
-    return getMsrpData(make, model).baseMsrp;
+    const dbMatch = lookupMsrpDatabase(make, model);
+    if (dbMatch) {
+        return dbMatch.baseMsrp;
+    }
+
+    // Fallback to estimated
+    const estimate = estimateMsrp({ make, year: new Date().getFullYear() }, model);
+    return estimate.estimatedMsrp;
+}
+
+// Re-export types for API compatibility
+export interface MsrpData {
+    baseMsrp: number;
+    category: 'economy' | 'midsize' | 'luxury' | 'truck' | 'suv';
+}
+
+export function getMsrpData(make: string, model: string): MsrpData {
+    const dbMatch = lookupMsrpDatabase(make, model);
+    if (dbMatch) {
+        // Map new categories to legacy categories
+        const categoryMap: Record<DepreciationCategory, MsrpData['category']> = {
+            economy: 'economy',
+            mainstream: 'midsize',
+            truck_suv: 'truck',
+            luxury: 'luxury',
+        };
+        return {
+            baseMsrp: dbMatch.baseMsrp,
+            category: categoryMap[dbMatch.category],
+        };
+    }
+
+    // Fallback
+    return { baseMsrp: 28000, category: 'midsize' };
 }
