@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/stripe';
-import { upgradeUserToPremium, downgradeUserToFree } from '@/lib/usage';
+import { upgradeUserToPremium, downgradeUserToFree, updateUserEmail } from '@/lib/usage';
+import type Stripe from 'stripe';
+
+/**
+ * Extract customer ID from Stripe customer field (can be string, object, or null)
+ */
+function extractCustomerId(customer: string | Stripe.Customer | Stripe.DeletedCustomer | null): string | null {
+  if (!customer) return null;
+  if (typeof customer === 'string') return customer;
+  if (typeof customer === 'object' && 'id' in customer) return customer.id;
+  return null;
+}
 
 export async function POST(request: Request) {
   try {
@@ -28,38 +39,65 @@ export async function POST(request: Request) {
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
+        const session = event.data.object as Stripe.Checkout.Session;
         const clerkId = session.metadata?.clerkId;
-        const customerId = session.customer as string;
+        const customerId = extractCustomerId(session.customer);
+        const customerEmail = session.customer_email || session.customer_details?.email;
+
+        console.log(`Webhook checkout.session.completed: clerkId=${clerkId}, customerId=${customerId}, email=${customerEmail}`);
 
         if (clerkId && customerId) {
-          console.log(`Upgrading user ${clerkId} to Premium`);
+          console.log(`Upgrading user ${clerkId} to Premium with customer ${customerId}`);
           await upgradeUserToPremium(clerkId, customerId);
+
+          // Also update email if we have it
+          if (customerEmail) {
+            await updateUserEmail(clerkId, customerEmail);
+          }
         } else {
-          console.warn('Checkout completed but missing clerkId or customerId', session);
+          console.error('Checkout completed but missing clerkId or customerId', {
+            clerkId,
+            customerId,
+            sessionId: session.id,
+            metadata: session.metadata,
+            customer: session.customer,
+          });
         }
         break;
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
-        const customerId = subscription.customer as string;
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = extractCustomerId(subscription.customer);
 
         if (customerId) {
-          console.log(`Downgrading customer ${customerId} to Free`);
+          console.log(`Downgrading customer ${customerId} to Free (subscription deleted)`);
           await downgradeUserToFree(customerId);
+        } else {
+          console.error('Subscription deleted but no customerId found', {
+            subscriptionId: subscription.id,
+            customer: subscription.customer,
+          });
         }
         break;
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const customerId = subscription.customer as string;
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = extractCustomerId(subscription.customer);
 
         // If subscription is cancelled or unpaid, downgrade user
         if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
-          console.log(`Subscription ${subscription.id} status: ${subscription.status}, downgrading`);
-          await downgradeUserToFree(customerId);
+          if (customerId) {
+            console.log(`Subscription ${subscription.id} status: ${subscription.status}, downgrading customer ${customerId}`);
+            await downgradeUserToFree(customerId);
+          } else {
+            console.error('Subscription updated but no customerId found', {
+              subscriptionId: subscription.id,
+              status: subscription.status,
+              customer: subscription.customer,
+            });
+          }
         }
         break;
       }
