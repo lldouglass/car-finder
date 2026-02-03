@@ -231,7 +231,11 @@ export async function getRecalls(make: string, model: string, year: number): Pro
  * Normalizes model name for NHTSA API by stripping trim levels and variants.
  * NHTSA uses base model names (e.g., "RENEGADE" not "Renegade Latitude 4x4").
  */
-function normalizeModelForNhtsa(model: string): string {
+// Export for testing
+export function normalizeModelForNhtsa(model: string): string {
+    // Strip Subaru "XV" prefix (e.g., "XV Crosstrek Premium" → "Crosstrek Premium")
+    let normalized = model.replace(/^xv\s+/i, '');
+
     // Common trim level patterns to remove
     const trimPatterns = [
         // Drive types
@@ -248,7 +252,6 @@ function normalizeModelForNhtsa(model: string): string {
         /\s+[a-z]?\d{2,4}[a-z]?\s*$/gi,
     ];
 
-    let normalized = model;
     for (const pattern of trimPatterns) {
         normalized = normalized.replace(pattern, ' ');
     }

@@ -29,6 +29,7 @@ import {
     CONFIDENCE_RANGE_MARGINS,
     RANGE_EXPANSION_FACTORS,
     MILEAGE_ADJUSTMENT,
+    MARKET_CONDITION,
 } from './constants';
 
 export type PriceConfidence = 'high' | 'medium' | 'low' | 'very_low';
@@ -292,13 +293,22 @@ function determineOverallConfidence(
         return msrpConfidence === 'low' ? 'low' : 'medium';
     }
 
-    // Very old vehicles reduce confidence
+    // Very old vehicles reduce confidence, but known models retain medium
     if (age > 20) {
-        return 'low';
+        return dbMatch ? 'medium' : 'low';
     }
 
+    // For 10-20 year old vehicles: known models can retain medium confidence
     if (age > 15) {
+        if (dbMatch) {
+            return 'medium';
+        }
         return msrpConfidence === 'high' ? 'medium' : 'low';
+    }
+
+    // For 10-15 year old known vehicles, retain high confidence
+    if (age > 10 && dbMatch) {
+        return 'high';
     }
 
     return msrpConfidence;
@@ -394,10 +404,9 @@ export function estimateFairPriceDetailed(
         depreciationCategory = isEV ? 'ev' : msrpEstimate.depreciationCategory;
     }
 
-    // Apply inflation adjustment for historical MSRP if from database
-    const inflationAdjustedMsrp = dbMatch
-        ? baseMsrp / Math.pow(1.03, age) // Work backwards to get historical MSRP
-        : baseMsrp;
+    // Use base MSRP directly - depreciation curves already account for age-based value decline
+    // Note: Previously this deflated MSRP by 1.03^age, causing double-depreciation
+    const inflationAdjustedMsrp = baseMsrp;
 
     // Calculate depreciation
     const depreciationRetention = getDepreciationRetention(age, depreciationCategory);
@@ -425,7 +434,10 @@ export function estimateFairPriceDetailed(
         regionalMultiplier = regionalAdjustment.totalMultiplier;
     }
 
-    const finalValue = reliabilityAdjustedValue * regionalMultiplier;
+    const regionalAdjustedValue = reliabilityAdjustedValue * regionalMultiplier;
+
+    // Apply market condition multiplier (accounts for elevated post-pandemic market)
+    const finalValue = regionalAdjustedValue * MARKET_CONDITION.multiplier;
 
     // Determine confidence
     const confidence = determineOverallConfidence(

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getSafetyRatings, getRecalls, getComplaints, decodeVin } from './nhtsa';
+import { getSafetyRatings, getRecalls, getComplaints, decodeVin, normalizeModelForNhtsa } from './nhtsa';
 
 // Mock fetch globally
 const originalFetch = global.fetch;
@@ -354,6 +354,27 @@ describe('NHTSA API - Make/Model/Year Uniqueness', () => {
             const result = await decodeVin('1HGBH41JXMN109186');
             expect(result).toBeNull();
         });
+    });
+});
+
+describe('normalizeModelForNhtsa', () => {
+    it('strips XV prefix from Subaru Crosstrek variants', () => {
+        expect(normalizeModelForNhtsa('XV Crosstrek')).toBe('Crosstrek');
+        expect(normalizeModelForNhtsa('XV Crosstrek Premium')).toBe('Crosstrek');
+        expect(normalizeModelForNhtsa('xv crosstrek')).toBe('crosstrek');
+    });
+
+    it('handles models without XV prefix normally', () => {
+        expect(normalizeModelForNhtsa('Crosstrek')).toBe('Crosstrek');
+        expect(normalizeModelForNhtsa('Outback')).toBe('Outback');
+        expect(normalizeModelForNhtsa('Forester')).toBe('Forester');
+    });
+
+    it('strips drive types from model names', () => {
+        // Drive types are stripped when followed by whitespace or at end
+        expect(normalizeModelForNhtsa('RAV4 4WD')).toBe('RAV4');
+        expect(normalizeModelForNhtsa('Renegade 4x4')).toBe('Renegade');
+        expect(normalizeModelForNhtsa('Highlander AWD')).toBe('Highlander');
     });
 });
 
