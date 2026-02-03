@@ -12,12 +12,12 @@
  * - RapidAPI: https://rapidapi.com/dominonet-lTpEE6zONeS/api/vehicle-market-value
  */
 
-import { PriceEstimate, estimateFairPrice as formulaEstimate } from './pricing';
+import { PriceEstimate, estimateFairPriceDetailed } from './pricing';
 
 export interface PriceEstimateWithSource extends PriceEstimate {
     source: 'api' | 'formula';
     apiProvider?: string;
-    confidence?: 'high' | 'medium' | 'low';
+    confidence?: 'high' | 'medium' | 'low' | 'very_low';
     sampleSize?: number;
     apiError?: string;
     breakdown?: {
@@ -313,7 +313,8 @@ export async function estimateFairPriceWithApi(
     }
 
     // Fall back to formula-based estimation
-    const formulaResult = formulaEstimate(make, model, year, mileage);
+    // Use detailed estimate to get proper confidence based on MSRP database match
+    const formulaResult = estimateFairPriceDetailed(make, model, year, mileage);
 
     let apiError = 'No API key configured';
     if (process.env.VEHICLE_DATABASES_API_KEY || process.env.RAPIDAPI_KEY) {
@@ -321,9 +322,11 @@ export async function estimateFairPriceWithApi(
     }
 
     return {
-        ...formulaResult,
+        low: formulaResult.low,
+        high: formulaResult.high,
+        midpoint: formulaResult.midpoint,
         source: 'formula',
-        confidence: 'low',
+        confidence: formulaResult.confidence,
         apiError,
         _debug: {
             hasRapidApiKey: !!process.env.RAPIDAPI_KEY,
