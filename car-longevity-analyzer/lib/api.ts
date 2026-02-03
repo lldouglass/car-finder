@@ -109,6 +109,7 @@ export interface Vehicle {
     make: string | null;
     model: string | null;
     trim?: string | null;
+    color?: string | null;
 }
 
 export interface Scores {

@@ -1,14 +1,14 @@
 import type { AnalysisResponse } from './api';
 
 const STORAGE_KEY = 'car-analyzer-history';
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 const MAX_ITEMS = 50;
 
 export interface ChatHistory {
   id: string;
   timestamp: number;
   starred: boolean;
-  vehicle: { year: number; make: string; model: string } | null;
+  vehicle: { year: number; make: string; model: string; trim?: string | null; color?: string | null } | null;
   inputType: 'vin' | 'listing';
   inputSummary: string; // VIN or first 100 chars of listing
   verdict: 'BUY' | 'MAYBE' | 'PASS' | null;
@@ -152,13 +152,20 @@ export function getHistoryItem(history: ChatHistory[], id: string): ChatHistory 
  * Migrate history from older versions
  */
 function migrateHistory(data: StoredData): ChatHistory[] {
-  // Currently no migrations needed, but structure is in place
-  // Future versions can add migration logic here
-
-  // For now, if version doesn't match, just return the history as-is
-  // or clear if it's too old/incompatible
   if (!data.history || !Array.isArray(data.history)) {
     return [];
+  }
+
+  // v1 -> v2: Add color/trim to vehicle (will be null for old entries)
+  if (data.version === 1) {
+    return data.history.map(item => ({
+      ...item,
+      vehicle: item.vehicle ? {
+        ...item.vehicle,
+        trim: null,
+        color: null,
+      } : null,
+    }));
   }
 
   return data.history;
@@ -180,7 +187,7 @@ export function createInputSummary(inputType: 'vin' | 'listing', input: string):
  */
 export function extractVehicleInfo(
   result: AnalysisResponse
-): { year: number; make: string; model: string } | null {
+): { year: number; make: string; model: string; trim?: string | null; color?: string | null } | null {
   if (!result.vehicle?.year || !result.vehicle?.make || !result.vehicle?.model) {
     return null;
   }
@@ -188,6 +195,8 @@ export function extractVehicleInfo(
     year: result.vehicle.year,
     make: result.vehicle.make,
     model: result.vehicle.model,
+    trim: result.vehicle.trim,
+    color: result.vehicle.color,
   };
 }
 
@@ -196,7 +205,10 @@ export function extractVehicleInfo(
  */
 export function getHistoryDisplayName(item: ChatHistory): string {
   if (item.vehicle) {
-    return `${item.vehicle.year} ${item.vehicle.make} ${item.vehicle.model}`;
+    const { year, make, model, trim, color } = item.vehicle;
+    const colorPrefix = color ? `${color} ` : '';
+    const trimSuffix = trim ? ` ${trim}` : '';
+    return `${colorPrefix}${year} ${make} ${model}${trimSuffix}`;
   }
   if (item.inputType === 'vin') {
     return `VIN: ${item.inputSummary}`;

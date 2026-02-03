@@ -25,12 +25,16 @@ export function VehicleHeader({ result }: VehicleHeaderProps) {
         <div className="flex-1 min-w-0">
           {hasVehicleInfo ? (
             <h2 className="text-xl font-bold">
+              {vehicle?.color && (
+                <span className="font-normal text-muted-foreground">
+                  {vehicle.color}{' '}
+                </span>
+              )}
               {vehicle?.year || 'Unknown'} {vehicle?.make || 'Unknown'}{' '}
               {vehicle?.model || 'Unknown'}
               {vehicle?.trim && (
                 <span className="font-normal text-muted-foreground">
-                  {' '}
-                  {vehicle.trim}
+                  {' '}{vehicle.trim}
                 </span>
               )}
             </h2>
