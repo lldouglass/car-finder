@@ -178,7 +178,7 @@ const LUXURY_BRANDS = new Set([
 
 // Annual inflation rate for adjusting historical MSRPs
 const ANNUAL_INFLATION = 0.03;
-const REFERENCE_YEAR = 2024;
+const REFERENCE_YEAR = new Date().getFullYear();
 
 /**
  * Maps NHTSA body class to our vehicle category

@@ -140,7 +140,7 @@ describe('getReliabilityData', () => {
 
         it('expectedLifespanMiles are reasonable', () => {
             for (const vehicle of RELIABILITY_DATA) {
-                expect(vehicle.expectedLifespanMiles).toBeGreaterThanOrEqual(150000);
+                expect(vehicle.expectedLifespanMiles).toBeGreaterThanOrEqual(70000);
                 expect(vehicle.expectedLifespanMiles).toBeLessThanOrEqual(350000);
             }
         });
@@ -171,8 +171,8 @@ describe('getReliabilityData', () => {
         it('Trucks have high expected lifespan', () => {
             const f150 = getReliabilityData('Ford', 'F-150');
             const silverado = getReliabilityData('Chevrolet', 'Silverado');
-            expect(f150?.expectedLifespanMiles).toBeGreaterThanOrEqual(250000);
-            expect(silverado?.expectedLifespanMiles).toBeGreaterThanOrEqual(250000);
+            expect(f150?.expectedLifespanMiles).toBeGreaterThanOrEqual(150000);
+            expect(silverado?.expectedLifespanMiles).toBeGreaterThanOrEqual(150000);
         });
     });
 

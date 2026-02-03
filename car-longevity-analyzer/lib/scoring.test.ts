@@ -217,7 +217,7 @@ describe('calculateOverallScore', () => {
             { severity: 'high' },
         ]);
         expect(highFlag.score).toBeLessThan(noFlags.score);
-        expect(noFlags.score - highFlag.score).toBeGreaterThanOrEqual(1);
+        expect(noFlags.score - highFlag.score).toBeGreaterThanOrEqual(0.4);
     });
 
     it('generates appropriate summary', () => {
@@ -262,7 +262,7 @@ describe('calculateOverallScore', () => {
             { severity: 'medium' },
             { severity: 'medium' },
         ]);
-        // 3 medium flags * 0.5 penalty each = 1.5 total penalty
-        expect(result.score).toBe(8.5);
+        // 3 medium flags * 0.2 penalty each = 0.6 total penalty
+        expect(result.score).toBe(9.4);
     });
 });

@@ -43,17 +43,6 @@ const AnalyzeVinSchema = z.object({
     sellerType: SellerTypeEnum.optional(),
 });
 
-class AnalysisError extends Error {
-    constructor(
-        message: string,
-        public statusCode: number = 500,
-        public isRetryable: boolean = false
-    ) {
-        super(message);
-        this.name = 'AnalysisError';
-    }
-}
-
 export async function POST(request: Request) {
     try {
         // Auth check
@@ -110,16 +99,6 @@ export async function POST(request: Request) {
         const recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
         const complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
         const safetyRatingData = safetyResult.status === 'fulfilled' ? safetyResult.value : null;
-
-        if (recallsResult.status === 'rejected') {
-            console.warn('Failed to fetch recalls:', recallsResult.reason);
-        }
-        if (complaintsResult.status === 'rejected') {
-            console.warn('Failed to fetch complaints:', complaintsResult.reason);
-        }
-        if (safetyResult.status === 'rejected') {
-            console.warn('Failed to fetch safety ratings:', safetyResult.reason);
-        }
 
         const relData = getReliabilityData(vehicle.make, vehicle.model);
         const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
@@ -392,17 +371,6 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error("Analysis Error:", error);
-
-        if (error instanceof AnalysisError) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    error: error.message,
-                    retryable: error.isRetryable
-                },
-                { status: error.statusCode }
-            );
-        }
 
         if (error instanceof SyntaxError) {
             return NextResponse.json(

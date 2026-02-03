@@ -159,20 +159,24 @@ describe('msrp-estimator', () => {
     });
 
     describe('getInflationAdjustment', () => {
+        const currentYear = new Date().getFullYear();
+
         it('should return 1.0 for current/future years', () => {
-            expect(getInflationAdjustment(2024)).toBe(1.0);
-            expect(getInflationAdjustment(2025)).toBe(1.0);
+            expect(getInflationAdjustment(currentYear)).toBe(1.0);
+            expect(getInflationAdjustment(currentYear + 1)).toBe(1.0);
         });
 
         it('should increase for older years', () => {
-            const adjustment2019 = getInflationAdjustment(2019);
-            expect(adjustment2019).toBeGreaterThan(1.0);
-            expect(adjustment2019).toBeCloseTo(Math.pow(1.03, 5), 4);
+            const fiveYearsAgo = currentYear - 5;
+            const adjustment = getInflationAdjustment(fiveYearsAgo);
+            expect(adjustment).toBeGreaterThan(1.0);
+            expect(adjustment).toBeCloseTo(Math.pow(1.03, 5), 4);
         });
 
         it('should compound correctly over multiple years', () => {
-            const adjustment2014 = getInflationAdjustment(2014);
-            expect(adjustment2014).toBeCloseTo(Math.pow(1.03, 10), 4);
+            const tenYearsAgo = currentYear - 10;
+            const adjustment = getInflationAdjustment(tenYearsAgo);
+            expect(adjustment).toBeCloseTo(Math.pow(1.03, 10), 4);
         });
     });
 
