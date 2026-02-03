@@ -42,6 +42,8 @@ export interface ExtractedVehicle {
     model: string | null;
     mileage: number | null;
     price: number | null;
+    color: string | null;
+    trim: string | null;
 }
 
 export interface Concern {
@@ -122,7 +124,9 @@ ${vehicleInfo ? `Known Context: ${vehicleInfo.year} ${vehicleInfo.make} ${vehicl
 
 Return a JSON object with:
 
-1. extractedVehicle: { year, make, model, mileage, price } (null if not found)
+1. extractedVehicle: { year, make, model, mileage, price, color, trim } (null if not found)
+   - color: Exterior color exactly as mentioned (e.g., "Blue", "Silver Metallic", "Pearl White")
+   - trim: Trim level exactly as mentioned (e.g., "Limited", "Sport", "EX-L", "Premium")
 
 2. concerns: [{ issue: string, severity: "low"|"medium"|"high", explanation: string }]
 

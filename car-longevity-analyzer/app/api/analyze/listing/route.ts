@@ -383,7 +383,8 @@ export async function POST(request: Request) {
                 year: extracted?.year,
                 make: extracted?.make,
                 model: extracted?.model,
-                trim: null, // Hard to extract reliably without VIN
+                trim: extracted?.trim || null,
+                color: extracted?.color || null,
             },
             scores: {
                 reliability: reliabilityScore || null,
