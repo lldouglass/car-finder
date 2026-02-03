@@ -203,3 +203,11 @@ export const MILEAGE_ADJUSTMENT = {
     adjustmentPer10k: 0.02,   // 2% per 10,000 miles
     maxAdjustment: 0.20,      // Cap at ±20%
 } as const;
+
+// Stripe subscription status constants
+export const STRIPE_SUBSCRIPTION_STATUS = {
+    ACTIVE: 'active',
+    CANCELED: 'canceled',
+    UNPAID: 'unpaid',
+    PAST_DUE: 'past_due',
+} as const;

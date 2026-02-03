@@ -1,6 +1,21 @@
 import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
 import { constructWebhookEvent } from '@/lib/stripe';
 import { upgradeUserToPremium, downgradeUserToFree } from '@/lib/usage';
+import { prisma } from '@/lib/db';
+import { STRIPE_SUBSCRIPTION_STATUS } from '@/lib/constants';
+
+/**
+ * Helper to extract customer ID from Stripe customer field.
+ * Handles string, Customer object, DeletedCustomer object, or null.
+ */
+function getCustomerId(
+  customer: string | Stripe.Customer | Stripe.DeletedCustomer | null
+): string | null {
+  if (!customer) return null;
+  if (typeof customer === 'string') return customer;
+  return customer.id;
+}
 
 export async function POST(request: Request) {
   try {
@@ -25,28 +40,37 @@ export async function POST(request: Request) {
       );
     }
 
+    // Idempotency check: skip if we've already processed this event
+    const existingEvent = await prisma.stripeEvent.findUnique({
+      where: { eventId: event.id },
+    });
+    if (existingEvent) {
+      return NextResponse.json({ received: true });
+    }
+
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const clerkId = session.metadata?.clerkId;
-        const customerId = session.customer as string;
+        const customerId = getCustomerId(session.customer);
 
         if (clerkId && customerId) {
-          console.log(`Upgrading user ${clerkId} to Premium`);
           await upgradeUserToPremium(clerkId, customerId);
         } else {
-          console.warn('Checkout completed but missing clerkId or customerId', session);
+          console.error('Checkout completed but missing clerkId or customerId', {
+            hasClerkId: !!clerkId,
+            hasCustomerId: !!customerId,
+          });
         }
         break;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object;
-        const customerId = subscription.customer as string;
+        const customerId = getCustomerId(subscription.customer);
 
         if (customerId) {
-          console.log(`Downgrading customer ${customerId} to Free`);
           await downgradeUserToFree(customerId);
         }
         break;
@@ -54,20 +78,24 @@ export async function POST(request: Request) {
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object;
-        const customerId = subscription.customer as string;
+        const customerId = getCustomerId(subscription.customer);
 
         // If subscription is cancelled or unpaid, downgrade user
-        if (subscription.status === 'canceled' || subscription.status === 'unpaid') {
-          console.log(`Subscription ${subscription.id} status: ${subscription.status}, downgrading`);
+        if (
+          customerId &&
+          (subscription.status === STRIPE_SUBSCRIPTION_STATUS.CANCELED ||
+            subscription.status === STRIPE_SUBSCRIPTION_STATUS.UNPAID)
+        ) {
           await downgradeUserToFree(customerId);
         }
         break;
       }
-
-      default:
-        // Unhandled event type - log but don't error
-        console.log(`Unhandled event type: ${event.type}`);
     }
+
+    // Record that we've processed this event (idempotency)
+    await prisma.stripeEvent.create({
+      data: { eventId: event.id, type: event.type },
+    });
 
     return NextResponse.json({ received: true });
   } catch (error) {
