@@ -29,6 +29,7 @@ import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
 import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
 import { calculateMaintenanceProjections } from '@/lib/maintenance-data';
+import { calculateSurvivalProbabilities } from '@/lib/survival-model';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -156,6 +157,19 @@ export async function POST(request: Request) {
         }
 
         const longevityResult = calculateLongevityScore(expectedLifespan, mileage);
+
+        // Calculate survival probabilities using Weibull distribution
+        const currentYear = new Date().getFullYear();
+        const vehicleAge = currentYear - vehicle.year;
+        const survivalAnalysis = calculateSurvivalProbabilities({
+            currentMileage: mileage,
+            vehicleAge,
+            adjustedLifespan: lifespanAnalysis.adjustedLifespan,
+            baseReliabilityScore: reliabilityScore,
+            knownIssues: allKnownIssuesForLifespan,
+            factors: lifespanFactors,
+            lifespanConfidence: lifespanAnalysis.confidence,
+        });
 
         const priceEstimate = await estimateFairPriceWithApi(vehicle.make, vehicle.model, vehicle.year, mileage, vin);
         const priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
@@ -366,7 +380,8 @@ export async function POST(request: Request) {
             maintenanceCosts,
             inspectionChecklist,
             warrantyValue,
-            priceThresholds
+            priceThresholds,
+            survivalAnalysis,
         });
 
     } catch (error) {

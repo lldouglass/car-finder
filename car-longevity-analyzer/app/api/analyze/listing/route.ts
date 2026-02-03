@@ -36,6 +36,7 @@ import { calculateMaintenanceCosts } from '@/lib/maintenance-costs';
 import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
+import { calculateSurvivalProbabilities, type SurvivalAnalysis } from '@/lib/survival-model';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -181,6 +182,7 @@ export async function POST(request: Request) {
         let priceEstimate: { low: number; high: number } | null = null;
         let lifespanAnalysis: ReturnType<typeof calculateAdjustedLifespan> | null = null;
         let safetyResult: ReturnType<typeof calculateSafetyScore> | null = null;
+        let survivalAnalysis: SurvivalAnalysis | null = null;
 
         // Reliability
         if (extracted?.make && extracted?.model) {
@@ -220,6 +222,19 @@ export async function POST(request: Request) {
             const expectedLifespan = lifespanAnalysis.adjustedLifespan;
 
             longevityResult = calculateLongevityScore(expectedLifespan, mileage);
+
+            // Calculate survival probabilities using Weibull distribution
+            const currentYear = new Date().getFullYear();
+            const vehicleAge = currentYear - year;
+            survivalAnalysis = calculateSurvivalProbabilities({
+                currentMileage: mileage,
+                vehicleAge,
+                adjustedLifespan: lifespanAnalysis.adjustedLifespan,
+                baseReliabilityScore: reliabilityScore || 5.0,  // Default if reliability not calculated
+                knownIssues: allKnownIssuesForLifespan,
+                factors: lifespanFactors,
+                lifespanConfidence: lifespanAnalysis.confidence,
+            });
         }
 
         // Price
@@ -439,7 +454,8 @@ export async function POST(request: Request) {
             maintenanceCosts,
             inspectionChecklist,
             warrantyValue,
-            priceThresholds
+            priceThresholds,
+            survivalAnalysis,
         });
 
     } catch (error) {

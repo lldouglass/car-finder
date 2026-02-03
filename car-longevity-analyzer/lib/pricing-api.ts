@@ -242,9 +242,12 @@ async function fetchFromRapidAPI(
         let confidence: 'high' | 'medium' | 'low' = 'medium';
         if (data.statistical_confidence) {
             const pct = parseInt(data.statistical_confidence);
-            if (pct >= 90) confidence = 'high';
-            else if (pct >= 70) confidence = 'medium';
-            else confidence = 'low';
+            if (!isNaN(pct)) {
+                if (pct >= 90) confidence = 'high';
+                else if (pct >= 70) confidence = 'medium';
+                else confidence = 'low';
+            }
+            // If NaN, keep default 'medium' confidence
         } else if (data.count) {
             if (data.count >= 50) confidence = 'high';
             else if (data.count >= 10) confidence = 'medium';

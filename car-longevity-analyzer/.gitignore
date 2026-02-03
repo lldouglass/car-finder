@@ -71,3 +71,10 @@ test-safety.js
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Claude worktrees for parallel sessions
+.claude/worktrees/
+
+# Verification screenshots
+screenshots/
+e2e/screenshots/

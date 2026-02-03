@@ -1,7 +1,13 @@
 import { prisma } from './db';
 import { clerkClient } from '@clerk/nextjs/server';
+import { Prisma } from '@prisma/client';
 
-const FREE_LIMIT = parseInt(process.env.FREE_ANALYSES_PER_MONTH || '2');
+// Validate FREE_LIMIT on module load to fail fast if misconfigured
+const FREE_LIMIT_RAW = parseInt(process.env.FREE_ANALYSES_PER_MONTH || '2');
+if (isNaN(FREE_LIMIT_RAW) || FREE_LIMIT_RAW < 1) {
+  throw new Error(`Invalid FREE_ANALYSES_PER_MONTH: ${process.env.FREE_ANALYSES_PER_MONTH}`);
+}
+const FREE_LIMIT = FREE_LIMIT_RAW;
 
 export interface UsageCheckResult {
   allowed: boolean;
@@ -19,7 +25,7 @@ export interface UsageCheckResult {
 export async function checkAndIncrementUsage(clerkId: string): Promise<UsageCheckResult> {
   const month = new Date().toISOString().slice(0, 7); // "2026-01"
 
-  // Get or create user
+  // Get or create user (with race condition handling)
   let user = await prisma.user.findUnique({
     where: { clerkId },
   });
@@ -34,12 +40,24 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
       throw new Error('User has no email address');
     }
 
-    user = await prisma.user.create({
-      data: {
-        clerkId,
-        email,
-      },
-    });
+    try {
+      user = await prisma.user.create({
+        data: {
+          clerkId,
+          email,
+        },
+      });
+    } catch (error) {
+      // Handle race condition - another request may have created the user
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        user = await prisma.user.findUnique({ where: { clerkId } });
+        if (!user) {
+          throw new Error('User creation race condition unresolved');
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   if (user.plan === 'PREMIUM') {
@@ -74,9 +92,11 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
       };
     }
 
-    // Record doesn't exist - create it with count 1
-    const newUsage = await prisma.usageRecord.create({
-      data: { userId: user.id, month, analysisCount: 1 },
+    // Record doesn't exist - create it with count 1 (use upsert for race safety)
+    const newUsage = await prisma.usageRecord.upsert({
+      where: { userId_month: { userId: user.id, month } },
+      update: { analysisCount: { increment: 1 } },
+      create: { userId: user.id, month, analysisCount: 1 },
     });
 
     return {
@@ -137,38 +157,23 @@ export async function getUsageStatus(clerkId: string): Promise<{
 
 /**
  * Upgrade a user to premium plan.
+ * Uses upsert to handle race conditions between webhook and user signup.
  */
 export async function upgradeUserToPremium(clerkId: string, stripeCustomerId: string): Promise<void> {
-  // Check if user exists first
-  const existingUser = await prisma.user.findUnique({ where: { clerkId } });
+  // Fetch email from Clerk (needed for create case in upsert)
+  const client = await clerkClient();
+  const clerkUser = await client.users.getUser(clerkId);
+  const email = clerkUser.emailAddresses[0]?.emailAddress;
 
-  if (existingUser) {
-    await prisma.user.update({
-      where: { clerkId },
-      data: {
-        plan: 'PREMIUM',
-        stripeCustomerId,
-      },
-    });
-  } else {
-    // Fetch email from Clerk API for new user
-    const client = await clerkClient();
-    const clerkUser = await client.users.getUser(clerkId);
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
-
-    if (!email) {
-      throw new Error('User has no email address');
-    }
-
-    await prisma.user.create({
-      data: {
-        clerkId,
-        email,
-        plan: 'PREMIUM',
-        stripeCustomerId,
-      },
-    });
+  if (!email) {
+    throw new Error('User has no email address');
   }
+
+  await prisma.user.upsert({
+    where: { clerkId },
+    update: { plan: 'PREMIUM', stripeCustomerId },
+    create: { clerkId, email, plan: 'PREMIUM', stripeCustomerId },
+  });
 }
 
 /**
