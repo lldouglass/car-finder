@@ -206,6 +206,14 @@ describe('estimateFairPriceDetailed', () => {
         const result = estimateFairPriceDetailed('Toyota', 'Camry', 2000, 150000);
 
         expect(result.warnings.some(w => w.includes('old vehicles'))).toBe(true);
+        // Known models retain medium confidence even when very old
+        expect(result.confidence).toBe('medium');
+    });
+
+    it('returns low confidence for unknown very old vehicles', () => {
+        const result = estimateFairPriceDetailed('UnknownMake', 'UnknownModel', 2000, 150000);
+
+        expect(result.warnings.some(w => w.includes('old vehicles'))).toBe(true);
         expect(result.confidence).toBe('low');
     });
 

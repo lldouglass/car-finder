@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { auth } from '@clerk/nextjs/server';
 import { checkAndIncrementUsage } from '@/lib/usage';
 import { analyzeListingWithAI } from '@/lib/ai-analyzer';
-import { getComplaints, getSafetyRatings } from '@/lib/nhtsa';
+import { getComplaints, getSafetyRatings, getRecalls, type Recall } from '@/lib/nhtsa';
 import {
     calculateReliabilityScore,
     calculateLongevityScore,
@@ -181,18 +181,21 @@ export async function POST(request: Request) {
         // Merge with empty VIN factors (no VIN decode for listing analysis)
         const lifespanFactors: LifespanFactors = mergeLifespanFactors({}, aiFactors, climateRegion);
 
-        // 4. Fetch safety data if we have vehicle info (parallel)
+        // 4. Fetch safety data and recalls if we have vehicle info (parallel)
         let complaints: Awaited<ReturnType<typeof getComplaints>> = [];
         let safetyRatings: Awaited<ReturnType<typeof getSafetyRatings>> = null;
+        let recalls: Recall[] = [];
 
         if (extracted?.make && extracted?.model && extracted?.year) {
-            const [complaintsResult, safetyRatingsResult] = await Promise.allSettled([
+            const [complaintsResult, safetyRatingsResult, recallsResult] = await Promise.allSettled([
                 getComplaints(make, model, year),
-                getSafetyRatings(make, model, year)
+                getSafetyRatings(make, model, year),
+                getRecalls(make, model, year)
             ]);
 
             complaints = complaintsResult.status === 'fulfilled' ? complaintsResult.value : [];
             safetyRatings = safetyRatingsResult.status === 'fulfilled' ? safetyRatingsResult.value : null;
+            recalls = recallsResult.status === 'fulfilled' ? recallsResult.value : [];
         }
 
         // 5. Scores Calculation (if sufficient data)
@@ -318,7 +321,7 @@ export async function POST(request: Request) {
         const questions = generateQuestionsForSeller(
             { make, model, year },
             allRedFlags,
-            [] // No recalls from just listing text
+            recalls
         );
         // Combine with AI suggested questions
         const allQuestions = Array.from(new Set([...questions, ...aiResult.suggestedQuestions]));
@@ -460,6 +463,8 @@ export async function POST(request: Request) {
             },
             redFlags: allRedFlags,
             knownIssues,
+            recalls,
+            recallNote: extracted?.make ? "Recall lookup based on extracted vehicle info. Use VIN analysis for most accurate results." : undefined,
             recommendation: {
                 verdict: overallResult?.recommendation || 'MAYBE', // Default if incomplete
                 confidence: overallResult?.confidence || 0.5,

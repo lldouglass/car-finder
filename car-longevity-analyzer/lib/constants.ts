@@ -144,19 +144,20 @@ export const BRAND_AVERAGE_RELIABILITY: Record<string, number> = {
 
 /**
  * Depreciation curves by vehicle category
- * Values represent retention percentage at each year
+ * Values represent retention percentage at each year (index 0 = new, index 10 = year 10)
+ * Years 8-10 adjusted upward to reflect survivor bias (well-maintained vehicles)
  */
 export const DEPRECIATION_CURVES = {
     // Economy cars (Civic, Corolla, etc.)
-    economy: [1.00, 0.82, 0.72, 0.63, 0.55, 0.48, 0.42, 0.37, 0.33, 0.29, 0.26],
+    economy: [1.00, 0.82, 0.72, 0.63, 0.55, 0.48, 0.42, 0.37, 0.35, 0.32, 0.29],
     // Mainstream (Accord, Camry, CR-V, etc.)
-    mainstream: [1.00, 0.85, 0.76, 0.68, 0.61, 0.54, 0.48, 0.43, 0.38, 0.34, 0.31],
+    mainstream: [1.00, 0.85, 0.76, 0.68, 0.61, 0.54, 0.48, 0.43, 0.40, 0.36, 0.34],
     // Trucks and SUVs (F-150, Tacoma, 4Runner, etc.)
-    truck_suv: [1.00, 0.88, 0.80, 0.73, 0.67, 0.61, 0.56, 0.51, 0.47, 0.43, 0.40],
+    truck_suv: [1.00, 0.88, 0.80, 0.73, 0.67, 0.61, 0.56, 0.51, 0.49, 0.46, 0.43],
     // Luxury (BMW, Mercedes, Audi, etc.)
-    luxury: [1.00, 0.75, 0.62, 0.52, 0.44, 0.38, 0.33, 0.29, 0.26, 0.23, 0.21],
+    luxury: [1.00, 0.75, 0.62, 0.52, 0.44, 0.38, 0.33, 0.29, 0.27, 0.25, 0.23],
     // Electric vehicles (steeper early depreciation)
-    ev: [1.00, 0.70, 0.58, 0.50, 0.44, 0.40, 0.37, 0.35, 0.33, 0.31, 0.30],
+    ev: [1.00, 0.70, 0.58, 0.50, 0.44, 0.40, 0.37, 0.35, 0.34, 0.33, 0.32],
 } as const;
 
 /**
@@ -202,4 +203,14 @@ export const MILEAGE_ADJUSTMENT = {
     expectedPerYear: 12000,
     adjustmentPer10k: 0.02,   // 2% per 10,000 miles
     maxAdjustment: 0.20,      // Cap at ±20%
+} as const;
+
+/**
+ * Market condition multiplier
+ * Accounts for current used car market conditions relative to historical norms.
+ * Post-pandemic market remains elevated vs pre-2020 levels.
+ */
+export const MARKET_CONDITION = {
+    multiplier: 1.10,           // Current market is ~10% elevated vs historical
+    effectiveDate: '2025-01',   // When this was calibrated
 } as const;
