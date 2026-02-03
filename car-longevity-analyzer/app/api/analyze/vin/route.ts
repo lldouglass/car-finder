@@ -339,10 +339,7 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis,
                 source: priceEstimate.source,
-                confidence: priceEstimate.confidence,
                 sampleSize: priceEstimate.sampleSize,
-                apiError: (priceEstimate as any).apiError,
-                _debug: (priceEstimate as any)._debug,
             },
             safety: {
                 score: safetyScoreResult.score,

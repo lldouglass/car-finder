@@ -198,6 +198,25 @@ npm run test:coverage  # Run with coverage
 
 Tests are colocated with source files (`lib/*.test.ts`).
 
+## UI Verification
+
+**Playwright MCP** is configured for real-time browser verification. After any UI changes:
+
+1. Ensure dev server is running (`npm run dev`)
+2. Use Playwright MCP tools:
+   - `browser_navigate` to `http://localhost:3000`
+   - `browser_screenshot` to verify UI renders correctly
+   - `browser_click`, `browser_type` to test interactions
+3. Save screenshots to `screenshots/` directory
+
+**E2E Tests** for regression testing:
+```bash
+npm run test:e2e        # Run all E2E tests
+npm run test:e2e:ui     # Interactive mode
+```
+
+E2E tests are in `e2e/` directory. Screenshots save to `e2e/screenshots/`.
+
 ## Common Tasks
 
 ### Adding a Vehicle to Reliability Database
@@ -227,3 +246,14 @@ Edit `lib/constants.ts`:
 - `OPENAI_API_KEY` - Enables AI-powered listing analysis
 
 **NEVER TOUCH THE .env FILE**
+
+## Before Starting Any Task
+
+  ALWAYS ask clarifying questions before writing code. Consider:
+  - What are the edge cases?
+  - What's the expected behavior on failure?
+  - Are there performance constraints?
+  - What's the scope boundary - what should this NOT do?
+  - Are there existing patterns in the codebase to follow?
+
+  Do not proceed until you've asked at least 3 relevant questions.

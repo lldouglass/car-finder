@@ -242,13 +242,11 @@ export async function POST(request: Request) {
 
         // Price
         let priceSource: 'api' | 'formula' | null = null;
-        let priceConfidence: string | null = null;
         let priceSampleSize: number | null = null;
         if (askingPrice !== undefined && mileage !== undefined && extracted?.make) {
             const priceEstimateResult = await estimateFairPriceWithApi(make, model, year, mileage);
             priceEstimate = { low: priceEstimateResult.low, high: priceEstimateResult.high };
             priceSource = priceEstimateResult.source;
-            priceConfidence = priceEstimateResult.confidence || null;
             priceSampleSize = priceEstimateResult.sampleSize || null;
             priceResult = calculatePriceScore(askingPrice, priceEstimate.low, priceEstimate.high);
         }
@@ -415,7 +413,6 @@ export async function POST(request: Request) {
                 dealQuality: priceResult.dealQuality,
                 analysis: priceResult.analysis,
                 source: priceSource,
-                confidence: priceConfidence,
                 sampleSize: priceSampleSize,
             } : null,
             safety: safetyResult ? {
@@ -446,7 +443,7 @@ export async function POST(request: Request) {
             },
             redFlags: allRedFlags,
             knownIssues,
-            recalls,
+            recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             recallNote: extracted?.make ? "Recall lookup based on extracted vehicle info. Use VIN analysis for most accurate results." : undefined,
             recommendation: {
                 verdict: overallResult?.recommendation || 'MAYBE', // Default if incomplete
