@@ -900,6 +900,20 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Disclaimer */}
+      <Alert className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+        <Wrench className="size-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+        <AlertTitle className="text-amber-800 dark:text-amber-200">Important Disclaimer</AlertTitle>
+        <AlertDescription className="text-amber-700 dark:text-amber-300 space-y-2">
+          <p>
+            <strong>Always have a used vehicle inspected by a qualified mechanic before purchase.</strong> This analysis is based on publicly available data and statistical models, and cannot detect hidden mechanical issues, accident damage, or maintenance problems specific to this vehicle.
+          </p>
+          <p className="text-sm">
+            A pre-purchase inspection (typically $100-200) can save you thousands by identifying problems that aren&apos;t visible in listings or vehicle history reports.
+          </p>
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }
