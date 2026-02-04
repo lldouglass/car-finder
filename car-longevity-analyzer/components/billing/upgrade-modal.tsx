@@ -71,13 +71,11 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
             <Crown className="size-8 text-amber-400" />
           </div>
           <h2 className="text-2xl font-bold text-zinc-100 mb-2">
-            Upgrade to Premium
+            Get 30 Days Unlimited
           </h2>
-          {usageInfo && (
-            <p className="text-zinc-400 text-sm">
-              You've used {usageInfo.used} of {usageInfo.limit} free analyses this month
-            </p>
-          )}
+          <p className="text-zinc-400 text-sm">
+            Analyze every car on your list before you buy
+          </p>
         </div>
 
         {/* Content */}
@@ -85,7 +83,7 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
           {/* Price */}
           <div className="text-center mb-6">
             <span className="text-4xl font-bold text-zinc-100">{PRICE}</span>
-            <span className="text-zinc-400">/month</span>
+            <span className="text-zinc-400"> for 30 days</span>
           </div>
 
           {/* Features */}
@@ -119,12 +117,12 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
                 Processing...
               </span>
             ) : (
-              'Get Premium Access'
+              'Start Analyzing'
             )}
           </Button>
 
           <p className="text-center text-xs text-zinc-500 mt-4">
-            Cancel anytime. Secure payment via Stripe.
+            One-time payment. Secure checkout via Stripe.
           </p>
         </div>
       </div>

@@ -130,7 +130,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     className="bg-amber-500 hover:bg-amber-600 text-zinc-900"
                   >
                     <Crown className="size-4 mr-2" />
-                    Upgrade to Premium
+                    Get 30 Days Unlimited
                   </Button>
                 </div>
               ) : error.toLowerCase().includes('sign in') || error.toLowerCase().includes('unauthorized') ? (
