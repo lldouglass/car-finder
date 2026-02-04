@@ -60,7 +60,9 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
     }
   }
 
-  if (user.plan === 'PREMIUM') {
+  // Verify premium status - must have stripeCustomerId to be considered premium
+  // This prevents accidental premium access without payment
+  if (user.plan === 'PREMIUM' && user.stripeCustomerId) {
     return { allowed: true, remaining: Infinity, isPremium: true, used: 0, limit: Infinity };
   }
 
@@ -142,7 +144,8 @@ export async function getUsageStatus(clerkId: string): Promise<{
     return { used: 0, limit: FREE_LIMIT, isPremium: false, remaining: FREE_LIMIT };
   }
 
-  if (user.plan === 'PREMIUM') {
+  // Verify premium status - must have stripeCustomerId to be considered premium
+  if (user.plan === 'PREMIUM' && user.stripeCustomerId) {
     return { used: 0, limit: Infinity, isPremium: true, remaining: Infinity };
   }
 
