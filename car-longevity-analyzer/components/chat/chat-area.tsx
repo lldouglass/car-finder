@@ -7,7 +7,8 @@ import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { Car, Crown, LogIn } from 'lucide-react';
+import { Car, Crown, LogIn, Shield, Database, Zap } from 'lucide-react';
+import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
 import { SignInButton } from '@clerk/nextjs';
 
@@ -18,6 +19,7 @@ interface ChatAreaProps {
 export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
   const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
   const resultsTopRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Find the current history item to show the input summary
   const currentItem = currentId ? history.find((h) => h.id === currentId) : null;
@@ -39,28 +41,53 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
 
   const hasContent = result || isLoading || error;
 
+  const handleTryYourVehicle = () => {
+    inputRef.current?.focus();
+  };
+
   // When empty, show centered layout with input
   if (!hasContent) {
     return (
       <div className="flex flex-1 flex-col min-h-0">
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-8">
-          <div className="w-full max-w-2xl">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="mx-auto mb-6 rounded-full bg-primary/10 p-4 w-fit">
-                <Car className="size-12 text-primary" />
+        <div className="flex-1 overflow-y-auto">
+          <div className="flex flex-col items-center px-4 py-8">
+            <div className="w-full max-w-2xl">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="mx-auto mb-6 rounded-full bg-primary/10 p-4 w-fit">
+                  <Car className="size-12 text-primary" />
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight mb-3">
+                  Don&apos;t Buy a Lemon.
+                </h1>
+                <p className="text-muted-foreground text-lg">
+                  Find out if a used car is overpriced, unreliable, or hiding problems — in 60 seconds.
+                </p>
               </div>
-              <h1 className="text-3xl font-bold tracking-tight mb-3">
-                Car Longevity Analyzer
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Get instant insights on reliability, longevity, and value for any used car
-              </p>
-            </div>
 
-            {/* Centered input */}
-            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
-              <ChatInput large />
+              {/* Centered input */}
+              <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
+                <ChatInput large inputRef={inputRef} />
+              </div>
+
+              {/* Trust indicators */}
+              <div className="flex items-center justify-center gap-6 mt-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Shield className="size-4" />
+                  NHTSA Data
+                </span>
+                <span className="flex items-center gap-1">
+                  <Database className="size-4" />
+                  200+ Models
+                </span>
+                <span className="flex items-center gap-1">
+                  <Zap className="size-4" />
+                  Instant Results
+                </span>
+              </div>
+
+              {/* Demo result */}
+              <DemoResult onTryYourVehicle={handleTryYourVehicle} />
             </div>
           </div>
         </div>

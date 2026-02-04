@@ -13,11 +13,13 @@ const VIN_PATTERN = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
 interface ChatInputProps {
   large?: boolean;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
 }
 
-export function ChatInput({ large = false }: ChatInputProps) {
+export function ChatInput({ large = false, inputRef }: ChatInputProps) {
   const { submitAnalysis, isLoading } = useAnalysis();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const internalRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = inputRef || internalRef;
 
   const [input, setInput] = useState('');
   const [mileage, setMileage] = useState('');
