@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Car Longevity Analyzer",
-  description: "Analyze used cars for reliability, longevity, and value",
+  title: "Don't Buy a Lemon - Used Car Analyzer",
+  description: "Find out if a used car is overpriced, unreliable, or hiding problems. Get instant reliability scores, price analysis, and red flag detection.",
 };
 
 export default function RootLayout({
