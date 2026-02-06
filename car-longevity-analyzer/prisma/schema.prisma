@@ -120,3 +120,17 @@ model StripeEvent {
   type      String
   createdAt DateTime @default(now())
 }
+
+model SharedReport {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  analysisData Json     // Full AnalysisResponse
+  vehicleYear  Int?
+  vehicleMake  String?
+  vehicleModel String?
+  verdict      String?
+  createdBy    String?  // clerkId (optional)
+  viewCount    Int      @default(0)
+
+  @@index([createdBy])
+}

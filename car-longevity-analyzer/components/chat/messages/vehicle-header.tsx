@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import type { AnalysisResponse } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
-import { Car, CheckCircle, HelpCircle, XCircle } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
+import { Car, CheckCircle, HelpCircle, XCircle, Share2, Check, Loader2 } from 'lucide-react';
 
 interface VehicleHeaderProps {
   result: AnalysisResponse;
+  showShareButton?: boolean;
 }
 
-export function VehicleHeader({ result }: VehicleHeaderProps) {
+export function VehicleHeader({ result, showShareButton = true }: VehicleHeaderProps) {
   const { vehicle, recommendation, scores } = result;
 
   const hasVehicleInfo = vehicle?.make || vehicle?.model || vehicle?.year;
@@ -23,6 +26,12 @@ export function VehicleHeader({ result }: VehicleHeaderProps) {
 
         {/* Vehicle info */}
         <div className="flex-1 min-w-0">
+          {/* Share button in top right */}
+          {showShareButton && (
+            <div className="float-right ml-2">
+              <ShareButton analysisData={result} />
+            </div>
+          )}
           {hasVehicleInfo ? (
             <h2 className="text-xl font-bold">
               {vehicle?.color && (
@@ -126,5 +135,67 @@ function ScoreItem({ label, value }: { label: string; value: number }) {
       <span className="text-muted-foreground">{label}:</span>
       <span className={`font-semibold ${getColor(value)}`}>{value.toFixed(1)}</span>
     </div>
+  );
+}
+
+function ShareButton({ analysisData }: { analysisData: AnalysisResponse }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const { addToast } = useToast();
+
+  const handleShare = async () => {
+    if (isLoading || isCopied) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ analysisData }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create share link');
+      }
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(data.shareUrl);
+
+      setIsCopied(true);
+      addToast('Link copied to clipboard!', 'success');
+
+      // Reset copied state after 3 seconds
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Share error:', error);
+      addToast('Failed to create share link', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleShare}
+      disabled={isLoading}
+      className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
+      title={isCopied ? 'Copied!' : 'Share report'}
+      aria-label={isCopied ? 'Link copied' : 'Share report'}
+    >
+      {isLoading ? (
+        <Loader2 className="size-5 animate-spin" />
+      ) : isCopied ? (
+        <Check className="size-5 text-green-500" />
+      ) : (
+        <Share2 className="size-5" />
+      )}
+    </button>
   );
 }
