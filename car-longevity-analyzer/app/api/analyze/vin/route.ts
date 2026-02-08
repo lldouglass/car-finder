@@ -19,7 +19,8 @@ import {
 import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { estimateFairPriceWithApi, isPricingApiConfigured } from '@/lib/pricing-api';
-import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS } from '@/lib/constants';
+import { INPUT_LIMITS, LIFESPAN_ADJUSTMENT_LIMITS, UNAUTH_ANALYSIS_RATE_LIMIT } from '@/lib/constants';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { calculateAdjustedLifespan, type LifespanFactors } from '@/lib/lifespan-factors';
 import { mapVinToLifespanFactors, mergeLifespanFactors } from '@/lib/vin-factor-mapper';
 import { getClimateRegion } from '@/lib/region-mapper';
@@ -46,29 +47,39 @@ const AnalyzeVinSchema = z.object({
 
 export async function POST(request: Request) {
     try {
-        // Auth check
+        // Auth check (optional — unauthenticated users get preview results)
         const { userId } = await auth();
-        if (!userId) {
-            return NextResponse.json(
-                { success: false, error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
 
-        // Usage check
-        const usage = await checkAndIncrementUsage(userId);
-        if (!usage.allowed) {
-            return NextResponse.json({
-                success: false,
-                error: 'Free limit reached',
-                upgrade: true,
-                message: `You have used all ${usage.limit} free analyses this month. Upgrade to Premium for unlimited access.`,
-                usage: {
-                    used: usage.used,
-                    limit: usage.limit,
-                    remaining: usage.remaining,
-                },
-            }, { status: 403 });
+        if (userId) {
+            // Authenticated: check usage quota (2 free/month)
+            const usage = await checkAndIncrementUsage(userId);
+            if (!usage.allowed) {
+                return NextResponse.json({
+                    success: false,
+                    error: 'Free limit reached',
+                    upgrade: true,
+                    message: `You have used all ${usage.limit} free analyses this month. Upgrade to Premium for unlimited access.`,
+                    usage: {
+                        used: usage.used,
+                        limit: usage.limit,
+                        remaining: usage.remaining,
+                    },
+                }, { status: 403 });
+            }
+        } else {
+            // Unauthenticated: soft IP-based abuse prevention (10/hour)
+            const ip = getClientIdentifier(request);
+            const rateLimit = checkRateLimit(
+                `unauth:analysis:${ip}`,
+                UNAUTH_ANALYSIS_RATE_LIMIT.maxRequests,
+                UNAUTH_ANALYSIS_RATE_LIMIT.windowMs
+            );
+            if (!rateLimit.allowed) {
+                return NextResponse.json(
+                    { success: false, error: 'Too many requests. Please wait a moment and try again.' },
+                    { status: 429 }
+                );
+            }
         }
 
         const body = await request.json();

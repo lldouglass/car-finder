@@ -77,6 +77,12 @@ export const RATE_LIMIT_DEFAULTS = {
     windowMs: 60000, // 1 minute
 } as const;
 
+// Abuse prevention for unauthenticated analysis (invisible to normal users)
+export const UNAUTH_ANALYSIS_RATE_LIMIT = {
+    maxRequests: 10,
+    windowMs: 60 * 60 * 1000, // 1 hour
+} as const;
+
 // Lifespan adjustment limits (multiplier bounds)
 export const LIFESPAN_ADJUSTMENT_LIMITS = {
     minMultiplier: 0.5,  // Floor at 50% of base lifespan

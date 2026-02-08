@@ -7,10 +7,10 @@ import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { Car, Crown, LogIn, Shield, Database, Zap } from 'lucide-react';
+import { Car, Crown, Shield, Database, Zap } from 'lucide-react';
 import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
-import { SignInButton } from '@clerk/nextjs';
+import { SignUpGate } from '@/components/sign-up-gate';
 
 interface ChatAreaProps {
   onUpgradeClick?: () => void;
@@ -117,8 +117,6 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
             <div className={`rounded-lg p-4 ${
               error.includes('Free limit') || error.includes('free analyses')
                 ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800'
-                : error.toLowerCase().includes('sign in') || error.toLowerCase().includes('unauthorized')
-                ? 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800'
                 : 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
             }`}>
               {error.includes('Free limit') || error.includes('free analyses') ? (
@@ -133,18 +131,6 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     Get 30 Days Unlimited
                   </Button>
                 </div>
-              ) : error.toLowerCase().includes('sign in') || error.toLowerCase().includes('unauthorized') ? (
-                <div className="flex flex-col items-center text-center gap-3">
-                  <LogIn className="size-8 text-blue-500" />
-                  <p className="text-blue-700 dark:text-blue-400 font-medium">Sign in to analyze vehicles</p>
-                  <p className="text-blue-600/70 dark:text-blue-400/70 text-sm">Create a free account to get started with 3 free analyses</p>
-                  <SignInButton mode="modal">
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                      <LogIn className="size-4 mr-2" />
-                      Sign In
-                    </Button>
-                  </SignInButton>
-                </div>
               ) : (
                 <p className="text-red-600 dark:text-red-400">{error}</p>
               )}
@@ -156,7 +142,9 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
             <>
               <div ref={resultsTopRef} />
               <VehicleHeader result={result} />
-              <ResultsDisplay result={result} />
+              <SignUpGate>
+                <ResultsDisplay result={result} />
+              </SignUpGate>
             </>
           )}
         </div>

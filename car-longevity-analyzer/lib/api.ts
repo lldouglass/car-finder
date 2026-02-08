@@ -332,7 +332,7 @@ export class TimeoutError extends APIError {
 // User-friendly error messages
 const ERROR_MESSAGES: Record<number, string> = {
     400: 'Invalid request. Please check your input.',
-    401: 'Please sign in to analyze vehicles.',
+    401: 'Authentication error. Please try signing in again.',
     403: 'Free analysis limit reached. Upgrade to Premium for unlimited access.',
     404: 'Vehicle not found. Please verify the VIN.',
     429: 'Too many requests. Please wait a moment and try again.',
