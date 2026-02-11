@@ -42,8 +42,8 @@ describe('calculateYearSpecificLifespan', () => {
         delete process.env.OPENAI_API_KEY;
 
         // Reset Prisma mocks
-        mockPrisma.lifespanEstimate.findUnique.mockResolvedValue(null);
-        mockPrisma.lifespanEstimate.upsert.mockResolvedValue(null);
+        mockPrisma.lifespanEstimate.findUnique.mockResolvedValue(null as any);
+        mockPrisma.lifespanEstimate.upsert.mockResolvedValue(null as any);
     });
 
     describe('database vehicles - no year issues (deterministic fallback)', () => {
@@ -215,6 +215,11 @@ describe('calculateYearSpecificLifespan', () => {
     describe('PostgreSQL persistence - fresh estimate returned', () => {
         it('returns persisted estimate when fresh and version matches', async () => {
             mockPrisma.lifespanEstimate.findUnique.mockResolvedValue({
+                id: 'test-1',
+                make: 'toyota',
+                model: 'camry',
+                year: 2018,
+                createdAt: new Date(),
                 expectedLifespanMiles: 158000,
                 confidence: 'high',
                 source: 'ai_hybrid',
@@ -235,6 +240,11 @@ describe('calculateYearSpecificLifespan', () => {
 
         it('returns persisted standalone estimate', async () => {
             mockPrisma.lifespanEstimate.findUnique.mockResolvedValue({
+                id: 'test-2',
+                make: 'fictional',
+                model: 'carmodel',
+                year: 2020,
+                createdAt: new Date(),
                 expectedLifespanMiles: 125000,
                 confidence: 'medium',
                 source: 'ai_standalone',
@@ -256,6 +266,11 @@ describe('calculateYearSpecificLifespan', () => {
     describe('PostgreSQL persistence - stale estimate triggers re-estimation', () => {
         it('re-estimates when persisted version is old', async () => {
             mockPrisma.lifespanEstimate.findUnique.mockResolvedValue({
+                id: 'test-3',
+                make: 'toyota',
+                model: 'camry',
+                year: 2018,
+                createdAt: new Date(),
                 expectedLifespanMiles: 158000,
                 confidence: 'high',
                 source: 'ai_hybrid',

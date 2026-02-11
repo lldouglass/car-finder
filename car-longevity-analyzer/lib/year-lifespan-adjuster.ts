@@ -183,23 +183,36 @@ export function isEstimateStale(estimate: PersistedEstimate, currentComplaintCou
     return false;
 }
 
-function buildResultFromPersisted(estimate: PersistedEstimate, inDatabase: boolean): YearSpecificLifespan {
-    const confidence = estimate.confidence as 'high' | 'medium' | 'low';
+function validateConfidence(value: string): 'high' | 'medium' | 'low' {
+    if (value === 'high' || value === 'medium' || value === 'low') return value;
+    return 'low'; // safe default for unexpected values
+}
+
+function buildResultFromPersisted(estimate: PersistedEstimate, inDatabase: boolean, dbBaseLifespan?: number): YearSpecificLifespan {
+    const confidence = validateConfidence(estimate.confidence);
     const sourceDetail = estimate.source;
     // Map granular source to backward-compatible source
     const source: 'database' | 'ai' | 'default' =
         sourceDetail === 'ai_hybrid' || sourceDetail === 'ai_standalone' ? 'ai' :
         sourceDetail === 'database' ? 'database' : 'default';
 
+    // For hybrid estimates, recover the original DB base lifespan to preserve the multiplier
+    const baseLifespanMiles = (sourceDetail === 'ai_hybrid' && dbBaseLifespan)
+        ? dbBaseLifespan
+        : estimate.expectedLifespanMiles;
+    const yearMultiplier = baseLifespanMiles !== 0
+        ? Math.round((estimate.expectedLifespanMiles / baseLifespanMiles) * 1000) / 1000
+        : 1.0;
+
     return {
         expectedLifespanMiles: estimate.expectedLifespanMiles,
         expectedLifespanYears: Math.round(estimate.expectedLifespanMiles / VEHICLE_CONSTANTS.avgMilesPerYear),
-        baseLifespanMiles: estimate.expectedLifespanMiles,
-        yearMultiplier: 1.0,
+        baseLifespanMiles,
+        yearMultiplier,
         adjustments: estimate.reasoning ? [{
             reason: estimate.reasoning,
-            impact: 'neutral' as const,
-            multiplier: 1.0,
+            impact: yearMultiplier >= 1.0 ? 'positive' as const : 'negative' as const,
+            multiplier: yearMultiplier,
         }] : [],
         confidence,
         source,
@@ -641,11 +654,12 @@ function buildDefaultEstimate(make: string, model: string, year: number): YearSp
  *
  * Flow:
  * 1. Check in-memory cache (L1)
- * 2. Check PostgreSQL LifespanEstimate (L2, durable)
- * 3. If vehicle in static DB -> AI hybrid (DB anchor + AI refinement)
- *    If vehicle NOT in static DB -> AI standalone
- * 4. Persist to PostgreSQL + in-memory cache
- * 5. If AI unavailable -> deterministic fallback (DB) or default (130k)
+ * 2. Look up static reliability DB
+ * 3. Check PostgreSQL LifespanEstimate (L2, durable)
+ * 4-5. If vehicle in static DB -> AI hybrid (DB anchor + AI refinement)
+ *      If vehicle NOT in static DB -> AI standalone
+ * 6. Persist to PostgreSQL + in-memory cache
+ * 7. If AI unavailable -> deterministic fallback (DB) or default (130k)
  */
 export async function calculateYearSpecificLifespan(
     make: string,
@@ -661,22 +675,23 @@ export async function calculateYearSpecificLifespan(
     const cached = getCached(cacheKey);
     if (cached) return cached;
 
-    // Step 2: Check PostgreSQL for persisted estimate
+    // Step 2: Look up static DB data (needed for both persistence check and estimation)
+    const relData = getReliabilityData(make, model);
+
+    // Step 3: Check PostgreSQL for persisted estimate
     const persisted = await getPersistedEstimate(make, model, year);
     if (persisted && !isEstimateStale(persisted, complaintCount)) {
-        const relData = getReliabilityData(make, model);
-        const result = buildResultFromPersisted(persisted, !!relData);
+        const result = buildResultFromPersisted(persisted, !!relData, relData?.expectedLifespanMiles);
         setCache(cacheKey, result);
         return result;
     }
 
-    // Step 3: Determine path — hybrid or standalone
-    const relData = getReliabilityData(make, model);
+    // Step 4: Determine path — hybrid or standalone
 
     let result: YearSpecificLifespan;
 
     if (relData) {
-        // Step 4a: Hybrid — DB anchor + AI refinement
+        // Step 5a: Hybrid — DB anchor + AI refinement
         const aiResult = await estimateWithAIHybrid(
             make, model, year,
             relData.expectedLifespanMiles,
@@ -697,7 +712,7 @@ export async function calculateYearSpecificLifespan(
             );
         }
     } else {
-        // Step 4b: Standalone AI — no DB anchor
+        // Step 5b: Standalone AI — no DB anchor
         const aiResult = await estimateWithAIStandalone(make, model, year, complaintsList);
 
         if (aiResult) {
@@ -708,12 +723,12 @@ export async function calculateYearSpecificLifespan(
         }
     }
 
-    // Step 5: Persist AI results to PostgreSQL (only for AI-generated results)
+    // Step 6: Persist AI results to PostgreSQL (only for AI-generated results)
     if (result.sourceDetail === 'ai_hybrid' || result.sourceDetail === 'ai_standalone') {
         await persistEstimate(make, model, year, result, complaintCount);
     }
 
-    // Step 6: Set in-memory cache
+    // Step 7: Set in-memory cache
     setCache(cacheKey, result);
     return result;
 }
