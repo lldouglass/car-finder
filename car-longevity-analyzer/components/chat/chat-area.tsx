@@ -7,7 +7,8 @@ import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { Car, Crown, Shield, Database, Zap } from 'lucide-react';
+import { UpsellBanner } from '@/components/upsell-banner';
+import { Car, Crown, Shield, Database, Zap, Search } from 'lucide-react';
 import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
 import { SignUpGate } from '@/components/sign-up-gate';
@@ -23,6 +24,9 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
 
   // Find the current history item to show the input summary
   const currentItem = currentId ? history.find((h) => h.id === currentId) : null;
+
+  // Detect if this is a vehicle (MMY) search result
+  const isVehicleSearch = result?.analysisType === 'vehicle';
 
   // Scroll to top of results when analysis completes
   useEffect(() => {
@@ -60,8 +64,11 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                 <h1 className="text-3xl font-bold tracking-tight mb-3">
                   Don&apos;t Buy a Lemon.
                 </h1>
-                <p className="text-muted-foreground text-lg">
-                  Find out if a used car is overpriced, unreliable, or hiding problems — in 60 seconds.
+                <p className="text-muted-foreground text-lg mb-2">
+                  Search any vehicle by make, model, and year — free, instant reliability reports.
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  Or use your VIN for a detailed analysis with pricing and lifespan projections.
                 </p>
               </div>
 
@@ -72,6 +79,10 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
 
               {/* Trust indicators */}
               <div className="flex items-center justify-center gap-6 mt-4 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Search className="size-4" />
+                  Free Search
+                </span>
                 <span className="flex items-center gap-1">
                   <Shield className="size-4" />
                   NHTSA Data
@@ -115,7 +126,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
           {/* Error state */}
           {error && !isLoading && (
             <div className={`rounded-lg p-4 ${
-              error.includes('Free limit') || error.includes('free analyses')
+              error.includes('Free limit') || error.includes('free analyses') || error.includes('Daily search limit')
                 ? 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800'
                 : 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
             }`}>
@@ -145,6 +156,10 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
               <SignUpGate>
                 <ResultsDisplay result={result} />
               </SignUpGate>
+              {/* Upsell banner for vehicle (MMY) searches - outside gate so always visible */}
+              {isVehicleSearch && (
+                <UpsellBanner />
+              )}
             </>
           )}
         </div>

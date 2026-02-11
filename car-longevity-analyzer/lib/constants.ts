@@ -83,6 +83,12 @@ export const UNAUTH_ANALYSIS_RATE_LIMIT = {
     windowMs: 60 * 60 * 1000, // 1 hour
 } as const;
 
+// Rate limit for unauthenticated Make/Model/Year searches (free tier, more generous)
+export const UNAUTH_VEHICLE_SEARCH_RATE_LIMIT = {
+    maxRequests: 5,
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+} as const;
+
 // Lifespan adjustment limits (multiplier bounds)
 export const LIFESPAN_ADJUSTMENT_LIMITS = {
     minMultiplier: 0.5,  // Floor at 50% of base lifespan

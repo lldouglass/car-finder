@@ -294,6 +294,93 @@ export async function getComplaints(make: string, model: string, year: number): 
     }
 }
 
+// Well-known passenger car makes (covers 95%+ of used car market)
+const COMMON_MAKES = new Set([
+    'ACURA', 'ALFA ROMEO', 'ASTON MARTIN', 'AUDI',
+    'BENTLEY', 'BMW', 'BUICK',
+    'CADILLAC', 'CHEVROLET', 'CHRYSLER',
+    'DODGE',
+    'FERRARI', 'FIAT', 'FORD',
+    'GENESIS', 'GMC',
+    'HONDA', 'HYUNDAI',
+    'INFINITI',
+    'JAGUAR', 'JEEP',
+    'KIA',
+    'LAMBORGHINI', 'LAND ROVER', 'LEXUS', 'LINCOLN', 'LOTUS', 'LUCID',
+    'MASERATI', 'MAZDA', 'MCLAREN', 'MERCEDES-BENZ', 'MERCURY', 'MINI', 'MITSUBISHI',
+    'NISSAN',
+    'OLDSMOBILE',
+    'POLESTAR', 'PONTIAC', 'PORSCHE',
+    'RAM', 'RIVIAN', 'ROLLS-ROYCE',
+    'SAAB', 'SATURN', 'SCION', 'SMART', 'SUBARU', 'SUZUKI',
+    'TESLA', 'TOYOTA',
+    'VOLKSWAGEN', 'VOLVO',
+]);
+
+function titleCaseMake(name: string): string {
+    const specialCases: Record<string, string> = {
+        'BMW': 'BMW', 'GMC': 'GMC', 'RAM': 'Ram', 'MINI': 'MINI',
+    };
+    if (specialCases[name]) return specialCases[name];
+    return name.split(/[\s-]+/).map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(name.includes('-') ? '-' : ' ');
+}
+
+/**
+ * Fetches all makes for a given model year from NHTSA VPIC API.
+ * Filters to common passenger car makes for clean autocomplete.
+ */
+export async function getMakesForYear(year: number): Promise<string[]> {
+    await delay(API_TIMEOUTS.nhtsaDelay);
+    try {
+        const response = await fetch(
+            `${NHTSA_VIN_API}/GetMakesForVehicleType/car?format=json`
+        );
+        if (!response.ok) throw new Error(`NHTSA Makes API error: ${response.status}`);
+        const data = await response.json();
+
+        if (!Array.isArray(data.Results)) return [];
+
+        return data.Results
+            .map((r: { MakeName?: string }) => r.MakeName)
+            .filter((name: unknown): name is string =>
+                typeof name === 'string' && name.length > 0 && COMMON_MAKES.has(name.toUpperCase())
+            )
+            .map((name: string) => titleCaseMake(name.toUpperCase()))
+            .sort();
+    } catch (error) {
+        console.error('Error fetching makes:', error);
+        return [];
+    }
+}
+
+/**
+ * Fetches all models for a given make and year from NHTSA VPIC API.
+ * Used for autocomplete in the Make/Model/Year search.
+ */
+export async function getModelsForMakeYear(make: string, year: number): Promise<string[]> {
+    await delay(API_TIMEOUTS.nhtsaDelay);
+    try {
+        const encodedMake = encodeURIComponent(make);
+        const response = await fetch(
+            `${NHTSA_VIN_API}/GetModelsForMakeYear/make/${encodedMake}/modelyear/${year}?format=json`
+        );
+        if (!response.ok) throw new Error(`NHTSA Models API error: ${response.status}`);
+        const data = await response.json();
+
+        if (!Array.isArray(data.Results)) return [];
+
+        return data.Results
+            .map((r: { Model_Name?: string }) => r.Model_Name)
+            .filter((name: unknown): name is string => typeof name === 'string' && name.length > 0)
+            .sort();
+    } catch (error) {
+        console.error('Error fetching models:', error);
+        return [];
+    }
+}
+
 /**
  * Fetches safety ratings for a specific vehicle.
  * @param make Vehicle make

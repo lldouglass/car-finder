@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { AnalysisResponse, analyzeByVin, analyzeByListing, APIError, type SellerType } from './api';
+import { AnalysisResponse, analyzeByVin, analyzeByListing, analyzeByVehicle, APIError, type SellerType } from './api';
 import {
   ChatHistory,
   loadHistory,
@@ -27,7 +27,7 @@ interface AnalysisContextType {
 
   // Actions
   submitAnalysis: (
-    inputType: 'vin' | 'listing',
+    inputType: 'vin' | 'listing' | 'vehicle',
     input: string,
     mileage?: number,
     price?: number,
@@ -74,7 +74,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   // Submit a new analysis
   const submitAnalysis = useCallback(
     async (
-      inputType: 'vin' | 'listing',
+      inputType: 'vin' | 'listing' | 'vehicle',
       input: string,
       mileage?: number,
       price?: number,
@@ -95,6 +95,13 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             mileage: mileage || 0,
             askingPrice: price || 0,
             sellerType: sellerType as SellerType | undefined,
+          });
+        } else if (inputType === 'vehicle') {
+          const vehicleData = JSON.parse(input);
+          analysisResult = await analyzeByVehicle({
+            year: vehicleData.year,
+            make: vehicleData.make,
+            model: vehicleData.model,
           });
         } else {
           analysisResult = await analyzeByListing({

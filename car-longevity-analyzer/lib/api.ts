@@ -278,6 +278,7 @@ export interface SurvivalAnalysis {
 
 export interface AnalysisResponse {
     success: boolean;
+    analysisType?: 'vin' | 'listing' | 'vehicle';
     error?: string;
     details?: unknown;
     vehicle?: Vehicle;
@@ -424,6 +425,45 @@ export async function analyzeByListing(data: ListingAnalysisRequest): Promise<An
 
         if (!response.ok || !result.success) {
             const message = result.error || getErrorMessage(response.status, 'Failed to analyze listing');
+            const isRetryable = [429, 500, 503].includes(response.status);
+            throw new APIError(message, response.status, result.details, isRetryable);
+        }
+
+        return result;
+    } catch (error) {
+        if (error instanceof APIError) {
+            throw error;
+        }
+        throw new NetworkError();
+    }
+}
+
+// Make/Model/Year Search Types and API
+export interface VehicleSearchRequest {
+    year: number;
+    make: string;
+    model: string;
+}
+
+export async function analyzeByVehicle(data: VehicleSearchRequest): Promise<AnalysisResponse> {
+    try {
+        const response = await fetchWithTimeout('/api/analyze/vehicle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        let result: AnalysisResponse;
+        try {
+            result = await response.json();
+        } catch {
+            throw new APIError('Invalid response from server', response.status);
+        }
+
+        if (!response.ok || !result.success) {
+            const message = result.error || getErrorMessage(response.status, 'Failed to analyze vehicle');
             const isRetryable = [429, 500, 503].includes(response.status);
             throw new APIError(message, response.status, result.details, isRetryable);
         }

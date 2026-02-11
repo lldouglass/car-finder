@@ -1,9 +1,9 @@
 'use client';
 
-import { Search, FileText } from 'lucide-react';
+import { Search, FileText, Car } from 'lucide-react';
 
 interface UserMessageProps {
-  inputType: 'vin' | 'listing';
+  inputType: 'vin' | 'listing' | 'vehicle';
   inputSummary: string;
 }
 
@@ -16,6 +16,11 @@ export function UserMessage({ inputType, inputSummary }: UserMessageProps) {
             <>
               <Search className="size-3.5" />
               <span>VIN Lookup</span>
+            </>
+          ) : inputType === 'vehicle' ? (
+            <>
+              <Car className="size-3.5" />
+              <span>Vehicle Search</span>
             </>
           ) : (
             <>

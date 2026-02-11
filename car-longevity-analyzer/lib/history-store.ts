@@ -9,8 +9,8 @@ export interface ChatHistory {
   timestamp: number;
   starred: boolean;
   vehicle: { year: number; make: string; model: string; trim?: string | null; color?: string | null } | null;
-  inputType: 'vin' | 'listing';
-  inputSummary: string; // VIN or first 100 chars of listing
+  inputType: 'vin' | 'listing' | 'vehicle';
+  inputSummary: string; // VIN, first 100 chars of listing, or "Year Make Model"
   verdict: 'BUY' | 'MAYBE' | 'PASS' | null;
   fullResult: AnalysisResponse;
 }
@@ -174,9 +174,17 @@ function migrateHistory(data: StoredData): ChatHistory[] {
 /**
  * Create input summary from analysis input
  */
-export function createInputSummary(inputType: 'vin' | 'listing', input: string): string {
+export function createInputSummary(inputType: 'vin' | 'listing' | 'vehicle', input: string): string {
   if (inputType === 'vin') {
     return input.toUpperCase();
+  }
+  if (inputType === 'vehicle') {
+    try {
+      const { year, make, model } = JSON.parse(input);
+      return `${year} ${make} ${model}`;
+    } catch {
+      return input;
+    }
   }
   // For listings, take first 100 chars
   return input.length > 100 ? `${input.substring(0, 100)}...` : input;
