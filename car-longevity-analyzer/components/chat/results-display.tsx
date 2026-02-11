@@ -33,9 +33,10 @@ import {
   BadgeCheck,
   ChevronDown,
   ChevronUp,
+  Clock,
 } from 'lucide-react';
 import { InlineVinUpsell } from '@/components/inline-vin-upsell';
-import type { AnalysisResponse, RedFlag, MaintenanceProjectionApi } from '@/lib/api';
+import type { AnalysisResponse, RedFlag, MaintenanceProjectionApi, ExpectedLifespan as ExpectedLifespanType } from '@/lib/api';
 
 interface ResultsDisplayProps {
   result: AnalysisResponse;
@@ -304,6 +305,7 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
     safetyRating,
     knownIssues,
     lifespanAnalysis,
+    expectedLifespan,
     maintenanceCost,
     negotiationStrategy,
     maintenanceCosts,
@@ -329,6 +331,7 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
   const hasWarrantyValue = warrantyValue && warrantyValue.coverageQuality !== 'none';
   const hasPriceThresholds = priceThresholds !== null && priceThresholds !== undefined;
   const hasSurvivalAnalysis = survivalAnalysis && survivalAnalysis.milestones && survivalAnalysis.milestones.length > 0;
+  const hasExpectedLifespan = expectedLifespan && expectedLifespan.miles > 0;
 
   const isVehicleSearch = result.analysisType === 'vehicle';
 
@@ -492,6 +495,81 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Expected Lifespan for free vehicle searches */}
+      {isVehicleSearch && hasExpectedLifespan && expectedLifespan && (
+        <Card role="region" aria-labelledby="expected-lifespan-heading">
+          <CardHeader>
+            <CardTitle id="expected-lifespan-heading" className="text-lg flex items-center gap-2">
+              <Clock className="size-5 text-purple-500" aria-hidden="true" />
+              Expected Lifespan
+              <span
+                className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                  expectedLifespan.confidence === 'high'
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                    : expectedLifespan.confidence === 'medium'
+                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
+                }`}
+              >
+                {expectedLifespan.confidence === 'high' ? 'High' : expectedLifespan.confidence === 'medium' ? 'Medium' : 'Low'} Confidence
+              </span>
+            </CardTitle>
+            <CardDescription>
+              {hasVehicleData
+                ? `Based on ${vehicle.year} ${vehicle.make} ${vehicle.model} reliability data`
+                : 'Based on vehicle reliability data'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted p-4 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground mb-1">Expected Total Lifespan</p>
+              <p className="text-3xl font-bold">
+                {expectedLifespan.miles.toLocaleString()} miles
+              </p>
+              <p className="text-lg text-muted-foreground">
+                ~{expectedLifespan.years} years
+              </p>
+            </div>
+
+            {expectedLifespan.adjustments.length > 0 && (
+              <div>
+                <p className="font-medium text-sm mb-2">Year-Specific Adjustments</p>
+                <div className="space-y-2">
+                  {expectedLifespan.adjustments.map((adj, index) => (
+                    <div key={index} className="flex items-start gap-2 text-sm">
+                      {adj.impact === 'negative' ? (
+                        <TrendingDown className="size-4 text-red-500 mt-0.5 shrink-0" aria-hidden="true" />
+                      ) : adj.impact === 'positive' ? (
+                        <TrendingUp className="size-4 text-green-500 mt-0.5 shrink-0" aria-hidden="true" />
+                      ) : (
+                        <Info className="size-4 text-blue-500 mt-0.5 shrink-0" aria-hidden="true" />
+                      )}
+                      <span className="flex-1">{adj.reason}</span>
+                      <span className={`font-medium shrink-0 ${
+                        adj.impact === 'negative' ? 'text-red-600 dark:text-red-400' :
+                        adj.impact === 'positive' ? 'text-green-600 dark:text-green-400' :
+                        'text-muted-foreground'
+                      }`}>
+                        {adj.multiplier < 1 ? '' : '+'}{Math.round((adj.multiplier - 1) * 100)}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground flex items-start gap-1">
+              <Info className="size-3 mt-0.5 shrink-0" aria-hidden="true" />
+              {expectedLifespan.source === 'ai'
+                ? 'Estimated by AI (vehicle not in our database). Enter a VIN for personalized lifespan with remaining miles.'
+                : expectedLifespan.source === 'default'
+                ? 'Using industry average (vehicle not in our database). Enter a VIN for personalized lifespan with remaining miles.'
+                : 'Based on reliability database. Enter a VIN for personalized lifespan with remaining miles.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Inline VIN upsell for free vehicle searches */}
       {isVehicleSearch && (

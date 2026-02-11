@@ -685,6 +685,96 @@ export const RELIABILITY_DATA: VehicleReliability[] = [
     // ============================================
     { make: 'Saab', model: '9-3', baseScore: 6.0, expectedLifespanMiles: 90000, yearsToAvoid: [2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011] },
     { make: 'Saab', model: '9-5', baseScore: 6.0, expectedLifespanMiles: 90000, yearsToAvoid: [2003, 2004, 2005, 2006, 2010, 2011] },
+
+    // ============================================
+    // ADDITIONAL HIGH-VOLUME VEHICLES
+    // Added to expand coverage for common searches
+    // ============================================
+
+    // Toyota additions
+    { make: 'Toyota', model: 'Corolla Cross', baseScore: 8.5, expectedLifespanMiles: 155000, yearsToAvoid: [] },
+    { make: 'Toyota', model: 'GR Corolla', baseScore: 8.0, expectedLifespanMiles: 120000, yearsToAvoid: [] },
+
+    // Honda additions
+    { make: 'Honda', model: 'Prelude', baseScore: 8.0, expectedLifespanMiles: 140000, yearsToAvoid: [1997, 1998] },
+
+    // Nissan additions
+    { make: 'Nissan', model: 'Juke', baseScore: 5.5, expectedLifespanMiles: 100000, yearsToAvoid: [2011, 2012, 2013] },
+    { make: 'Nissan', model: 'Xterra', baseScore: 7.0, expectedLifespanMiles: 150000, yearsToAvoid: [2005, 2006] },
+    { make: 'Nissan', model: 'Quest', baseScore: 5.0, expectedLifespanMiles: 100000, yearsToAvoid: [2004, 2005, 2006, 2011] },
+    { make: 'Nissan', model: 'NV200', baseScore: 5.5, expectedLifespanMiles: 110000, yearsToAvoid: [2013, 2014] },
+
+    // Ford additions
+    { make: 'Ford', model: 'Taurus', baseScore: 6.5, expectedLifespanMiles: 130000, yearsToAvoid: [2010, 2011, 2013] },
+    { make: 'Ford', model: 'Flex', baseScore: 7.0, expectedLifespanMiles: 130000, yearsToAvoid: [2009, 2010] },
+    { make: 'Ford', model: 'Crown Victoria', baseScore: 8.5, expectedLifespanMiles: 175000, yearsToAvoid: [] },
+    { make: 'Ford', model: 'C-Max', baseScore: 6.0, expectedLifespanMiles: 110000, yearsToAvoid: [2013, 2014] },
+    { make: 'Ford', model: 'Freestyle', baseScore: 6.0, expectedLifespanMiles: 120000, yearsToAvoid: [2005, 2006] },
+
+    // Chevrolet additions
+    { make: 'Chevrolet', model: 'Avalanche', baseScore: 7.0, expectedLifespanMiles: 160000, yearsToAvoid: [2007, 2008] },
+    { make: 'Chevrolet', model: 'HHR', baseScore: 5.5, expectedLifespanMiles: 100000, yearsToAvoid: [2006, 2007, 2008] },
+    { make: 'Chevrolet', model: 'S-10', baseScore: 7.5, expectedLifespanMiles: 155000, yearsToAvoid: [1999, 2000] },
+    { make: 'Chevrolet', model: 'Express', baseScore: 7.0, expectedLifespanMiles: 170000, yearsToAvoid: [2003, 2004, 2005] },
+    { make: 'Chevrolet', model: 'Monte Carlo', baseScore: 6.5, expectedLifespanMiles: 120000, yearsToAvoid: [2006, 2007] },
+
+    // GMC additions
+    { make: 'GMC', model: 'Envoy', baseScore: 6.0, expectedLifespanMiles: 120000, yearsToAvoid: [2002, 2003, 2004, 2005] },
+    { make: 'GMC', model: 'Savana', baseScore: 7.0, expectedLifespanMiles: 170000, yearsToAvoid: [2003, 2004] },
+
+    // Hyundai additions
+    { make: 'Hyundai', model: 'Genesis Coupe', baseScore: 7.0, expectedLifespanMiles: 120000, yearsToAvoid: [2010, 2011] },
+    { make: 'Hyundai', model: 'Azera', baseScore: 7.0, expectedLifespanMiles: 120000, yearsToAvoid: [2006, 2007] },
+    { make: 'Hyundai', model: 'Nexo', baseScore: 7.5, expectedLifespanMiles: 130000, yearsToAvoid: [] },
+
+    // Kia additions
+    { make: 'Kia', model: 'EV9', baseScore: 7.0, expectedLifespanMiles: 130000, yearsToAvoid: [] },
+    { make: 'Kia', model: 'Cadenza', baseScore: 7.0, expectedLifespanMiles: 120000, yearsToAvoid: [2014, 2015] },
+    { make: 'Kia', model: 'Borrego', baseScore: 5.0, expectedLifespanMiles: 100000, yearsToAvoid: [2009] },
+    { make: 'Kia', model: 'K8', baseScore: 7.5, expectedLifespanMiles: 130000, yearsToAvoid: [] },
+
+    // Subaru additions
+    { make: 'Subaru', model: 'Baja', baseScore: 7.0, expectedLifespanMiles: 130000, yearsToAvoid: [2003, 2004] },
+    { make: 'Subaru', model: 'Tribeca', baseScore: 5.5, expectedLifespanMiles: 110000, yearsToAvoid: [2006, 2007, 2008] },
+
+    // Acura additions
+    { make: 'Acura', model: 'RSX', baseScore: 8.0, expectedLifespanMiles: 140000, yearsToAvoid: [] },
+    { make: 'Acura', model: 'RL', baseScore: 7.5, expectedLifespanMiles: 135000, yearsToAvoid: [2005] },
+    { make: 'Acura', model: 'RLX', baseScore: 7.5, expectedLifespanMiles: 135000, yearsToAvoid: [] },
+    { make: 'Acura', model: 'NSX', baseScore: 8.5, expectedLifespanMiles: 110000, yearsToAvoid: [] },
+
+    // Lexus additions
+    { make: 'Lexus', model: 'CT', baseScore: 8.0, expectedLifespanMiles: 140000, yearsToAvoid: [] },
+    { make: 'Lexus', model: 'RC F', baseScore: 8.0, expectedLifespanMiles: 120000, yearsToAvoid: [] },
+    { make: 'Lexus', model: 'SC', baseScore: 8.5, expectedLifespanMiles: 140000, yearsToAvoid: [] },
+
+    // Dodge additions
+    { make: 'Dodge', model: 'Ram 1500', baseScore: 6.5, expectedLifespanMiles: 150000, yearsToAvoid: [2003, 2004, 2005, 2014, 2015] },
+    { make: 'Dodge', model: 'Dakota', baseScore: 6.0, expectedLifespanMiles: 130000, yearsToAvoid: [2000, 2001, 2002, 2005] },
+    { make: 'Dodge', model: 'Caravan', baseScore: 5.0, expectedLifespanMiles: 100000, yearsToAvoid: [2008, 2009, 2010, 2011] },
+    { make: 'Dodge', model: 'Nitro', baseScore: 4.5, expectedLifespanMiles: 100000, yearsToAvoid: [2007, 2008, 2009, 2010, 2011] },
+
+    // Jeep additions
+    { make: 'Jeep', model: 'Commander', baseScore: 5.0, expectedLifespanMiles: 110000, yearsToAvoid: [2006, 2007, 2008, 2009, 2010] },
+
+    // Volkswagen additions
+    { make: 'Volkswagen', model: 'Routan', baseScore: 4.5, expectedLifespanMiles: 95000, yearsToAvoid: [2009, 2010, 2011] },
+    { make: 'Volkswagen', model: 'Eos', baseScore: 5.0, expectedLifespanMiles: 100000, yearsToAvoid: [2007, 2008, 2009] },
+    { make: 'Volkswagen', model: 'Phaeton', baseScore: 5.0, expectedLifespanMiles: 100000, yearsToAvoid: [2004, 2005, 2006] },
+
+    // Buick additions
+    { make: 'Buick', model: 'LeSabre', baseScore: 7.5, expectedLifespanMiles: 150000, yearsToAvoid: [2000, 2001] },
+    { make: 'Buick', model: 'Century', baseScore: 7.0, expectedLifespanMiles: 140000, yearsToAvoid: [2003, 2004, 2005] },
+    { make: 'Buick', model: 'Rendezvous', baseScore: 5.5, expectedLifespanMiles: 110000, yearsToAvoid: [2002, 2003, 2004] },
+    { make: 'Buick', model: 'Verano', baseScore: 6.5, expectedLifespanMiles: 120000, yearsToAvoid: [2012, 2013] },
+
+    // Cadillac additions
+    { make: 'Cadillac', model: 'DTS', baseScore: 7.0, expectedLifespanMiles: 140000, yearsToAvoid: [2006, 2007] },
+    { make: 'Cadillac', model: 'DeVille', baseScore: 6.5, expectedLifespanMiles: 130000, yearsToAvoid: [2000, 2001, 2002, 2003, 2004, 2005] },
+
+    // Lincoln additions
+    { make: 'Lincoln', model: 'Town Car', baseScore: 8.0, expectedLifespanMiles: 175000, yearsToAvoid: [] },
+    { make: 'Lincoln', model: 'Mark LT', baseScore: 6.5, expectedLifespanMiles: 140000, yearsToAvoid: [2006, 2007, 2008] },
 ];
 
 /**

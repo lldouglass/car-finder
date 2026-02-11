@@ -10,6 +10,7 @@ import {
 import { calculateSafetyScore, detectSafetyRedFlags } from '@/lib/safety-scoring';
 import { getReliabilityData } from '@/lib/reliability-data';
 import { LIFESPAN_ADJUSTMENT_LIMITS, UNAUTH_VEHICLE_SEARCH_RATE_LIMIT } from '@/lib/constants';
+import { calculateYearSpecificLifespan } from '@/lib/year-lifespan-adjuster';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
 
@@ -65,6 +66,9 @@ export async function POST(request: Request) {
 
         const relData = getReliabilityData(make, model);
         const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
+
+        // Calculate year-specific expected lifespan
+        const yearLifespan = await calculateYearSpecificLifespan(make, model, year);
 
         // Extract known issues from NHTSA complaints
         const knownIssues = extractKnownIssues(complaints);
@@ -164,6 +168,15 @@ export async function POST(request: Request) {
                 priceValue: null,
                 safety: safetyScoreResult.score,
                 overall: null, // No overall score without price/mileage
+            },
+            expectedLifespan: {
+                miles: yearLifespan.expectedLifespanMiles,
+                years: yearLifespan.expectedLifespanYears,
+                baseLifespanMiles: yearLifespan.baseLifespanMiles,
+                yearMultiplier: yearLifespan.yearMultiplier,
+                adjustments: yearLifespan.adjustments,
+                confidence: yearLifespan.confidence,
+                source: yearLifespan.source,
             },
             longevity: null, // Requires mileage
             lifespanAnalysis: null, // No adjustment factors available without VIN

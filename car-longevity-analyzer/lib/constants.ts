@@ -96,6 +96,14 @@ export const LIFESPAN_ADJUSTMENT_LIMITS = {
     defaultLifespan: 130000, // Default lifespan when vehicle not in database (calibrated to real-world data)
 } as const;
 
+// Year-specific lifespan adjustments for free Make/Model/Year search
+export const YEAR_LIFESPAN_ADJUSTMENTS = {
+    yearToAvoidPenalty: 0.90,    // -10% for known problematic model years
+    modernEraBonus2020: 1.03,    // +3% for 2020+ (modern manufacturing/safety)
+    modernEraBonus2015: 1.01,    // +1% for 2015-2019
+    oldEraPenalty: 0.97,         // -3% for pre-2005 vehicles
+} as const;
+
 // HTTP status codes with user-friendly messages
 export const ERROR_MESSAGES: Record<number, string> = {
     400: 'Invalid request. Please check your input.',

@@ -19,7 +19,7 @@ interface InlineVinUpsellProps {
 }
 
 const vinFeatures = [
-  { icon: TrendingUp, label: 'Lifespan Projections', description: 'Remaining miles & years estimate' },
+  { icon: TrendingUp, label: 'Personalized Lifespan', description: 'Remaining miles based on your mileage' },
   { icon: DollarSign, label: 'Fair Price Analysis', description: 'Market comparison & deal quality' },
   { icon: Shield, label: 'Negotiation Strategy', description: 'Suggested offer & walk-away price' },
   { icon: Wrench, label: 'Maintenance Costs', description: 'Annual & 5-year cost projection' },

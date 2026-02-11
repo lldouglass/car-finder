@@ -142,6 +142,22 @@ export interface LifespanAnalysis {
     confidence: 'high' | 'medium' | 'low';
 }
 
+export interface LifespanAdjustment {
+    reason: string;
+    impact: 'positive' | 'negative' | 'neutral';
+    multiplier: number;
+}
+
+export interface ExpectedLifespan {
+    miles: number;
+    years: number;
+    baseLifespanMiles: number;
+    yearMultiplier: number;
+    adjustments: LifespanAdjustment[];
+    confidence: 'high' | 'medium' | 'low';
+    source: 'database' | 'ai' | 'default';
+}
+
 export interface ReliabilityAnalysis {
     baseScore: number;
     yearAdjustment: number;
@@ -285,6 +301,7 @@ export interface AnalysisResponse {
     scores?: Scores;
     longevity?: Longevity | null;
     lifespanAnalysis?: LifespanAnalysis;
+    expectedLifespan?: ExpectedLifespan | null;
     reliabilityAnalysis?: ReliabilityAnalysis;
     pricing?: Pricing | null;
     knownIssues?: KnownIssue[];
