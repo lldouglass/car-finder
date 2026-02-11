@@ -134,3 +134,21 @@ model SharedReport {
 
   @@index([createdBy])
 }
+
+model LifespanEstimate {
+  id                    String   @id @default(cuid())
+  make                  String   // stored lowercase
+  model                 String   // stored lowercase
+  year                  Int
+  expectedLifespanMiles Int
+  confidence            String   // 'high' | 'medium' | 'low'
+  source                String   // 'ai_hybrid' | 'ai_standalone'
+  reasoning             String   @db.Text
+  complaintCount        Int      @default(0)     // NHTSA complaints used as context
+  modelVersion          String   @default("v1")  // prompt version for invalidation
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([make, model, year])
+  @@index([make, model])
+}

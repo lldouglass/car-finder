@@ -67,8 +67,8 @@ export async function POST(request: Request) {
         const relData = getReliabilityData(make, model);
         const baseLifespan = relData ? relData.expectedLifespanMiles : LIFESPAN_ADJUSTMENT_LIMITS.defaultLifespan;
 
-        // Calculate year-specific expected lifespan
-        const yearLifespan = await calculateYearSpecificLifespan(make, model, year);
+        // Calculate year-specific expected lifespan (pass NHTSA complaints for AI context)
+        const yearLifespan = await calculateYearSpecificLifespan(make, model, year, complaints);
 
         // Extract known issues from NHTSA complaints
         const knownIssues = extractKnownIssues(complaints);

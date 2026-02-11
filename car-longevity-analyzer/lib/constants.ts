@@ -242,3 +242,29 @@ export const STRIPE_SUBSCRIPTION_STATUS = {
     UNPAID: 'unpaid',
     PAST_DUE: 'past_due',
 } as const;
+
+// ============================================
+// AI LIFESPAN ESTIMATION CONSTANTS
+// ============================================
+
+// Prompt version — bump this to invalidate all persisted AI estimates
+export const AI_LIFESPAN_PROMPT_VERSION = 'v1';
+
+// Staleness thresholds for persisted AI estimates
+export const AI_LIFESPAN_STALENESS = {
+    maxAgeDays: 90,                  // Re-estimate after 90 days
+    complaintThresholdNew: 5,        // Re-estimate if had 0 complaints but now >5
+    complaintThresholdDelta: 10,     // Re-estimate if complaints grew by 10+
+} as const;
+
+// Hybrid estimation bounds (relative to DB base value)
+export const AI_HYBRID_BOUNDS = {
+    minMultiplier: 0.70,  // AI can't go below 70% of DB value
+    maxMultiplier: 1.10,  // AI can't go above 110% of DB value
+} as const;
+
+// Standalone estimation bounds (absolute miles)
+export const AI_STANDALONE_BOUNDS = {
+    minMiles: 80000,
+    maxMiles: 300000,
+} as const;
