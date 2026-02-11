@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { useAnalysis } from '@/lib/analysis-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,13 +14,17 @@ const VIN_PATTERN = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
 type InputTab = 'search' | 'vin' | 'listing';
 
+export interface ChatInputHandle {
+  switchToVin: () => void;
+}
+
 interface ChatInputProps {
   large?: boolean;
   inputRef?: React.RefObject<HTMLTextAreaElement | null>;
   defaultTab?: InputTab;
 }
 
-export function ChatInput({ large = false, inputRef, defaultTab = 'search' }: ChatInputProps) {
+export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function ChatInput({ large = false, inputRef, defaultTab = 'search' }, ref) {
   const { submitAnalysis, isLoading } = useAnalysis();
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const textareaRef = inputRef || internalRef;
@@ -30,6 +34,10 @@ export function ChatInput({ large = false, inputRef, defaultTab = 'search' }: Ch
   const [mileage, setMileage] = useState('');
   const [price, setPrice] = useState('');
   const [sellerType, setSellerType] = useState('');
+
+  useImperativeHandle(ref, () => ({
+    switchToVin: () => setActiveTab('vin'),
+  }));
 
   // Detect if input looks like a VIN
   const trimmedInput = input.trim().replace(/\s/g, '');
@@ -229,4 +237,4 @@ export function ChatInput({ large = false, inputRef, defaultTab = 'search' }: Ch
       )}
     </div>
   );
-}
+});

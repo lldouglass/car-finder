@@ -1,13 +1,12 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { useAnalysis } from '@/lib/analysis-context';
-import { ChatInput } from './chat-input';
+import { ChatInput, type ChatInputHandle } from './chat-input';
 import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { UpsellBanner } from '@/components/upsell-banner';
 import { Car, Crown, Shield, Database, Zap, Search } from 'lucide-react';
 import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
@@ -21,12 +20,14 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
   const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const chatInputRef = useRef<ChatInputHandle>(null);
 
   // Find the current history item to show the input summary
   const currentItem = currentId ? history.find((h) => h.id === currentId) : null;
 
-  // Detect if this is a vehicle (MMY) search result
-  const isVehicleSearch = result?.analysisType === 'vehicle';
+  const handleSwitchToVin = useCallback(() => {
+    chatInputRef.current?.switchToVin();
+  }, []);
 
   // Scroll to top of results when analysis completes
   useEffect(() => {
@@ -154,12 +155,8 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
               <div ref={resultsTopRef} />
               <VehicleHeader result={result} />
               <SignUpGate>
-                <ResultsDisplay result={result} />
+                <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
               </SignUpGate>
-              {/* Upsell banner for vehicle (MMY) searches - outside gate so always visible */}
-              {isVehicleSearch && (
-                <UpsellBanner />
-              )}
             </>
           )}
         </div>
@@ -168,7 +165,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
       {/* Input area - fixed at bottom */}
       <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <ChatInput />
+          <ChatInput ref={chatInputRef} />
         </div>
       </div>
     </div>

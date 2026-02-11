@@ -166,13 +166,7 @@ export async function POST(request: Request) {
                 overall: null, // No overall score without price/mileage
             },
             longevity: null, // Requires mileage
-            lifespanAnalysis: {
-                baseLifespan,
-                adjustedLifespan: baseLifespan, // No adjustment factors
-                totalMultiplier: 1.0,
-                appliedFactors: [],
-                confidence: 'low' as const,
-            },
+            lifespanAnalysis: null, // No adjustment factors available without VIN
             reliabilityAnalysis: {
                 baseScore: reliabilityBaseScore,
                 yearAdjustment: reliabilityYearAdjustment,

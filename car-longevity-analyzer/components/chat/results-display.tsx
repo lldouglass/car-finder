@@ -34,10 +34,12 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { InlineVinUpsell } from '@/components/inline-vin-upsell';
 import type { AnalysisResponse, RedFlag, MaintenanceProjectionApi } from '@/lib/api';
 
 interface ResultsDisplayProps {
   result: AnalysisResponse;
+  onSwitchToVin?: () => void;
 }
 
 function formatNumber(num: number | null | undefined): string {
@@ -290,7 +292,7 @@ function DataStatusDebug({ result }: { result: AnalysisResponse }) {
   );
 }
 
-export function ResultsDisplay({ result }: ResultsDisplayProps) {
+export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
   const {
     vehicle,
     longevity,
@@ -328,12 +330,15 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const hasPriceThresholds = priceThresholds !== null && priceThresholds !== undefined;
   const hasSurvivalAnalysis = survivalAnalysis && survivalAnalysis.milestones && survivalAnalysis.milestones.length > 0;
 
+  const isVehicleSearch = result.analysisType === 'vehicle';
+
   return (
     <div className="space-y-6">
       {/* Debug info in development */}
       <DataStatusDebug result={result} />
 
-      {/* Longevity & Price Grid */}
+      {/* Longevity & Price Grid - hidden for free vehicle searches */}
+      {!isVehicleSearch && (
       <div className="grid md:grid-cols-2 gap-6">
         {/* Longevity Details */}
         <Card role="region" aria-labelledby="longevity-heading">
@@ -451,6 +456,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* Safety Ratings & Known Issues Grid */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -486,6 +492,14 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Inline VIN upsell for free vehicle searches */}
+      {isVehicleSearch && (
+        <InlineVinUpsell
+          onSwitchToVin={onSwitchToVin}
+          vehicleName={hasVehicleData ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : undefined}
+        />
+      )}
 
       {/* Lifespan Factors */}
       {hasLifespanAnalysis && (
@@ -730,27 +744,30 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         </Card>
       )}
 
-      {/* Red Flags */}
-      <Card role="region" aria-labelledby="redflags-heading">
-        <CardHeader>
-          <CardTitle id="redflags-heading" className="text-lg flex items-center gap-2">
-            <AlertTriangle className="size-5 text-yellow-500" aria-hidden="true" />
-            Red Flags {hasRedFlags && `(${redFlags.length})`}
-          </CardTitle>
-          <CardDescription>Issues to be aware of before purchasing</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {hasRedFlags ? (
-            <div className="space-y-3" role="list" aria-label="List of red flags">
-              {redFlags.map((flag, index) => (
-                <RedFlagItem key={index} flag={flag} />
-              ))}
-            </div>
-          ) : (
-            <NoRedFlags />
-          )}
-        </CardContent>
-      </Card>
+      {/* Red Flags - hide empty state for free searches */}
+      {(!isVehicleSearch || hasRedFlags) && (
+        <Card role="region" aria-labelledby="redflags-heading">
+          <CardHeader>
+            <CardTitle id="redflags-heading" className="text-lg flex items-center gap-2">
+              <AlertTriangle className="size-5 text-yellow-500" aria-hidden="true" />
+              Red Flags {hasRedFlags && `(${redFlags.length})`}
+            </CardTitle>
+            <CardDescription>Issues to be aware of before purchasing</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {hasRedFlags ? (
+              <div className="space-y-3" role="list" aria-label="List of red flags">
+                {redFlags.map((flag, index) => (
+                  <RedFlagItem key={index} flag={flag} />
+                ))}
+              </div>
+            ) : (
+              <NoRedFlags />
+            )}
+          </CardContent>
+        </Card>
+      )}
+
 
       {/* AI Analysis (for listing analysis) */}
       {aiAnalysis && (
@@ -820,7 +837,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         </CardContent>
       </Card>
 
-      {/* Maintenance Projections */}
+      {/* Maintenance Projections - hidden for free vehicle searches */}
+      {!isVehicleSearch && (
       <Card role="region" aria-labelledby="maintenance-projections-heading">
         <CardHeader>
           <CardTitle id="maintenance-projections-heading" className="text-lg flex items-center gap-2">
@@ -875,6 +893,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Questions for Seller */}
       <Card role="region" aria-labelledby="questions-heading">
