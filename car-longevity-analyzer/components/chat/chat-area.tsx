@@ -11,6 +11,7 @@ import { Car, Crown, Shield, Database, Zap, Search } from 'lucide-react';
 import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
 import { SignUpGate } from '@/components/sign-up-gate';
+import { SignUpBanner } from '@/components/sign-up-banner';
 
 interface ChatAreaProps {
   onUpgradeClick?: () => void;
@@ -154,9 +155,16 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
             <>
               <div ref={resultsTopRef} />
               <VehicleHeader result={result} />
-              <SignUpGate>
-                <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
-              </SignUpGate>
+              {result.analysisType === 'vehicle' ? (
+                <>
+                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
+                  <SignUpBanner />
+                </>
+              ) : (
+                <SignUpGate>
+                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
+                </SignUpGate>
+              )}
             </>
           )}
         </div>

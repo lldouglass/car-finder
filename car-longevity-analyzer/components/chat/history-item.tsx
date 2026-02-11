@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useAnalysis, type ChatHistory } from '@/lib/analysis-context';
 import { getHistoryDisplayName, formatRelativeTime } from '@/lib/history-store';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,8 @@ interface HistoryItemProps {
 
 export function HistoryItem({ item, isActive, onSelect }: HistoryItemProps) {
   const { loadAnalysis, toggleStar, deleteAnalysis } = useAnalysis();
+  const { isSignedIn } = useUser();
+  const { openSignUp } = useClerk();
   const [showActions, setShowActions] = useState(false);
 
   const handleClick = () => {
@@ -23,6 +26,10 @@ export function HistoryItem({ item, isActive, onSelect }: HistoryItemProps) {
 
   const handleStar = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!isSignedIn) {
+      openSignUp();
+      return;
+    }
     toggleStar(item.id);
   };
 
