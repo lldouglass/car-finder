@@ -12,6 +12,8 @@ A low price tag on a used car can be tempting, but there's often a reason certai
 
 We've analyzed NHTSA complaint data, recall volumes, and average repair costs to identify the used cars you should avoid. Always verify a specific vehicle's history with [Car Lifespan Check](https://carlifespancheck.com) before making any purchase decision.
 
+---
+
 ## Worst Used Sedans
 
 ### Nissan Altima (2013–2018)
@@ -37,6 +39,8 @@ The Dart was Dodge's attempt at a compact sedan, and it was plagued with problem
 Charming to look at, miserable to own. The Fiat 500 suffers from chronic electrical issues, premature clutch wear, engine oil consumption, and overall poor build quality. Dealer support in the US has essentially evaporated.
 
 **Why it's bad:** Everything except the styling. Repair frequency is among the highest of any car sold in America.
+
+---
 
 ## Worst Used SUVs
 
@@ -64,6 +68,8 @@ Land Rover consistently ranks at the bottom of reliability surveys, and the Disc
 
 **Why it's bad:** Beautiful inside and out, but reliability is abysmal and repair costs are astronomical.
 
+---
+
 ## Worst Used Trucks
 
 ### Ram 1500 EcoDiesel (2014–2016)
@@ -71,6 +77,8 @@ Land Rover consistently ranks at the bottom of reliability surveys, and the Disc
 The 3.0L EcoDiesel V6 sounded great on paper — a fuel-efficient diesel in a full-size truck. In reality, these engines suffer from emissions system failures, EGR problems, and expensive DEF system issues. Fiat Chrysler paid a massive settlement over emissions cheating with these engines.
 
 **Why it's bad:** Diesel complexity combined with poor emissions system reliability. Repairs can run into the thousands.
+
+---
 
 ## Worst Used Luxury Cars
 
@@ -86,6 +94,8 @@ The GLA suffers from a rough-shifting dual-clutch transmission, cramped interior
 
 **Why it's bad:** All the expense of a Mercedes without the refinement, plus transmission issues.
 
+---
+
 ## How to Avoid Buying a Problem Car
 
 1. **Research before you shop** — use [Car Lifespan Check](https://carlifespancheck.com) to identify known issues for any year, make, and model
@@ -93,6 +103,8 @@ The GLA suffers from a rough-shifting dual-clutch transmission, cramped interior
 3. **Get a pre-purchase inspection** — a mechanic can catch developing problems
 4. **Read owner forums** — real owners share the unfiltered truth about their vehicles
 5. **Avoid the first model year** of any redesign — let other buyers find the problems first
+
+---
 
 ## What to Buy Instead
 
@@ -102,6 +114,8 @@ For every bad used car, there's a reliable alternative at a similar price:
 - Instead of Jeep Cherokee → **Toyota RAV4** or **Mazda CX-5**
 - Instead of Ford Escape 1.6T → **Honda CR-V** or **Subaru Forester**
 - Instead of any luxury car in this list → **Lexus** (Toyota reliability, luxury experience)
+
+---
 
 ## The Bottom Line
 

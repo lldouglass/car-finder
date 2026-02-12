@@ -12,6 +12,8 @@ For decades, 100,000 miles was considered the end of a car's useful life. Engine
 
 So should you buy a car with 100K miles? The answer depends on three things: what car it is, how it was maintained, and what you're paying for it.
 
+---
+
 ## The Case for Buying at 100K Miles
 
 ### Massive Depreciation Savings
@@ -27,6 +29,8 @@ Today's engines use better materials, tighter tolerances, and synthetic lubrican
 ### Known Quantity
 
 A car with 100,000 miles has a history you can research. You can check NHTSA complaints, look at owner forums for common issues, and see if the specific model has proven reliable at that mileage. With a new car, you're relying on projections. Use [Car Lifespan Check](https://carlifespancheck.com) to see exactly how a specific make and model performs at high mileage.
+
+---
 
 ## The Case Against (When to Be Cautious)
 
@@ -50,6 +54,8 @@ Around 100,000 miles, several expensive maintenance items come due:
 
 Budget an additional $1,500–$3,000 for catch-up maintenance when buying at 100K miles.
 
+---
+
 ## Which Cars Are Worth Buying at 100K Miles?
 
 ### Great Buys at 100K
@@ -67,6 +73,8 @@ Budget an additional $1,500–$3,000 for catch-up maintenance when buying at 100
 - **Chrysler/Dodge sedans** — transmission and electrical concerns
 - **Land Rover anything** — repair costs can be staggering
 
+---
+
 ## The 100K-Mile Buying Checklist
 
 Before purchasing any car with 100,000+ miles:
@@ -77,6 +85,8 @@ Before purchasing any car with 100,000+ miles:
 4. **Check for upcoming maintenance** — Is the timing belt due? Transmission service? Factor these into your offer price
 5. **Research the specific model year** — Some years are better than others, even within the same generation
 6. **Verify the odometer** — Compare wear patterns (pedals, seats, steering wheel) to the stated mileage
+
+---
 
 ## How to Calculate If It's a Good Deal
 
@@ -90,6 +100,8 @@ Compare this to:
 - The cost of a new car over the same period (including depreciation)
 
 If the high-mileage car wins on total cost and the reliability data supports it, it's a smart buy.
+
+---
 
 ## The Bottom Line
 

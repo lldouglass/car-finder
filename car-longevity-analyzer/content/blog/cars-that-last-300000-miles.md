@@ -12,6 +12,8 @@ Absolutely — and more cars are doing it than ever before. According to data fr
 
 But not all cars are created equal. Some are engineered from the ground up for extraordinary longevity, while others start developing expensive problems well before 150,000 miles. Here are the vehicles most likely to reach — and exceed — the 300,000-mile mark.
 
+---
+
 ## The 300,000-Mile Club
 
 ### Toyota Camry
@@ -68,6 +70,8 @@ Surprising to some, the F-150 with the 3.5L EcoBoost V6 has proven remarkably du
 
 **Key to longevity:** Turbo maintenance, regular oil changes with quality synthetic oil, and spark plug replacements at recommended intervals.
 
+---
+
 ## What These Cars Have in Common
 
 Vehicles that consistently reach 300,000 miles share several characteristics:
@@ -77,6 +81,8 @@ Vehicles that consistently reach 300,000 miles share several characteristics:
 3. **Simple, accessible designs** — easy and affordable to maintain
 4. **Quality materials** — components built to last, not to a price point
 5. **Large owner communities** — parts availability and shared maintenance knowledge
+
+---
 
 ## The Maintenance Required to Reach 300,000 Miles
 
@@ -91,11 +97,15 @@ No car reaches 300,000 miles on its own. Here's the maintenance reality:
 - **Brake system:** Multiple pad and rotor replacements over the life of the vehicle
 - **Water pump:** Typically needs replacement once between 100,000–200,000 miles
 
+---
+
 ## Is It Worth Keeping a Car to 300,000 Miles?
 
 Financially, yes — if the car is reliable and repairs are reasonable. The cheapest car to own is almost always the one you already have (assuming it's paid off). Even spending $2,000–$3,000 per year on maintenance is far less than a car payment.
 
 The math changes when repair costs consistently exceed the car's value, or when safety becomes a concern due to aging systems.
+
+---
 
 ## Check Your Vehicle's Longevity Potential
 

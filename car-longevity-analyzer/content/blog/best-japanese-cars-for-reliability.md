@@ -17,6 +17,8 @@ Japanese automakers have dominated reliability rankings for decades, and the rea
 
 The result? Japanese brands consistently occupy the top spots in reliability surveys from Consumer Reports, J.D. Power, and owner satisfaction studies. Let's look at the best models.
 
+---
+
 ## Toyota: The Reliability King
 
 Toyota doesn't just make reliable cars — they wrote the book on it. The Toyota Production System (TPS) is studied by manufacturers worldwide, and its emphasis on quality is evident in every vehicle.
@@ -33,6 +35,8 @@ Toyota doesn't just make reliable cars — they wrote the book on it. The Toyota
 
 **Toyota 4Runner** — Built for abuse and capable of absorbing it. The 4.0L V6 is legendarily durable. Expected lifespan: 300,000+ miles.
 
+---
+
 ## Honda: Engineering Excellence
 
 Honda approaches reliability through engineering innovation within proven frameworks. Their engines are celebrated for precision, efficiency, and longevity.
@@ -47,6 +51,8 @@ Honda approaches reliability through engineering innovation within proven framew
 
 **Honda Ridgeline** — The most car-like truck on the market, with car-like reliability to match. Unibody construction, a smooth V6, and minimal reported issues. Expected lifespan: 200,000–250,000 miles.
 
+---
+
 ## Mazda: The Rising Star
 
 Mazda has surged in reliability rankings over the past decade, often rivaling Toyota and Honda. Their Skyactiv technology platform combines efficiency with remarkable durability.
@@ -58,6 +64,8 @@ Mazda has surged in reliability rankings over the past decade, often rivaling To
 **Mazda CX-5** — The compact SUV segment's reliability dark horse. Build quality rivals vehicles costing twice as much. Expected lifespan: 200,000–250,000 miles.
 
 **Mazda CX-9/CX-90** — Three-row reliability that competes with the Highlander. The turbocharged Skyactiv engine has proven more dependable than many predicted. Expected lifespan: 200,000+ miles.
+
+---
 
 ## Lexus: Toyota Luxury Reliability
 
@@ -71,6 +79,8 @@ Lexus deserves its own mention because it consistently ranks as the single most 
 
 **Lexus GX** — Based on the 4Runner/Land Cruiser platform, the GX is a luxury off-roader that lasts forever. Expected lifespan: 300,000+ miles.
 
+---
+
 ## Subaru: Reliability with Capability
 
 Subaru's standard AWD system gives it a unique position in the market. Reliability has improved significantly in recent years, though some older models had head gasket concerns.
@@ -81,6 +91,8 @@ Subaru's standard AWD system gives it a unique position in the market. Reliabili
 
 **Subaru Forester (2014+)** — Same platform improvements as the Outback. Excellent safety ratings and all-weather capability. Expected lifespan: 200,000–250,000 miles.
 
+---
+
 ## Japanese Cars to Be Cautious About
 
 Not every Japanese car is perfect:
@@ -88,6 +100,8 @@ Not every Japanese car is perfect:
 - **Nissan (with CVT)** — Nissan's Jatco CVT transmissions have poor reliability records. The engines are fine, but transmission failures are common.
 - **Subaru (pre-2012)** — Older EJ-series engines are prone to head gasket failures. Stick to 2012+ models with the FB engine.
 - **Mitsubishi** — Limited model range and declining investment in the US market make long-term parts availability a concern.
+
+---
 
 ## How to Verify Any Japanese Car's Reliability
 
@@ -97,6 +111,8 @@ Brand reputation is a starting point, but individual vehicles vary. A well-maint
 2. Verify the vehicle's maintenance history
 3. Get a pre-purchase inspection from an independent mechanic
 4. Research known issues for the specific year and trim
+
+---
 
 ## The Bottom Line
 

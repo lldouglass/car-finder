@@ -12,6 +12,8 @@ Spending under $15,000 on a used car doesn't mean settling for a money pit. In 2
 
 We analyzed NHTSA complaint data, repair cost averages, and depreciation curves to find the best values. Before buying any of these, run it through [Car Lifespan Check](https://carlifespancheck.com) to verify the specific vehicle's reliability score.
 
+---
+
 ## Best Sedans Under $15,000
 
 ### Toyota Corolla (2017–2020) — $11,000–$14,500
@@ -37,6 +39,8 @@ The Mazda3 offers the most upscale interior in this price range. Skyactiv engine
 Hyundai offers tremendous value in this segment. The Elantra is well-equipped, fuel-efficient, and backed by strong warranty coverage (which may still be active on newer models — 10 years/100,000 miles powertrain).
 
 **Why buy it:** Best warranty value, lower purchase prices, solid reliability since 2017.
+
+---
 
 ## Best SUVs Under $15,000
 
@@ -64,6 +68,8 @@ Standard AWD makes the Forester ideal for buyers in snowy climates. Visibility i
 
 **Why buy it:** Standard AWD, excellent visibility, rugged capability, good safety ratings.
 
+---
+
 ## Best Trucks Under $15,000
 
 ### Toyota Tacoma (2012–2016) — $13,000–$15,000
@@ -71,6 +77,8 @@ Standard AWD makes the Forester ideal for buyers in snowy climates. Visibility i
 Tacomas hold their value incredibly well, so your budget gets an older model year — but that's fine because these trucks are nearly indestructible. The 2.7L four-cylinder is sufficient for light-duty use and extremely reliable.
 
 **Why buy it:** Best-in-class reliability and resale value, will outlast almost any other truck.
+
+---
 
 ## Tips for Buying Under $15,000
 
@@ -94,6 +102,8 @@ Set aside $500–$1,000 for deferred maintenance. Even reliable used cars often 
 
 Some of these vehicles may be available as CPO, which includes manufacturer-backed warranty coverage. It costs a premium but provides peace of mind.
 
+---
+
 ## Cars to Avoid Under $15,000
 
 Not every car in this price range is a good buy. Watch out for:
@@ -102,6 +112,8 @@ Not every car in this price range is a good buy. Watch out for:
 - **BMW/Audi/Mercedes** at this price point — cheap to buy, expensive to fix
 - **Any vehicle with a salvage title** — unless you're a mechanic and know exactly what you're getting
 - **Chrysler 200** — poor reliability ratings and high depreciation for a reason
+
+---
 
 ## The Bottom Line
 

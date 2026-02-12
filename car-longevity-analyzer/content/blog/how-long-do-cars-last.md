@@ -12,6 +12,8 @@ The average car on American roads today is 12.6 years old — a record high. Mod
 
 But "average" doesn't tell the whole story. How long your specific car lasts depends on the make and model, how it's been maintained, driving conditions, and a bit of luck. Let's break down what the data actually shows.
 
+---
+
 ## How Many Miles Can You Expect?
 
 Here's a realistic breakdown by vehicle category:
@@ -40,6 +42,8 @@ Here's a realistic breakdown by vehicle category:
 - **Average lifespan:** 150,000–200,000 miles
 - **Time equivalent:** 10–15 years
 - Not because they're poorly made, but because repair costs escalate significantly after warranty
+
+---
 
 ## The 5 Biggest Factors That Determine How Long a Car Lasts
 
@@ -80,6 +84,8 @@ A one-owner car with full service records is far more likely to last than a four
 - **Hybrid powertrains** from Toyota/Lexus have exceptional longevity records
 - **Diesel engines** can last extremely long (400,000+ miles) but have higher maintenance costs
 
+---
+
 ## Signs Your Car Is Reaching End of Life
 
 Not every repair is worth making. Watch for these signals:
@@ -90,6 +96,8 @@ Not every repair is worth making. Watch for these signals:
 - **Engine burning oil** excessively (more than 1 quart per 1,000 miles)
 - **Multiple systems failing** simultaneously (electrical, suspension, drivetrain)
 
+---
+
 ## How to Maximize Your Car's Lifespan
 
 1. **Follow the maintenance schedule** — not the "severe" or "normal" schedule, but the one that matches your actual driving conditions
@@ -99,11 +107,15 @@ Not every repair is worth making. Watch for these signals:
 5. **Use quality parts and fluids** — OEM or equivalent quality filters, fluids, and components
 6. **Address rust early** — treat surface rust before it becomes structural
 
+---
+
 ## Check Before You Buy
 
 If you're buying a used car, understanding its expected lifespan is crucial to making a smart investment. A car priced at $15,000 with 200,000 miles of expected life left is a far better deal than one priced at $12,000 with only 50,000 miles remaining before major issues.
 
 Use [Car Lifespan Check](https://carlifespancheck.com) to get an instant reliability and longevity score for any vehicle. Our tool analyzes NHTSA complaint data, recall history, and safety ratings to help you understand exactly what you're buying.
+
+---
 
 ## The Bottom Line
 

@@ -12,6 +12,8 @@ The Honda Civic is one of the longest-lasting compact cars ever made. With prope
 
 But not all Civics are created equal. Different generations and engine options have different longevity profiles. Let's break it down.
 
+---
+
 ## Expected Lifespan by Generation
 
 ### 8th Generation (2006–2011)
@@ -33,6 +35,8 @@ This is where the Civic got interesting again. The 1.5L turbo engine offers grea
 **Expected lifespan:** 250,000–300,000+ miles (projected)
 
 Still too early for definitive long-term data, but early reliability indicators are excellent. Honda refined the 1.5T and 2.0L engines, and build quality is the best in Civic history. The hybrid powertrain introduced in 2025 uses Honda's proven two-motor system.
+
+---
 
 ## Common Honda Civic Issues by Mileage
 
@@ -58,6 +62,8 @@ Still too early for definitive long-term data, but early reliability indicators 
 - Possible catalytic converter issues
 - Continued suspension and brake maintenance
 
+---
+
 ## The Oil Dilution Question (1.5T Engine)
 
 The biggest concern for 10th-gen Civic buyers is the 1.5L turbo engine's oil dilution issue. In cold climates, fuel can mix with the engine oil during short trips, raising the oil level and reducing lubrication effectiveness.
@@ -65,6 +71,8 @@ The biggest concern for 10th-gen Civic buyers is the 1.5L turbo engine's oil dil
 **The reality:** Honda issued software updates that increase engine warm-up temperature and rev patterns to burn off fuel contamination. Post-update, the issue is largely resolved. However, if you live in a very cold climate and primarily make short trips, the 2.0L naturally aspirated engine is the safer choice.
 
 **How to check:** Pull the dipstick and smell the oil. If it smells strongly of gasoline, the oil is diluted. This isn't a deal-breaker if caught and managed, but it is worth knowing about.
+
+---
 
 ## Maintenance Schedule for Maximum Lifespan
 
@@ -81,6 +89,8 @@ To get your Civic past 250,000 miles, follow this schedule:
 | Brake fluid | Every 3 years |
 | Valve adjustment | Every 60,000–100,000 miles (older models) |
 
+---
+
 ## Annual Maintenance Costs
 
 The Civic is one of the cheapest cars to maintain in America:
@@ -91,6 +101,8 @@ The Civic is one of the cheapest cars to maintain in America:
 
 For comparison, the average car costs $650+ per year in maintenance. The Civic's simplicity and parts availability keep costs remarkably low.
 
+---
+
 ## Best Used Civic Model Years
 
 1. **2019–2021** — Mature 10th-gen with all issues resolved, great value
@@ -98,11 +110,15 @@ For comparison, the average car costs $650+ per year in maintenance. The Civic's
 3. **2014–2015** — Budget option, simple and reliable
 4. **2017–2018** — First years of 10th-gen, good value if turbo oil dilution is checked
 
+---
+
 ## Civic Model Years to Be Cautious About
 
 - **2006–2008** — Engine block cracking issue (check if Honda's extended coverage applied)
 - **2016** — First year of 1.5T, most likely to have oil dilution concerns
 - **2012** — First year of 9th-gen, some early production quality concerns
+
+---
 
 ## Check Before You Buy
 

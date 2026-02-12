@@ -12,6 +12,8 @@ Americans are buying more SUVs than ever — they now account for over 55% of ne
 
 Let's dig into the data.
 
+---
+
 ## Reliability by the Numbers
 
 ### Average Annual Repair Costs
@@ -30,6 +32,8 @@ Sedans have a clear advantage in maintenance costs, primarily due to lighter wei
 
 The top sedans and SUVs are surprisingly close in longevity. The gap widens when you look at average models rather than the best-in-class.
 
+---
+
 ## Why Sedans Tend to Be More Reliable
 
 ### Simpler Drivetrains
@@ -44,6 +48,8 @@ Sedans handle weight transfer more gently during cornering and braking, reducing
 ### Less Expensive Components
 Sedan tires, brake pads, and rotors are typically smaller and cheaper. A brake job on a midsize sedan costs $250–$450; the same job on a midsize SUV costs $350–$600.
 
+---
+
 ## Why Modern SUVs Have Closed the Gap
 
 ### Unibody Construction
@@ -54,6 +60,8 @@ The Honda CR-V uses the same engine as the Civic. The Toyota RAV4 shares its eng
 
 ### Improved AWD Systems
 Modern AWD systems are simpler and more reliable than the 4WD systems of old. Many use on-demand coupling that only engages when needed, reducing mechanical wear.
+
+---
 
 ## Head-to-Head Comparisons
 
@@ -72,6 +80,8 @@ Modern AWD systems are simpler and more reliable than the 4WD systems of old. Ma
 - **CX-5 reliability:** 8.5/10
 - **Verdict:** Virtually identical reliability. They share the same Skyactiv platform and powertrain.
 
+---
+
 ## When to Choose a Sedan
 
 - You prioritize lowest possible maintenance costs
@@ -79,6 +89,8 @@ Modern AWD systems are simpler and more reliable than the 4WD systems of old. Ma
 - You want the best fuel economy
 - You prefer a sportier driving experience
 - Your cargo needs are moderate
+
+---
 
 ## When to Choose an SUV
 
@@ -88,6 +100,8 @@ Modern AWD systems are simpler and more reliable than the 4WD systems of old. Ma
 - You tow anything (even light loads)
 - You have an active lifestyle that requires versatile cargo space
 
+---
+
 ## The Real Reliability Variables
 
 Body style matters less than these factors:
@@ -96,6 +110,8 @@ Body style matters less than these factors:
 2. **Maintenance history** — A well-maintained SUV outlasts a neglected sedan
 3. **Engine and transmission choice** — Avoid known problematic powertrains regardless of body style
 4. **Driving conditions** — An AWD SUV in snow country may actually last longer than a FWD sedan that struggles in winter
+
+---
 
 ## Check Any Vehicle's Reliability
 

@@ -10,6 +10,8 @@ tags: ["reliability", "toyota", "review"]
 
 The Toyota Camry has been America's best-selling sedan for over two decades, and "reliable" is the first word most people associate with it. But does the data actually back up the reputation? After analyzing NHTSA complaint data, consumer reliability surveys, and real-world ownership reports, the answer is a clear yes — with a few caveats worth knowing.
 
+---
+
 ## Reliability by Generation
 
 ### 2007–2011 (XV40)
@@ -33,6 +35,8 @@ The current generation brought the TNGA platform, a more powerful 2.5L Dynamic F
 **Reliability rating:** 9.5/10  
 **Watch for:** Some early 2018 models had infotainment software bugs (resolved via updates). Otherwise, nearly flawless.
 
+---
+
 ## How Many Miles Can a Camry Last?
 
 The Toyota Camry routinely reaches 250,000–300,000 miles with basic maintenance. Taxi and rideshare drivers have documented Camrys with over 400,000 miles on the original engine and transmission. Here's what determines where in that range your Camry will land:
@@ -41,6 +45,8 @@ The Toyota Camry routinely reaches 250,000–300,000 miles with basic maintenanc
 - **Transmission fluid service** every 30,000–60,000 miles extends transmission life significantly
 - **Coolant system maintenance** prevents overheating and head gasket issues
 - **Driving conditions** — highway miles are easier on the car than city miles
+
+---
 
 ## Common Camry Issues (and How Serious They Are)
 
@@ -60,6 +66,8 @@ Water pumps typically need replacement between 100,000–150,000 miles. This is 
 **Severity: Low**  
 Struts, sway bar links, and bushings wear out with age and mileage. Expected maintenance, not a reliability concern. Budget $500–$1,000 for suspension refresh at higher mileage.
 
+---
+
 ## Maintenance Costs
 
 The Camry is one of the cheapest midsize sedans to maintain:
@@ -72,6 +80,8 @@ The Camry is one of the cheapest midsize sedans to maintain:
 
 Compare this to European midsize sedans where annual maintenance can run $800–$1,500, and the Camry's value proposition becomes clear.
 
+---
+
 ## Camry vs the Competition
 
 ### Camry vs Honda Accord
@@ -83,6 +93,8 @@ No contest. The Camry is dramatically more reliable, especially regarding transm
 ### Camry vs Hyundai Sonata
 The Sonata offers more features for the money, but the Camry's long-term reliability and resale value are superior. The gap is closing, though.
 
+---
+
 ## Best Used Camry Model Years to Buy
 
 1. **2015–2017** — Refined XV50 with all early issues resolved, excellent value
@@ -90,10 +102,14 @@ The Sonata offers more features for the money, but the Camry's long-term reliabi
 3. **2018–2019** — First TNGA Camry, great value as prices drop
 4. **2013–2014** — Budget pick, rock-solid reliability
 
+---
+
 ## Camry Model Years to Avoid
 
 1. **2007–2009** — Oil consumption risk with the 2.4L engine
 2. **2012** — First year of the XV50 had some minor teething issues
+
+---
 
 ## Should You Buy a Used Camry?
 

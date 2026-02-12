@@ -12,6 +12,8 @@ Every used car seller says their vehicle is "reliable" and "well-maintained." Bu
 
 This guide walks you through every step of checking a used car's reliability, from initial online research to hands-on verification.
 
+---
+
 ## Step 1: Research the Make, Model, and Year
 
 Before you even look at a specific car, research the reliability profile of that make, model, and year.
@@ -38,6 +40,8 @@ Visit [nhtsa.gov/complaints](https://www.nhtsa.gov/complaints) and search for th
 
 Search for "[car model] forum" and browse the common problems section. Real owners share unfiltered experiences that reveal patterns manufacturer data might miss.
 
+---
+
 ## Step 2: Check the Specific Vehicle's History
 
 A reliable model can still be an unreliable individual car if it was in an accident, abused, or poorly maintained.
@@ -55,6 +59,8 @@ Get a Carfax or AutoCheck report. Look for:
 ### NHTSA Recall Check
 
 Search the VIN at [nhtsa.gov/recalls](https://www.nhtsa.gov/recalls) to see if there are any open recalls. Unrepaired recalls mean the car may have known safety defects.
+
+---
 
 ## Step 3: Physical Inspection
 
@@ -82,6 +88,8 @@ Search the VIN at [nhtsa.gov/recalls](https://www.nhtsa.gov/recalls) to see if t
 - **Test everything:** Power windows, locks, mirrors, AC, heater, radio, USB ports, cameras, sensors.
 - **Battery:** Check for corrosion on terminals and verify the battery date.
 
+---
+
 ## Step 4: The Test Drive
 
 A proper test drive reveals issues that visual inspection can't. Drive for at least 20–30 minutes covering:
@@ -99,6 +107,8 @@ A proper test drive reveals issues that visual inspection can't. Drive for at le
 - Whining from engine bay = power steering or belt issues
 - Grinding when braking = worn brake pads
 
+---
+
 ## Step 5: Professional Pre-Purchase Inspection
 
 Even after all your research, have an independent mechanic inspect the car. For $100–$300, they'll:
@@ -111,6 +121,8 @@ Even after all your research, have an independent mechanic inspect the car. For 
 
 **Never skip this step.** It's the best $200 you'll spend in the entire car-buying process.
 
+---
+
 ## Step 6: Verify Documentation
 
 Before committing:
@@ -121,6 +133,8 @@ Before committing:
 - Service records are consistent and verifiable
 - No outstanding liens
 
+---
+
 ## Red Flags That Mean Walk Away
 
 - Seller refuses a pre-purchase inspection
@@ -130,6 +144,8 @@ Before committing:
 - Transmission slipping or harsh shifting
 - Frame damage or severe structural rust
 - Price is dramatically below market value
+
+---
 
 ## Put It All Together
 

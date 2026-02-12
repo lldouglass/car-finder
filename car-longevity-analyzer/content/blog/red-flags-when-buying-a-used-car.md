@@ -12,6 +12,8 @@ The used car market has plenty of great deals, but it also has plenty of traps. 
 
 Before visiting any car, run it through [Car Lifespan Check](https://carlifespancheck.com) to check the model's reliability history. Then watch for these warning signs in person.
 
+---
+
 ## Seller Red Flags
 
 ### 1. The Seller Won't Allow an Independent Inspection
@@ -33,6 +35,8 @@ Legitimate private sellers are usually willing to meet at their home. If they in
 ### 5. The Price Is Too Good to Be True
 
 A $20,000 car listed for $12,000 isn't a steal — it's a trap. Dramatically underpriced vehicles are either scams (deposit schemes, fake listings) or hiding major problems that justify the low price.
+
+---
 
 ## Vehicle Red Flags
 
@@ -76,6 +80,8 @@ If you arrive and the engine is already warm, the seller may be hiding cold-star
 
 A car with four owners in five years raises questions. Why did everyone get rid of it so quickly? While there can be innocent explanations, frequent ownership changes often indicate persistent problems that each owner discovered and passed along.
 
+---
+
 ## How to Protect Yourself
 
 1. **Research the model** — Use [Car Lifespan Check](https://carlifespancheck.com) to identify known reliability issues before you visit
@@ -84,6 +90,8 @@ A car with four owners in five years raises questions. Why did everyone get rid 
 4. **Always get a PPI** — Pre-purchase inspection by an independent mechanic ($100–$300)
 5. **Trust your instincts** — If something feels wrong, it probably is
 6. **Be willing to walk away** — There are always other cars
+
+---
 
 ## The Bottom Line
 

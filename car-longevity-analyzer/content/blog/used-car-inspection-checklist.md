@@ -12,6 +12,8 @@ A used car might look perfect in photos and drive fine for 10 minutes, but hidde
 
 Before you even visit the car, run the year, make, and model through [Car Lifespan Check](https://carlifespancheck.com) to understand known issues, recall history, and reliability scores for that specific vehicle.
 
+---
+
 ## Before You Visit: Remote Checks
 
 - [ ] Research the vehicle's reliability rating and known issues
@@ -20,6 +22,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Compare the asking price with KBB, Edmunds, and NADA values
 - [ ] Search for the VIN online — it may reveal hidden listings or issues
 - [ ] Ask the seller for the VIN and photos before visiting
+
+---
 
 ## Exterior Inspection
 
@@ -50,6 +54,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Inspect exhaust system for holes, rust, or loose hangers
 - [ ] Look for fresh undercoating that might be hiding rust
 
+---
+
 ## Engine Bay Inspection
 
 - [ ] Check oil level and condition (should be amber/brown, not black or milky)
@@ -62,6 +68,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Check for oil leaks around valve covers, oil pan, and rear main seal
 - [ ] Look for evidence of rodent damage to wiring
 - [ ] Verify the VIN on the engine matches the title
+
+---
 
 ## Interior Inspection
 
@@ -91,6 +99,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Test parking brake
 - [ ] Inspect spare tire and jack
 
+---
+
 ## Test Drive Checklist
 
 ### Cold Start
@@ -115,6 +125,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Check that the engine temperature gauge is in normal range
 - [ ] Verify the engine idles smoothly when warm
 
+---
+
 ## Documentation Checklist
 
 - [ ] Title is in the seller's name (not someone else's)
@@ -124,6 +136,8 @@ Before you even visit the car, run the year, make, and model through [Car Lifesp
 - [ ] Service records are available and consistent
 - [ ] Number of owners matches the seller's claims
 - [ ] No outstanding liens on the vehicle
+
+---
 
 ## When to Walk Away
 
@@ -135,6 +149,8 @@ Some issues are deal-breakers regardless of price:
 - **Seller won't allow inspection** — they're hiding something
 - **VIN discrepancies** — possible stolen vehicle or title fraud
 - **Flood damage signs** — water damage causes endless electrical problems
+
+---
 
 ## Get Professional Backup
 

@@ -14,6 +14,8 @@ In 2026, the used car market offers some incredible options. Many vehicles from 
 
 Before you buy, consider running any vehicle through [Car Lifespan Check](https://carlifespancheck.com) to get an instant reliability score based on NHTSA data, recall history, and known issues for that specific make and model.
 
+---
+
 ## The 10 Most Reliable Used Cars in 2026
 
 ### 1. Toyota Camry (2018–2023)
@@ -86,6 +88,8 @@ If you need a truck, the Tacoma is the reliability king. These trucks are famous
 **Expected lifespan:** 300,000+ miles  
 **Average annual repair cost:** $400–$500
 
+---
+
 ## How to Verify Reliability Before You Buy
 
 While brand reputation is a good starting point, every individual vehicle has its own history. A Toyota with deferred maintenance can be less reliable than a well-maintained Chevrolet. Here's how to verify:
@@ -94,6 +98,8 @@ While brand reputation is a good starting point, every individual vehicle has it
 2. **Get a pre-purchase inspection** from an independent mechanic ($100–$300)
 3. **Run a vehicle history report** to check for accidents, title issues, and service records
 4. **Use [Car Lifespan Check](https://carlifespancheck.com)** to get an instant reliability score that factors in NHTSA data, known issues, and safety ratings
+
+---
 
 ## What Makes a Car Reliable?
 
@@ -104,6 +110,8 @@ Several factors contribute to long-term reliability:
 - **Build quality:** Tight tolerances and quality materials resist wear
 - **Manufacturer track record:** Brands that invest in long-term durability testing produce more reliable vehicles
 - **Maintenance accessibility:** Cars with lower maintenance costs get serviced more regularly
+
+---
 
 ## The Bottom Line
 
