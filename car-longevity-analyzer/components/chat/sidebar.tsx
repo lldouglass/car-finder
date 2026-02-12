@@ -7,7 +7,8 @@ import { HistoryItem } from './history-item';
 import { UserHeader } from '@/components/auth/user-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Search, X, Car } from 'lucide-react';
+import Link from 'next/link';
+import { PlusCircle, Search, X, Car, BookOpen, FileText } from 'lucide-react';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -146,6 +147,22 @@ export function Sidebar({ onClose, onUpgradeClick }: SidebarProps) {
 
       {/* Footer with User Info */}
       <div className="border-t border-zinc-800 p-3 space-y-3">
+        <div className="flex gap-2">
+          <Link
+            href="/blog"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+          >
+            <BookOpen className="size-3.5" />
+            Blog
+          </Link>
+          <Link
+            href="/guide"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+          >
+            <FileText className="size-3.5" />
+            Guide
+          </Link>
+        </div>
         <UserHeader onUpgradeClick={onUpgradeClick} />
         <p className="text-xs text-zinc-500 text-center">
           Data from NHTSA & AI analysis
