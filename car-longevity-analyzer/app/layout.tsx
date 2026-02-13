@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Don't Buy a Lemon - Used Car Analyzer",
   description: "Find out if a used car is overpriced, unreliable, or hiding problems. Get instant reliability scores, price analysis, and red flag detection.",
   other: {
-    "impact-site-verification": "c6a8ac03-2948-4789-82fa-786baf4d7add",
+    "impact-site-verification": "576c5c58-aa4c-4042-a769-6944b16c2e39",
   },
 };
 
