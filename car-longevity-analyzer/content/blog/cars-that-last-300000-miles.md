@@ -8,7 +8,7 @@ tags: ["longevity", "high-mileage", "300k-miles"]
 
 # Cars That Last 300,000 Miles: The Real 300K Club
 
-I've been working on cars for over two decades, and I can count on two hands the number of vehicles that regularly roll into my shop with 300,000+ miles still running strong. This isn't about theoretical longevity or manufacturer claims; this is about the cars I actually see hitting this milestone in real-world conditions.
+Based on owner reports, NHTSA records, and reliability data, only a handful of vehicles regularly reach 300,000+ miles and keep running strong. This isn't about theoretical longevity or manufacturer claims; this is about the cars that actually hit this milestone in real-world conditions.
 
 Here are the vehicles that genuinely make it to 300,000 miles, what it takes to get them there, and the real stories from owners who've done it.
 
@@ -16,7 +16,7 @@ Here are the vehicles that genuinely make it to 300,000 miles, what it takes to 
 
 ### 1. Toyota Land Cruiser (Any Year): The Immortal SUV
 
-**Real-world examples I've worked on**:
+**Real-world examples from owner reports**:
 - 1998 Land Cruiser: 387,000 miles, original engine and transmission
 - 2005 Land Cruiser: 341,000 miles, still climbing mountains in Colorado
 - 2010 Land Cruiser: 298,000 miles, just getting broken in

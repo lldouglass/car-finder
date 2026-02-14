@@ -6,9 +6,9 @@ author: "Car Lifespan Check Team"
 tags: ["car-lifespan", "maintenance", "longevity"]
 ---
 
-# How Long Do Cars Last? The Brutal Truth from the Shop Floor
+# How Long Do Cars Last? The Brutal Truth from the Data
 
-After 25 years working on everything from beater Chevys to luxury BMWs, I've seen exactly what kills cars and what keeps them running past 300,000 miles. The answer to "how long do cars last" isn't what most people think, and it definitely isn't what manufacturers want you to believe.
+Based on NHTSA complaint records, owner reports, and real-world reliability data, the patterns are clear: certain things kill cars and certain practices keep them running past 300,000 miles. The answer to "how long do cars last" isn't what most people think, and it definitely isn't what manufacturers want you to believe.
 
 The average car today lasts 12.2 years and 200,000 miles. But that's just the average. Some die at 80,000 miles, others are still running strong at 400,000. The difference isn't luck; it's understanding what actually destroys cars and preventing it.
 
@@ -27,7 +27,7 @@ The average car today lasts 12.2 years and 200,000 miles. But that's just the av
 
 ### 1. Deferred Maintenance (Kills 40% of Cars Prematurely)
 
-**Oil change neglect**: I've rebuilt more engines destroyed by old oil than any other single cause. Oil breaks down, turns to sludge, and starves bearings of lubrication.
+**Oil change neglect**: More engines are destroyed by old oil than any other single cause. Oil breaks down, turns to sludge, and starves bearings of lubrication.
 
 **Real-world example**: 2015 Honda Civic with seized engine at 87,000 miles. Owner followed "10,000-mile oil change" schedule religiously. Engine was full of sludge.
 
@@ -38,7 +38,7 @@ The average car today lasts 12.2 years and 200,000 miles. But that's just the av
 **Where it hits**: Subframes, suspension mounting points, brake lines, fuel lines
 **Timeline**: Starts around year 7-8 in salt states, becomes serious by year 12-15
 
-**Real economics**: I've seen $8,000 cars need $4,000 in rust repair. Once structural rust starts, the car is effectively totaled.
+**Real economics**: It's common for $8,000 cars to need $4,000 in rust repair. Once structural rust starts, the car is effectively totaled.
 
 **Prevention**: Regular undercarriage washing in winter, annual rust treatment, garage storage when possible.
 

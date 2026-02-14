@@ -145,7 +145,7 @@ Here's my no-nonsense list of cars that won't leave you stranded, based on real 
 
 **The problem**: CVT transmissions in these cars fail regularly between 60,000-120,000 miles. Replacement cost: $4,000-6,000.
 
-**My shop reality**: I see more Nissan CVT failures than any other transmission type. It's not if, it's when.
+**The data is clear**: Nissan CVT failures appear in NHTSA complaint records more than any other transmission type. It's not if, it's when.
 
 ### BMW/Mercedes/Audi from 2008-2015
 

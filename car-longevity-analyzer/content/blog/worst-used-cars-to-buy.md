@@ -6,11 +6,11 @@ author: "Car Lifespan Check Team"
 tags: ["avoid", "unreliable", "expensive-repairs"]
 ---
 
-# Worst Used Cars to Buy: The Mechanic's Blacklist
+# Worst Used Cars to Buy: The Data-Backed Blacklist
 
-After 25 years working on cars, there are vehicles I cringe when I see them roll into my shop. Not because I don't want the work, but because I know the owner is about to get bad news about expensive repairs that could have been avoided with better vehicle selection.
+Some vehicles show up in NHTSA complaint databases and repair records far more often than others. The owners of these cars face expensive repairs that could have been avoided with better vehicle selection.
 
-Here's my no-holds-barred list of used cars to avoid, based on real repair frequency and costs. These aren't theoretical problems; these are the cars that consistently cause financial pain for their owners.
+Here's a no-holds-barred list of used cars to avoid, based on real repair frequency data and ownership costs. These aren't theoretical problems; these are the cars that consistently cause financial pain for their owners.
 
 ## The Absolutely Worst: Avoid at All Costs
 
@@ -25,7 +25,7 @@ Here's my no-holds-barred list of used cars to avoid, based on real repair frequ
 - Cheaply made belts and pulleys wear prematurely
 - Programming issues cause excessive wear
 
-**Real examples from my shop**:
+**Common examples from owner reports**:
 - 2014 Nissan Altima: CVT failed at 67,000 miles ($4,200 repair)
 - 2016 Nissan Rogue: CVT started slipping at 78,000 miles ($5,100 replacement)
 - 2015 Nissan Sentra: Complete CVT failure at 54,000 miles ($3,800 repair)

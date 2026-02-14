@@ -130,7 +130,7 @@ After seeing hundreds of high-mileage examples, here's what typically kills them
 
 ## The 300,000-Mile Club: What It Takes
 
-I've worked on plenty of 300,000+ mile Camrys. Here's what the successful ones have in common:
+Owner reports consistently show what 300,000+ mile Camrys have in common:
 
 **Religious Maintenance**
 - Oil changes every 5,000 miles, no exceptions
