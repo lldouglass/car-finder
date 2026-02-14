@@ -1,0 +1,22 @@
+# Car Lifespan Check
+
+## About
+Car Lifespan Check is a free tool that analyzes how long specific cars last using real NHTSA complaint data, reliability records, and owner reports. It helps buyers make informed decisions about used car purchases by providing data-driven lifespan estimates.
+
+## What It Does
+- Estimates expected lifespan for specific make/model/year combinations
+- Uses NHTSA complaint data and recall history
+- Identifies common problems and failure points by model year
+- Provides maintenance cost estimates
+- Blog with detailed reliability guides for popular vehicles
+
+## URL
+https://www.carlifespancheck.com
+
+## Key Pages
+- Homepage (Analysis Tool): https://www.carlifespancheck.com
+- Blog: https://www.carlifespancheck.com/blog
+- Example Articles: https://www.carlifespancheck.com/blog/most-reliable-used-cars-2026, https://www.carlifespancheck.com/blog/how-long-does-toyota-camry-last
+
+## Category
+Automotive, Car Buying, Vehicle Reliability, Used Cars, Car Maintenance
