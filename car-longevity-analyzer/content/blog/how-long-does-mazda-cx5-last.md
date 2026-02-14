@@ -7,555 +7,123 @@ slug: "how-long-does-mazda-cx5-last"
 featured: false
 ---
 
-# How Long Does a Mazda CX-5 Last? Complete Reliability Guide
-
-The Mazda CX-5 has established itself as one of the most appealing compact SUVs on the market, combining engaging driving dynamics with practical utility and attractive styling. But how long can you expect a CX-5 to last? This comprehensive analysis examines the CX-5's longevity across generations, reliability patterns, and what it takes to maximize its lifespan.
+# How Long Does a Mazda CX-5 Last?
 
-## Overall Mazda CX-5 Lifespan
+A well-maintained Mazda CX-5 will typically last 200,000 to 250,000 miles. That puts it behind the Toyota RAV4 and Honda CR-V in raw longevity, but ahead of most other compact SUVs. The Skyactiv platform has been in production since 2012, and by now there's enough real-world data to know exactly what holds up and what doesn't.
 
-### Expected Longevity
+## Generation Breakdown
 
-**Typical Lifespan:** 180,000-250,000 miles
-**Time Frame:** 12-18 years with average driving
-**High-Mileage Examples:** 280,000+ miles documented
-**Reliability Rating:** 8.4/10
+### 2nd Generation (2017-2024): The One to Buy
 
-**Factors Affecting Lifespan:**
-- Regular maintenance adherence
-- Driving patterns (highway vs. city)
-- Climate and environmental conditions
-- Quality of service and parts used
-
-The CX-5's lifespan represents solid reliability in the competitive compact SUV segment. While not quite matching Toyota or Honda's longevity champions, proper maintenance can deliver many years of dependable service.
+**Engine:** Skyactiv-G 2.5L (187 hp), available 2.5L turbo (227 hp, 2019+)
+**Transmission:** Skyactiv-Drive 6-speed automatic
+**Expected lifespan:** 200,000-260,000 miles
 
-## Generation-by-Generation Analysis
-
-### 2nd Generation (2017-2026): Mature Platform
-
-**Expected Lifespan:** 200,000-280,000 miles
-**Reliability Rating:** 8.6/10
+The 2017 redesign addressed most of the first generation's weak points. Better sound insulation, improved interior materials, and a more refined 2.5L engine. The 6-speed automatic is a conventional torque converter unit (not a CVT), which is inherently more durable and easier to service.
 
-**Key Improvements:**
-- **Refined Skyactiv Engines:** Better efficiency and reliability
-- **Improved Build Quality:** Better materials and assembly
-- **Enhanced Sound Deadening:** Quieter, more refined ride
-- **Updated Infotainment:** More reliable electronics
-
-**Engine Options:**
-- **2.5L Skyactiv-G:** Naturally aspirated, proven reliability
-- **2.5L Turbo Skyactiv-G:** More power, early indicators positive
-
-**Reliability Strengths:**
-- Mature Skyactiv technology
-- Conservative engineering approach
-- Good build quality standards
-- Improved rust protection
-
-**Common Issues (Minor):**
-- Some infotainment system glitches (early models)
-- Occasional brake squealing (normal for design)
-- Paint chip susceptibility on front end
+**NHTSA complaint data tells the story:**
+- 2017: 579 complaints (typical for a first model year of a new generation)
+- 2018: 360 complaints
+- 2019: 291 complaints
+- 2020: 207 complaints
 
-### 1st Generation (2013-2016): Foundation Years
+That's a steady decline, showing Mazda resolved early issues quickly.
 
-**Expected Lifespan:** 180,000-220,000 miles
-**Reliability Rating:** 8.2/10
-
-**Pioneering Features:**
-- **First Skyactiv Platform:** New lightweight architecture
-- **Skyactiv-G Engine:** High compression naturally aspirated design
-- **Manual Transmission Available:** Ultimate reliability choice
-- **Simple, Proven Systems:** Conservative complexity approach
-
-**Known Issues:**
-- **Some Rust Concerns:** Wheel wells and door frames in salt belt
-- **Engine Noise:** Some owners report increased engine noise over time
-- **Infotainment Limitations:** Basic system functionality
-- **Paint Quality:** Some concerns with certain colors
+**The naturally aspirated 2.5L** is the reliability pick. It uses a 13:1 compression ratio, timing chain, and (starting in 2019 on the turbo, all models by later years) a combination of port and direct injection. The high compression design extracts efficiency without turbo complexity.
 
-**Reliability Notes:**
-- Manual transmission models exceptionally reliable
-- Automatic transmission generally dependable
-- Simple mechanical systems reduce failure points
-- Good parts availability and reasonable costs
+**The 2.5L turbo** (available from 2019) adds a turbocharger to the same base engine. Early data is positive, but turbochargers are inherently additional complexity with a finite lifespan. Expect turbo replacement around 150,000-200,000 miles ($1,200-$2,000). If maximum longevity is your priority, the naturally aspirated version is the safer bet.
 
-## Engine Reliability Analysis
-
-### 2.5L Skyactiv-G (All Years)
-
-**Reliability Rating:** 8.7/10
-**Expected Lifespan:** 200,000-300,000 miles
-
-**Engineering Advantages:**
-- **High Compression Design:** 13:1 compression ratio for efficiency
-- **Naturally Aspirated:** No turbocharger complexity
-- **Direct Injection:** Precise fuel delivery
-- **Timing Chain:** No belt replacement needed
+**Known problems in this generation:**
+- Infotainment screen delamination on 2017-2018 models (touch screen becomes unresponsive or develops dark spots). Mazda extended warranty coverage for this. Replacement cost otherwise: $800-$1,200
+- Windshield cracking from minor impacts. This is a common owner complaint across multiple model years; the glass seems unusually thin
+- Liftgate struts weaken around 60,000-80,000 miles ($150-$250 to replace both)
+- Some 2017-2018 owners report excessive brake dust and squealing. This is a pad compound issue, not a defect. Switching to ceramic pads ($80-$120) resolves it
 
-**Maintenance Requirements:**
-- Regular oil changes with full synthetic oil
-- Timing chain inspection at 150,000+ miles
-- Carbon cleaning service recommended 80,000-100,000 miles
-- Quality fuel to prevent carbon buildup
+### 1st Generation (2013-2016): Solid but Watch for Rust
 
-**Common Issues:**
-- **Carbon Buildup:** Direct injection engines susceptible
-- **Oil Consumption:** Some engines develop slight consumption after 100,000 miles
-- **Timing Chain Stretch:** Rare but possible after 200,000+ miles
+**Engine:** Skyactiv-G 2.0L (155 hp) or 2.5L (184 hp)
+**Transmission:** Skyactiv-Drive 6-speed automatic or 6-speed manual (rare)
+**Expected lifespan:** 180,000-220,000 miles
 
-**Prevention Strategies:**
-- Use top-tier gasoline with detergent additives
-- Regular highway driving to burn carbon deposits
-- Italian tune-up (occasional high-RPM operation)
-- Quality oil and filter changes
-
-### 2.5L Turbo Skyactiv-G (2019+)
-
-**Reliability Rating:** 8.3/10 (Limited Data)
-**Expected Lifespan:** TBD (too new for long-term assessment)
-
-**Early Indicators:**
-- Conservative turbocharger design
-- Good cooling system design
-- Mazda's reliable engineering approach
-- No major issues reported yet
+The first-gen CX-5 introduced the Skyactiv platform, and it was good from the start. The 2.5L engine is the one to target; the 2.0L is adequate but feels underpowered for an SUV, especially at highway speeds or with passengers.
 
-**Potential Concerns:**
-- Turbocharger longevity (typical wear item)
-- More complex cooling system
-- Premium fuel requirement
-- Higher heat generation
-
-**Maintenance Considerations:**
-- Premium fuel recommended for optimal performance
-- More frequent oil changes during severe use
-- Turbo cool-down procedures
-- Enhanced cooling system maintenance
-
-### 2.0L Skyactiv-G (Early Models)
-
-**Reliability Rating:** 8.5/10
-**Expected Lifespan:** 180,000-250,000 miles
-
-**Characteristics:**
-- Smaller displacement, lower stress
-- Simple, proven design
-- Good fuel economy
-- Adequate power for most uses
-
-**Longevity Notes:**
-- Generally very reliable
-- Lower power reduces component stress
-- Simple maintenance requirements
-- Good for urban and highway use
-
-## Transmission Reliability
+**The rust issue is documented.** NHTSA has complaints about premature corrosion on 2013-2016 CX-5s, particularly on the rear subframe, rear wheel arches, and lower door panels. This is most severe in salt-belt states. If you're buying a first-gen CX-5 in the Northeast or Midwest, put it on a lift and inspect the subframe carefully. Perforation rust in the subframe is a safety issue and a likely deal-breaker.
 
-### 6-Speed Manual Transmission
-
-**Reliability Rating:** 9.2/10
-**Expected Lifespan:** 200,000-400,000+ miles
-
-**Advantages:**
-- Simple, robust design
-- Owner-controlled wear patterns
-- Lower maintenance costs
-- Engaging driving experience
-
-**Maintenance:**
-- Fluid changes every 60,000-100,000 miles
-- Clutch replacement typically 100,000-150,000 miles
-- Simple, straightforward service
+**NHTSA data:**
+- 2013: 746 complaints (first model year, higher volume is normal)
+- 2014: 458 complaints
+- 2015: 373 complaints
+- 2016: 552 complaints (uptick due to LED headlight issues and some engine stalling reports)
 
-### 6-Speed Automatic Transmission
-
-**Reliability Rating:** 8.4/10
-**Expected Lifespan:** 150,000-250,000 miles
-
-**Characteristics:**
-- Generally reliable operation
-- Smooth shifting behavior
-- Good calibration with engines
-- Reasonable maintenance requirements
-
-**Maintenance Requirements:**
-- Fluid changes every 60,000 miles
-- Filter replacement as needed
-- Regular inspection of cooling lines
-- Quality fluid specification important
+**Known problems:**
+- Engine stalling at low speeds on some 2014-2016 models. Mazda issued TSB 01-036/16 addressing fuel system software updates
+- LED headlight condensation on 2016 models ($0 if under warranty, $400-$700 otherwise)
+- Rear differential mount bushing wear around 80,000-100,000 miles on AWD models ($200-$400)
 
-**Common Issues:**
-- Some shift programming updates available
-- Occasional harsh downshift when cold
-- Filter clogging in high-mileage examples
-
-## All-Wheel Drive System Longevity
+## Engine Deep Dive: Skyactiv-G 2.5L
 
-### i-Activ AWD System
-
-**Reliability Rating:** 8.6/10
-**Expected Lifespan:** 200,000+ miles
-
-**System Advantages:**
-- Predictive AWD engagement
-- Simple mechanical design
-- Good fuel economy retention
-- Reliable operation in various conditions
-
-**Maintenance Requirements:**
-- Rear differential service every 60,000 miles
-- Transfer case inspection and service
-- CV joint replacement (normal wear)
-- Tire rotation critical for system health
-
-**System Strengths:**
-- Proactive engagement prevents slip
-- Lower stress than reactive systems
-- Good durability track record
-- Simple diagnostic and repair procedures
-
-## Common Problems by Mileage Range
-
-### 0-60,000 Miles: Early Ownership
-
-**Typical Issues:**
-- Minimal problems in this range
-- Some paint chip concerns
-- Occasional software updates needed
-- Normal break-in period adjustments
-
-**Maintenance Focus:**
-- Follow factory service schedule exactly
-- Address any warranty items promptly
-- Establish good service relationships
-- Monitor for any developing patterns
-
-**Annual Costs:** $400-600
-
-### 60,000-120,000 Miles: Middle Years
-
-**Common Maintenance Items:**
-- Brake system service (pads, rotors)
-- Suspension component inspection
-- Timing chain inspection (if applicable)
-- Carbon cleaning service consideration
-
-**Watch For:**
-- Engine oil consumption development
-- Brake squealing (normal for Mazda design)
-- HVAC system service needs
-- Infotainment system aging
-
-**Annual Costs:** $600-1,000
-
-### 120,000-200,000 Miles: Maturity Phase
-
-**Expected Services:**
-- Major brake system refresh
-- Suspension component replacement
-- Engine mount replacement consideration
-- Transmission service intervals
-
-**Assessment Points:**
-- Evaluate major system condition
-- Consider timing chain service
-- Monitor for rust development
-- Plan for higher maintenance frequency
-
-**Annual Costs:** $800-1,500
-
-### 200,000+ Miles: Veteran Territory
-
-**Major Considerations:**
-- Engine rebuild vs. replacement evaluation
-- Transmission overhaul consideration
-- Rust treatment and prevention
-- Complete system assessment
-
-**Economic Evaluation:**
-- Compare repair costs to replacement
-- Consider remaining useful life
-- Factor in sentimental value
-- Evaluate total cost of ownership
-
-**Annual Costs:** $1,500-3,000+
-
-## Build Quality and Corrosion Resistance
-
-### Construction Quality
-
-**Strengths:**
-- Solid panel fit and finish
-- Quality interior materials
-- Good paint application (most colors)
-- Reliable assembly standards
-
-**Areas for Improvement:**
-- Some wind noise at highway speeds
-- Road noise transmission
-- Paint chip susceptibility
-- Interior wear patterns
-
-### Corrosion Resistance
-
-**Rust-Prone Areas:**
-- Rear wheel wells (salt belt states)
-- Door frame seals
-- Exhaust system mounting points
-- Suspension component attachment points
-
-**Protection Measures:**
-- Regular undercarriage washing
-- Annual rust prevention treatment
-- Prompt repair of paint chips
-- Garage storage when possible
-
-### Climate Considerations
-
-**Cold Climate Performance:**
-- Good cold-weather starting
-- Effective heating system
-- AWD provides excellent traction
-- Some salt corrosion susceptibility
-
-**Hot Climate Performance:**
-- Adequate cooling system capacity
-- Effective A/C system
-- Heat-resistant interior materials
-- Good hot-weather reliability
-
-## Maintenance Schedule and Costs
-
-### Critical Maintenance Items
-
-**Oil Changes:**
-- Every 7,500 miles or 12 months (normal conditions)
-- Every 5,000 miles for severe conditions
-- Full synthetic oil recommended
-- Quality filter replacement essential
-
-**Transmission Service:**
-- Manual: Every 60,000-100,000 miles
-- Automatic: Every 60,000 miles
-- AWD rear differential: Every 60,000 miles
-
-**Engine Specific:**
-- Carbon cleaning: Every 80,000-100,000 miles
-- Timing chain inspection: 150,000+ miles
-- Spark plugs: Every 75,000 miles
-- Air filter: Every 30,000 miles
-
-### Annual Maintenance Budgets
-
-**Years 1-5:** $400-700
-- Routine maintenance primarily
-- Warranty coverage for defects
-- Minimal unexpected repairs
-
-**Years 6-10:** $700-1,200
-- More frequent service intervals
-- Some component replacements
-- Brake system service
-
-**Years 11+:** $1,000-2,000
-- Major system maintenance
-- Component replacement frequency increases
-- Rust prevention and treatment
-
-## Reliability Comparison to Competitors
-
-### Mazda CX-5 vs Honda CR-V
-
-**CX-5 Advantages:**
-- Better driving dynamics
-- More engaging experience
-- Good build quality
-- Competitive reliability
-
-**CR-V Advantages:**
-- Better long-term reliability record
-- Lower maintenance costs
-- Better resale value
-- Simpler systems
-
-### Mazda CX-5 vs Toyota RAV4
-
-**CX-5 Advantages:**
-- More refined ride quality
-- Better interior materials
-- Engaging driving experience
-
-**RAV4 Advantages:**
-- Superior long-term reliability
-- Better resale value retention
-- Lower total ownership costs
-- Proven durability
-
-### Mazda CX-5 vs Subaru Forester
-
-**CX-5 Advantages:**
-- Lower maintenance requirements
-- Better fuel economy
-- More refined on-road manners
-
-**Forester Advantages:**
-- Standard AWD capability
-- Better cargo space
-- Higher ground clearance
-- All-weather confidence
-
-## Regional and Market Considerations
-
-### Climate Impact on Longevity
-
-**Best Climates:**
-- Moderate temperatures with low humidity
-- Limited salt exposure
-- Garage storage availability
-- Regular driving patterns
-
-**Challenging Climates:**
-- High salt/corrosion exposure
-- Extreme temperature variations
-- High humidity environments
-- Limited maintenance access
-
-### Service Network Quality
-
-**Mazda Service Network:**
-- Generally good dealer coverage
-- Improving service quality
-- Competitive maintenance pricing
-- Good parts availability
-
-**Independent Service Options:**
-- Growing independent mechanic familiarity
-- Reasonable parts costs
-- Good aftermarket support
-- Online community resources
-
-## Cost of Ownership Analysis
-
-### 10-Year Ownership Example
-
-**2018 Mazda CX-5 (Example):**
-- Purchase price: $20,000
-- Routine maintenance: $7,000
-- Major repairs: $3,500
-- Total: $30,500
-- Cost per mile (150,000 miles): $0.20
-
-### Value Retention
-
-**Depreciation Patterns:**
-- Good initial value retention
-- Competitive resale values
-- Strong used car demand
-- Attractive styling ages well
-
-**Factors Affecting Value:**
-- Maintenance history documentation
-- Rust prevention and treatment
-- Mileage and condition
-- Market demand for features
-
-## Buying Guide for Used CX-5s
-
-### Best Model Years for Reliability
-
-**Top Choices:**
-- **2019-2021:** Mature second-generation platform
-- **2017-2018:** Early second-generation improvements
-- **2016:** Final first-generation refinement
-
-**Years to Consider Carefully:**
-- **2013-2014:** Early production potential issues
-- **2015:** Transition year considerations
-
-### Pre-Purchase Inspection Focus
-
-**Critical Areas:**
-- Engine oil consumption patterns
-- Transmission operation smoothness
-- AWD system engagement
-- Rust inspection (wheel wells, doors)
-- Service history documentation
-
-**Warning Signs:**
-- Evidence of poor maintenance
-- Rust development in critical areas
-- Unusual engine noises or oil consumption
-- Transmission shifting problems
-- Accident damage affecting structure
-
-### Mileage Considerations
-
-**Sweet Spot:** 30,000-80,000 miles
-- Past initial depreciation
-- Modern features and reliability
-- Reasonable remaining useful life
-- Good warranty coverage potential
-
-## Future Outlook and Recommendations
-
-### CX-5 Evolution
-
-**Recent Improvements:**
-- Enhanced sound deadening
-- Better infotainment systems
-- Improved build quality
-- Refined engine calibrations
-
-**Future Considerations:**
-- Electrification planning
-- Continued refinement focus
-- Maintaining driving dynamics priority
-- Competitive positioning
-
-### Buying Recommendations
-
-**Best For:**
-- Buyers wanting engaging driving dynamics
-- Those prioritizing style and refinement
-- Drivers seeking good fuel economy
-- People wanting AWD capability
-
-**Consider Alternatives If:**
-- Maximum reliability is priority
-- Lowest maintenance costs essential
-- Maximum cargo space needed
-- Off-road capability required
-
-## Conclusion: CX-5 Longevity Assessment
-
-The Mazda CX-5 offers solid reliability and longevity potential in the competitive compact SUV segment. With proper maintenance, most CX-5s can provide 180,000-250,000 miles of dependable service, representing good value for buyers prioritizing driving dynamics alongside reliability.
-
-**Key Takeaways:**
-
-1. **Good overall reliability** with proper maintenance
-2. **Skyactiv engines** are generally durable and efficient
-3. **Regular maintenance** critical for longevity
-4. **Rust prevention** important in harsh climates
-5. **Driving dynamics** come with acceptable reliability trade-offs
-
-**Smart Ownership Strategy:**
-
-**Maximize Longevity:**
-- Follow maintenance schedules religiously
-- Address issues promptly
-- Prevent rust development
-- Use quality parts and fluids
-- Monitor for developing patterns
-
-**Best Value Approach:**
-- Choose 2017+ models for refinement
-- Prioritize maintenance history over low mileage
-- Budget for regular service intervals
-- Consider certified pre-owned options
-- Plan for normal wear item replacement
-
-**Bottom Line:**
-
-The Mazda CX-5 represents a solid choice for buyers seeking an engaging, well-built compact SUV with reasonable longevity expectations. While not quite matching the ultimate reliability of Honda or Toyota alternatives, its combination of driving dynamics, build quality, and dependability makes it an appealing option for many buyers.
-
-Success with CX-5 ownership depends on matching expectations to the vehicle's capabilities, maintaining it properly, and appreciating its balance of reliability and driving enjoyment. With proper care, your CX-5 can provide many years of satisfying, dependable transportation while delivering the engaging driving experience that sets Mazda apart in the competitive SUV market.
+The Skyactiv-G 2.5L (PE-VPS) is the heart of the CX-5 across both generations. Here's what actually breaks and when:
+
+**Carbon buildup (direct injection models):** The 2013-2018 models use direct injection only, which means fuel doesn't wash over the intake valves. Carbon deposits build up on the valves over time, causing rough idle and reduced power. Walnut blasting to clean the valves costs $300-$500 and is recommended around 80,000-100,000 miles. The 2019+ turbo and later NA models add port injection, which largely solves this problem.
+
+**Oil consumption:** Some CX-5 owners report the 2.5L consuming a quart of oil every 3,000-5,000 miles after 100,000 miles. This is on the high side of normal for a direct injection engine but isn't necessarily a sign of failure. Monitor levels between changes.
+
+**Timing chain:** The chain itself is durable and typically lasts the life of the engine. Timing chain tensioner wear is possible after 200,000 miles but is uncommon. No timing belt replacements to worry about.
+
+**Spark plugs:** Iridium plugs last about 75,000 miles ($120-$180 for a set of four, installed).
+
+## Transmission: The 6-Speed Automatic
+
+The Skyactiv-Drive 6-speed automatic is one of the CX-5's strongest reliability points. It's a conventional torque converter automatic, not a CVT, and it uses a torque converter lock-up strategy that improves fuel economy without the durability concerns of a belt-driven CVT.
+
+**Maintenance:** Change the fluid every 60,000 miles. Use Mazda's FZ fluid specification. Cost: $150-$250 at an independent shop. Ignore any claims about "lifetime" fluid.
+
+**Failure rate:** Very low. NHTSA has minimal transmission-specific complaints for the CX-5 compared to CVT-equipped competitors. When these do fail (typically north of 200,000 miles), rebuild costs run $2,500-$3,500.
+
+## AWD System: i-Activ
+
+Mazda's i-Activ AWD uses a predictive system that monitors 27 different sensors to engage the rear wheels before slip occurs. It's a simple and lightweight system compared to Subaru's symmetrical AWD.
+
+**Maintenance:** Rear differential fluid change every 30,000-60,000 miles ($80-$120). Often skipped by owners, which leads to premature wear.
+
+**Durability:** The system is reliable with proper fluid changes. The most common AWD-specific repair is rear differential seal leaks around 100,000-150,000 miles ($200-$400).
+
+## Maintenance Costs by Mileage
+
+**0-60,000 miles:** $400-$600/year. Routine oil changes (every 7,500 miles with full synthetic), cabin/engine air filters, tire rotations, and brake inspections. Nothing exciting.
+
+**60,000-120,000 miles:** $600-$1,000/year. Add transmission fluid change, brake pad/rotor replacement ($350-$600 for all four corners), spark plugs, and potentially walnut blasting for carbon buildup.
+
+**120,000-200,000 miles:** $900-$1,500/year. Strut replacement ($600-$1,000 for all four), engine mounts ($300-$500), water pump ($250-$450), and various rubber components (CV boots, bushings).
+
+**200,000+ miles:** $1,500-$2,500/year. Major items start appearing: potential timing chain service, suspension overhaul, and brake line replacement in rust-belt cars.
+
+## CX-5 vs. the Competition
+
+### vs. Toyota RAV4
+
+The RAV4 wins on raw longevity (250,000-300,000 miles) and resale value. The CX-5 wins on driving dynamics, interior quality, and engagement. If you plan to keep the car until the wheels fall off, the RAV4 is the better bet. If you want something nicer to drive for 200,000 miles, the CX-5 is the pick.
+
+### vs. Honda CR-V
+
+Similar longevity potential. The 2017-2018 CR-V had the 1.5T oil dilution issue (TSB 18-075) that the CX-5 avoids entirely by not using a turbo on the base engine. The CR-V has more cargo space; the CX-5 has a better driving experience.
+
+### vs. Subaru Forester
+
+The Forester offers standard AWD and more ground clearance. The CX-5's i-Activ AWD is simpler and cheaper to maintain. Both have similar expected lifespans, but the CX-5 has lower annual maintenance costs ($400-$600 vs. $500-$800 for the Subaru).
+
+## Best Model Years to Buy
+
+**Best value:** 2019-2021 (mature second-gen, turbo option available, dual injection on turbo models, post-infotainment fix)
+
+**Best budget option:** 2015-2016 first-gen with 2.5L engine (if rust-free)
+
+**Avoid:** 2013 (first model year quirks) and any first-gen in heavy salt exposure areas without thorough underbody inspection
+
+## The Bottom Line
+
+The Mazda CX-5 is a solid 200,000-250,000 mile vehicle with straightforward maintenance needs. It won't quite match a RAV4 or CR-V in maximum lifespan, but it's a better driving experience, and the gap is smaller than most people think.
+
+The key factors for CX-5 longevity: regular oil changes with full synthetic, transmission fluid changes every 60,000 miles, addressing carbon buildup on pre-2019 models, and (in the rust belt) proactive corrosion prevention.
+
+Look up any specific CX-5 year at [Car Lifespan Check](https://carlifespancheck.com) to see its NHTSA complaint history, common problems, and reliability score before you buy.
