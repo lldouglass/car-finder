@@ -102,6 +102,21 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Top CTA Banner */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-white font-semibold text-sm sm:text-base text-center sm:text-left">
+              🚗 Check Your Car&apos;s Lifespan Free
+            </p>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center rounded-lg bg-white text-blue-700 px-5 py-2 text-sm font-semibold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap"
+            >
+              Try the Analysis Tool →
+            </Link>
+          </div>
+        </div>
+
         <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
           <header className="mb-10">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -154,17 +169,17 @@ export default async function BlogPostPage({ params }: Props) {
               <span className="text-2xl">🔍</span>
             </div>
             <h2 className="text-2xl font-bold">
-              Check Any Vehicle&apos;s Reliability Score
+              Want to Know How Long Your Car Will Last?
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
-              Get instant reliability scores, safety ratings, recall data, and
-              longevity predictions — completely free.
+              Try our free analysis tool. Get instant reliability scores, safety ratings,
+              recall data, and longevity predictions for any vehicle.
             </p>
             <Link
               href="/"
               className="inline-flex items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-8 py-3.5 text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
             >
-              Analyze a Vehicle Now →
+              Try the Free Analysis Tool →
             </Link>
           </div>
 
