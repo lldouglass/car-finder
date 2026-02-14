@@ -183,7 +183,7 @@ Here are the vehicles that genuinely make it to 300,000 miles, what it takes to 
 
 ### The Non-Negotiable Maintenance Items
 
-**Oil changes**: Every 5,000 miles, no exceptions. I've seen more engines destroyed by extended oil change intervals than any other cause.
+**Oil changes**: Every 5,000 miles, no exceptions. More engines are destroyed by extended oil change intervals than any other cause.
 
 **Timing belt replacement**: Follow the schedule exactly. A $800 timing belt service prevents $4,000-8,000 in engine damage.
 

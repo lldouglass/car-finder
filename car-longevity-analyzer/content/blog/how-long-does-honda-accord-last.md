@@ -21,7 +21,7 @@ The Honda Accord typically lasts 200,000-250,000 miles with proper maintenance, 
 **Reliability rating**: Excellent
 **Best years**: 2010-2012 (early production issues resolved)
 
-This is the generation I recommend most often. The platform matured beautifully, and Honda had worked out the few early issues by 2010.
+This is the most recommended generation. The platform matured beautifully, and Honda had worked out the few early issues by 2010.
 
 **Engine options that last**:
 - **K24A8 2.4L four-cylinder**: Bulletproof design, timing chain (no belt), excellent longevity
@@ -59,7 +59,7 @@ This is the generation I recommend most often. The platform matured beautifully,
 
 **What I tell customers**: If you're in a cold climate, get the 2.0L engine. If you're in a warm climate and drive longer distances, the 1.5T is probably fine, especially 2020+ models.
 
-**CVT transmission reality**: Honda's CVT is much better than Nissan's. I see very few Honda CVT failures compared to other brands.
+**CVT transmission reality**: Honda's CVT is much better than Nissan's. NHTSA complaint data shows far fewer Honda CVT failures compared to other brands.
 
 ### Ninth Generation (2013-2017): The Transition Years
 

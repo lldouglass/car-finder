@@ -128,11 +128,11 @@ Here are the 10 used cars with the strongest reliability track records, ranked b
 
 ## The Brands and Years to Absolutely Avoid
 
-**Nissan 2013-2022**: The CVT transmissions in Altima, Sentra, Rogue, and Pathfinder are notorious for early failure. I've seen them die as early as 60,000 miles.
+**Nissan 2013-2022**: The CVT transmissions in Altima, Sentra, Rogue, and Pathfinder are notorious for early failure. Owner reports show them dying as early as 60,000 miles.
 
 **BMW N63 engine (2008-2016)**: Twin-turbo V8 in X5, X6, 5-series, 7-series. Catastrophically expensive oil consumption and timing chain issues.
 
-**Land Rover anything**: Beautiful trucks, but I see more Land Rovers on my lift than any other luxury brand. Parts are expensive, labor is expensive, failures are common.
+**Land Rover anything**: Beautiful trucks, but Land Rovers have some of the highest repair frequencies of any luxury brand. Parts are expensive, labor is expensive, failures are common.
 
 **Chrysler 200 2015-2017**: The nine-speed automatic transmission is a disaster. Jerky shifting, early failures, expensive repairs.
 
