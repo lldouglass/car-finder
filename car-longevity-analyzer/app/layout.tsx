@@ -18,8 +18,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Don't Buy a Lemon - Used Car Analyzer",
-  description: "Find out if a used car is overpriced, unreliable, or hiding problems. Get instant reliability scores, price analysis, and red flag detection.",
+  title: "How Long Will My Car Last? | Free Car Lifespan & Reliability Check",
+  description: "Check any car's expected lifespan, reliability score, and known problems. Free instant analysis using NHTSA data for 200+ models. Find out if your car is a keeper or a money pit.",
+  keywords: "car lifespan, how long will my car last, car reliability check, vehicle lifespan calculator, car life expectancy, used car analyzer, car reliability scores",
+  openGraph: {
+    title: "How Long Will My Car Last? | Free Car Lifespan Check",
+    description: "Check any car's expected lifespan, reliability score, and known problems. Free instant analysis for 200+ models.",
+    url: "https://www.carlifespancheck.com",
+    siteName: "Car Lifespan Check",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How Long Will My Car Last? | Free Car Lifespan Check",
+    description: "Check any car's expected lifespan, reliability score, and known problems. Free instant analysis for 200+ models.",
+  },
   other: {
     "impact-site-verification": "576c5c58-aa4c-4042-a769-6944b16c2e39",
   },
