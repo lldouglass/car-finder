@@ -123,7 +123,7 @@ export function DemoResult({ onTryYourVehicle }: DemoResultProps) {
           
           {/* Soft pricing mention */}
           <p className="text-xs text-muted-foreground mt-3 text-center">
-            Want the full picture? VIN analysis includes pricing, negotiation tips, and maintenance projections. Just $5.99 for 30 days.
+            Want the full picture? VIN analysis includes pricing, negotiation tips, and maintenance projections. Just $19/month.
           </p>
         </CardContent>
       </Card>

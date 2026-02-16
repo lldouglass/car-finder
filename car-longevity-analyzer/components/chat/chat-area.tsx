@@ -174,7 +174,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     <div className="flex items-center gap-2 mb-4">
                       <Crown className="size-5 text-amber-600" />
                       <h3 className="text-lg font-semibold">Premium</h3>
-                      <span className="ml-auto text-xl font-bold text-amber-600">$5.99</span>
+                      <span className="ml-auto text-xl font-bold text-amber-600">$19/mo</span>
                       <span className="text-sm text-muted-foreground">/30 days</span>
                     </div>
                     <ul className="space-y-2 text-sm text-muted-foreground">
