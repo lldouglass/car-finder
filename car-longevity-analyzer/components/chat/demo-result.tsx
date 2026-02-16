@@ -120,6 +120,11 @@ export function DemoResult({ onTryYourVehicle }: DemoResultProps) {
             Try Your Vehicle
             <ArrowRight className="size-4 ml-2" />
           </Button>
+          
+          {/* Soft pricing mention */}
+          <p className="text-xs text-muted-foreground mt-3 text-center">
+            Want the full picture? VIN analysis includes pricing, negotiation tips, and maintenance projections. Just $5.99 for 30 days.
+          </p>
         </CardContent>
       </Card>
     </div>

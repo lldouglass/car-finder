@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Crown, Zap, Shield, Clock } from 'lucide-react';
+import { X, Check, Crown, Zap, Shield, Clock, DollarSign, Target, FileText, BarChart3, TrendingUp } from 'lucide-react';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -16,9 +16,12 @@ interface UpgradeModalProps {
 const PRICE = process.env.NEXT_PUBLIC_PREMIUM_PRICE || '$5.99';
 
 const features = [
-  { icon: Zap, text: 'Unlimited vehicle analyses' },
-  { icon: Shield, text: 'Full safety reports & recalls' },
-  { icon: Clock, text: 'Priority processing' },
+  { icon: Zap, text: 'Unlimited VIN analyses' },
+  { icon: DollarSign, text: 'Fair market price estimates' },
+  { icon: Target, text: 'Negotiation talking points' },
+  { icon: Clock, text: '10-year maintenance cost projections' },
+  { icon: FileText, text: 'Pre-purchase inspection checklist' },
+  { icon: BarChart3, text: 'Survival probability curves' },
 ];
 
 export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) {
