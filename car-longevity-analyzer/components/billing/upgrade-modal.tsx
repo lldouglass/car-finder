@@ -13,7 +13,7 @@ interface UpgradeModalProps {
   };
 }
 
-const PRICE = process.env.NEXT_PUBLIC_PREMIUM_PRICE || '$5.99';
+const PRICE = process.env.NEXT_PUBLIC_PREMIUM_PRICE || '$19';
 
 const features = [
   { icon: Zap, text: 'Unlimited VIN analyses' },
