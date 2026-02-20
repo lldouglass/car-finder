@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /api/
+
+Sitemap: https://www.carlifespancheck.com/sitemap.xml
