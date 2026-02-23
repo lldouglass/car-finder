@@ -50,7 +50,7 @@ export function SignUpGate({ children, previewHeight = 400 }: SignUpGateProps) {
             </Button>
           </SignUpButton>
           <p className="text-xs text-muted-foreground">
-            No credit card required. 2 free analyses per month.
+            No credit card required. 3 free VIN reports per month.
           </p>
         </div>
       </div>

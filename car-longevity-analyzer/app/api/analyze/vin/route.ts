@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         const { userId } = await auth();
 
         if (userId) {
-            // Authenticated: check usage quota (2 free/month)
+            // Authenticated: check usage quota (3 free/month)
             const usage = await checkAndIncrementUsage(userId);
             if (!usage.allowed) {
                 return NextResponse.json({
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
             );
             if (!rateLimit.allowed) {
                 return NextResponse.json(
-                    { success: false, error: 'Daily analysis limit reached. Create a free account for 10 analyses per month.', signup: true },
+                    { success: false, error: 'Daily analysis limit reached. Create a free account for 3 VIN reports per month.', signup: true },
                     { status: 429 }
                 );
             }

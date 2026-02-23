@@ -78,7 +78,7 @@ export const RATE_LIMIT_DEFAULTS = {
 } as const;
 
 // Abuse prevention for unauthenticated VIN/listing analysis
-// Tight limit to incentivize sign-up (free account gets 10/month)
+// Tight limit to incentivize sign-up (free account gets 3/month)
 export const UNAUTH_ANALYSIS_RATE_LIMIT = {
     maxRequests: 3,
     windowMs: 24 * 60 * 60 * 1000, // 24 hours (3/day)
