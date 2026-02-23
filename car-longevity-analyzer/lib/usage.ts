@@ -3,7 +3,7 @@ import { clerkClient } from '@clerk/nextjs/server';
 import { Prisma } from '@prisma/client';
 
 // Validate FREE_LIMIT on module load to fail fast if misconfigured
-const FREE_LIMIT_RAW = parseInt(process.env.FREE_ANALYSES_PER_MONTH || '2');
+const FREE_LIMIT_RAW = parseInt(process.env.FREE_ANALYSES_PER_MONTH || '10');
 if (isNaN(FREE_LIMIT_RAW) || FREE_LIMIT_RAW < 1) {
   throw new Error(`Invalid FREE_ANALYSES_PER_MONTH: ${process.env.FREE_ANALYSES_PER_MONTH}`);
 }

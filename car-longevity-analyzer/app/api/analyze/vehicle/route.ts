@@ -34,7 +34,7 @@ export async function POST(request: Request) {
             );
             if (!rateLimit.allowed) {
                 return NextResponse.json(
-                    { success: false, error: 'Daily search limit reached. Sign up for unlimited free searches.' },
+                    { success: false, error: 'Daily search limit reached. Create a free account for unlimited searches.', signup: true },
                     { status: 429 }
                 );
             }

@@ -77,16 +77,18 @@ export const RATE_LIMIT_DEFAULTS = {
     windowMs: 60000, // 1 minute
 } as const;
 
-// Abuse prevention for unauthenticated analysis (invisible to normal users)
+// Abuse prevention for unauthenticated VIN/listing analysis
+// Tight limit to incentivize sign-up (free account gets 10/month)
 export const UNAUTH_ANALYSIS_RATE_LIMIT = {
-    maxRequests: 10,
-    windowMs: 60 * 60 * 1000, // 1 hour
+    maxRequests: 3,
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours (3/day)
 } as const;
 
-// Rate limit for unauthenticated Make/Model/Year searches (free tier, more generous)
+// Rate limit for unauthenticated Make/Model/Year searches
+// Tight limit to incentivize sign-up (free account gets unlimited)
 export const UNAUTH_VEHICLE_SEARCH_RATE_LIMIT = {
-    maxRequests: 5,
-    windowMs: 24 * 60 * 60 * 1000, // 24 hours
+    maxRequests: 3,
+    windowMs: 24 * 60 * 60 * 1000, // 24 hours (3/day)
 } as const;
 
 // Lifespan adjustment limits (multiplier bounds)

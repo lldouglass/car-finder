@@ -67,7 +67,7 @@ export async function POST(request: Request) {
                 }, { status: 403 });
             }
         } else {
-            // Unauthenticated: soft IP-based abuse prevention (10/hour)
+            // Unauthenticated: tight limit to incentivize sign-up (3/day)
             const ip = getClientIdentifier(request);
             const rateLimit = checkRateLimit(
                 `unauth:analysis:${ip}`,
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
             );
             if (!rateLimit.allowed) {
                 return NextResponse.json(
-                    { success: false, error: 'Too many requests. Please wait a moment and try again.' },
+                    { success: false, error: 'Daily analysis limit reached. Create a free account for 10 analyses per month.', signup: true },
                     { status: 429 }
                 );
             }
