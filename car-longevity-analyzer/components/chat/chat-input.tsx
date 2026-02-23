@@ -170,22 +170,26 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
               )}
             </Button>
 
-            {/* VIN detected badge */}
-            {isVin && (
-              <Badge
-                className="absolute left-2 top-2 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-              >
+          </div>
+
+          {/* VIN detected banner */}
+          {isVin && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-green-50 border border-green-200 dark:bg-green-950 dark:border-green-800">
+              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 shrink-0">
                 VIN detected
               </Badge>
-            )}
-          </div>
+              <span className="text-sm text-green-800 dark:text-green-200">
+                Add mileage and price below for a full analysis.
+              </span>
+            </div>
+          )}
 
           {/* Additional fields */}
           <div className="flex flex-wrap gap-3">
             <div className="flex-1 min-w-[120px]">
               <Input
                 type="number"
-                placeholder={isVin ? 'Mileage *' : 'Mileage (optional)'}
+                placeholder={isVin ? 'Mileage *' : 'Mileage'}
                 value={mileage}
                 onChange={(e) => setMileage(e.target.value)}
                 disabled={isLoading}
@@ -197,7 +201,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
             <div className="flex-1 min-w-[120px]">
               <Input
                 type="number"
-                placeholder={isVin ? 'Price ($) *' : 'Price (optional)'}
+                placeholder={isVin ? 'Price ($) *' : 'Price ($)'}
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 disabled={isLoading}
@@ -226,13 +230,13 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
           </div>
 
           {/* Help text */}
-          <p className="text-xs text-muted-foreground">
-            {isVin
-              ? 'Mileage and price are required for VIN analysis.'
-              : activeTab === 'vin'
+          {!isVin && (
+            <p className="text-xs text-muted-foreground">
+              {activeTab === 'vin'
                 ? 'Enter a 17-character VIN for a detailed vehicle report.'
                 : 'Paste a full vehicle listing for AI-powered analysis.'}
-          </p>
+            </p>
+          )}
         </form>
       )}
     </div>

@@ -22,38 +22,22 @@ function formatPercent(probability: number): string {
     return `${Math.round(probability * 100)}%`;
 }
 
-// Risk level colors and styling
-const RISK_CONFIG: Record<SurvivalRiskLevel, {
-    bgClass: string;
-    textClass: string;
-    barClass: string;
-    label: string;
-}> = {
-    safe: {
-        bgClass: 'bg-green-100 dark:bg-green-900/30',
-        textClass: 'text-green-700 dark:text-green-300',
-        barClass: 'bg-green-500',
-        label: 'Safe',
-    },
-    moderate: {
-        bgClass: 'bg-yellow-100 dark:bg-yellow-900/30',
-        textClass: 'text-yellow-700 dark:text-yellow-300',
-        barClass: 'bg-yellow-500',
-        label: 'Moderate',
-    },
-    risky: {
-        bgClass: 'bg-orange-100 dark:bg-orange-900/30',
-        textClass: 'text-orange-700 dark:text-orange-300',
-        barClass: 'bg-orange-500',
-        label: 'Risky',
-    },
-    unlikely: {
-        bgClass: 'bg-red-100 dark:bg-red-900/30',
-        textClass: 'text-red-700 dark:text-red-300',
-        barClass: 'bg-red-500',
-        label: 'Unlikely',
-    },
-};
+// Bar color based on probability
+function getBarClass(probability: number): string {
+    const pct = probability * 100;
+    if (pct >= 80) return 'bg-green-500';
+    if (pct >= 50) return 'bg-yellow-500';
+    if (pct >= 20) return 'bg-orange-500';
+    return 'bg-red-500';
+}
+
+function getTextClass(probability: number): string {
+    const pct = probability * 100;
+    if (pct >= 80) return 'text-green-600 dark:text-green-400';
+    if (pct >= 50) return 'text-yellow-600 dark:text-yellow-400';
+    if (pct >= 20) return 'text-orange-600 dark:text-orange-400';
+    return 'text-red-600 dark:text-red-400';
+}
 
 function ConfidenceBadge({ confidence }: { confidence: SurvivalAnalysis['modelConfidence'] }) {
     const config = {
@@ -85,32 +69,31 @@ function ConfidenceBadge({ confidence }: { confidence: SurvivalAnalysis['modelCo
 }
 
 function MilestoneRow({ milestone }: { milestone: SurvivalMilestone }) {
-    const config = RISK_CONFIG[milestone.riskLevel];
     const probabilityPercent = milestone.probability * 100;
+    const barClass = getBarClass(milestone.probability);
+    const textClass = getTextClass(milestone.probability);
 
     return (
         <div
-            className={`flex items-center justify-between py-2.5 px-3 rounded-lg ${config.bgClass}`}
+            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-muted/30"
             role="row"
-            aria-label={`${formatMiles(milestone.additionalMiles)} more miles: ${formatPercent(milestone.probability)} probability`}
+            aria-label={`${formatMiles(milestone.totalMiles)} total miles: ${formatPercent(milestone.probability)} probability`}
         >
             <div className="flex items-center gap-3">
                 <span className="text-sm font-medium w-16">
-                    +{formatMiles(milestone.additionalMiles)}
+                    {formatMiles(milestone.totalMiles)}
                 </span>
                 {/* Probability bar */}
                 <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                     <div
-                        className={`h-full rounded-full transition-all ${config.barClass}`}
+                        className={`h-full rounded-full transition-all ${barClass}`}
                         style={{ width: `${Math.min(100, probabilityPercent)}%` }}
                     />
                 </div>
             </div>
-            <div className="flex items-center gap-2">
-                <span className={`text-lg font-bold ${config.textClass}`}>
-                    {formatPercent(milestone.probability)}
-                </span>
-            </div>
+            <span className={`text-lg font-bold ${textClass}`}>
+                {formatPercent(milestone.probability)}
+            </span>
         </div>
     );
 }
@@ -142,6 +125,9 @@ export function SurvivalAnalysisDisplay({ survivalAnalysis }: SurvivalAnalysisDi
         warnings,
     } = survivalAnalysis;
 
+    // Filter out milestones with <1% probability
+    const visibleMilestones = milestones.filter(m => Math.round(m.probability * 100) >= 1);
+
     return (
         <div className="space-y-4">
             {/* Summary Header */}
@@ -170,55 +156,30 @@ export function SurvivalAnalysisDisplay({ survivalAnalysis }: SurvivalAnalysisDi
             </div>
 
             {/* Milestone Table */}
-            <div>
-                <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                    <Activity className="size-4 text-purple-500" aria-hidden="true" />
-                    Probability of Reaching Milestones
-                </h4>
-                <div className="space-y-1.5" role="table" aria-label="Survival probability milestones">
-                    {milestones.map((milestone) => (
-                        <MilestoneRow
-                            key={milestone.additionalMiles}
-                            milestone={milestone}
-                        />
-                    ))}
+            {visibleMilestones.length > 0 && (
+                <div>
+                    <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                        <Activity className="size-4 text-purple-500" aria-hidden="true" />
+                        Chance of Reaching
+                    </h4>
+                    <div className="space-y-1.5" role="table" aria-label="Survival probability milestones">
+                        {visibleMilestones.map((milestone) => (
+                            <MilestoneRow
+                                key={milestone.totalMiles}
+                                milestone={milestone}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
-
-            {/* Legend */}
-            <div className="flex flex-wrap gap-3 text-xs">
-                {(['safe', 'moderate', 'risky', 'unlikely'] as const).map((level) => {
-                    const config = RISK_CONFIG[level];
-                    return (
-                        <div key={level} className="flex items-center gap-1.5">
-                            <div className={`w-3 h-3 rounded ${config.barClass}`} />
-                            <span className="text-muted-foreground">
-                                {level === 'safe' && '80%+'}
-                                {level === 'moderate' && '50-79%'}
-                                {level === 'risky' && '20-49%'}
-                                {level === 'unlikely' && '<20%'}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
+            )}
 
             {/* Warnings */}
             <WarningsList warnings={warnings} />
 
-            {/* Explanation */}
+            {/* Single-line explanation */}
             <p className="text-xs text-muted-foreground">
-                Probabilities are calculated using a Weibull survival model, which accounts for the vehicle's current mileage,
-                adjusted lifespan, reliability score, and known issues. These estimates assume continued normal use and maintenance.
+                Based on a Weibull survival model using this vehicle's mileage, reliability score, and known issues. Assumes normal use and maintenance.
             </p>
-
-            {/* Disclaimer */}
-            <div className="text-xs text-muted-foreground bg-muted/50 rounded-lg p-3 mt-2">
-                <strong>Note:</strong> These probabilities estimate the chance of reaching each mileage milestone based on
-                real-world vehicle survival data. They account for all reasons vehicles leave the road—mechanical failure,
-                accidents, and owner decisions. Only about 15-20% of even the most reliable vehicles remain on the road
-                at 200k miles.
-            </div>
         </div>
     );
 }

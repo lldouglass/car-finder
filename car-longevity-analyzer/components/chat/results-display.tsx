@@ -8,6 +8,7 @@ import { SafetyRatingsDisplay, NoSafetyRatings } from '@/components/safety-ratin
 import { KnownIssuesDisplay } from '@/components/known-issues-display';
 import { LifespanFactorsDisplay } from '@/components/lifespan-factors-display';
 import { SurvivalAnalysisDisplay } from '@/components/survival-analysis-display';
+import { UnifiedLifespanDisplay } from '@/components/unified-lifespan-display';
 import {
   NoRecallsFound,
   NoRedFlags,
@@ -340,65 +341,27 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
       {/* Debug info in development */}
       <DataStatusDebug result={result} />
 
-      {/* Longevity & Price Grid - hidden for free vehicle searches */}
+      {/* Unified Lifespan + Price - hidden for free vehicle searches */}
       {!isVehicleSearch && (
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Longevity Details */}
-        <Card role="region" aria-labelledby="longevity-heading">
-          <CardHeader>
-            <CardTitle id="longevity-heading" className="text-lg flex items-center gap-2">
-              <Gauge className="size-5" aria-hidden="true" />
-              Longevity Analysis
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {hasLongevityData ? (
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Expected Lifespan</span>
-                  <span className="font-medium">
-                    {formatNumber(
-                      longevity.percentUsed < 100
-                        ? Math.round(longevity.estimatedRemainingMiles / ((100 - longevity.percentUsed) / 100))
-                        : longevity.estimatedRemainingMiles
-                    )} miles
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Remaining Miles</span>
-                  <span className="font-medium text-lg text-green-600 dark:text-green-400">
-                    {formatNumber(longevity.estimatedRemainingMiles)} miles
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Remaining Years</span>
-                  <span className="font-medium">{longevity.remainingYears} years</span>
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-muted-foreground">Life Used</span>
-                    <span className="font-medium">{longevity.percentUsed}%</span>
-                  </div>
-                  <div
-                    className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-2"
-                    role="progressbar"
-                    aria-valuenow={longevity.percentUsed}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`Vehicle life used: ${longevity.percentUsed}%`}
-                  >
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ width: `${Math.min(100, longevity.percentUsed)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <NoLongevityData reason={!hasVehicleData ? 'no_vehicle' : 'no_mileage'} />
-            )}
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        {/* How Long Will It Last - unified lifespan card */}
+        {hasLongevityData && (
+          <Card role="region" aria-labelledby="lifespan-heading">
+            <CardHeader>
+              <CardTitle id="lifespan-heading" className="text-lg flex items-center gap-2">
+                <Gauge className="size-5" aria-hidden="true" />
+                How Long Will It Last?
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UnifiedLifespanDisplay
+                longevity={longevity}
+                lifespanAnalysis={hasLifespanAnalysis ? lifespanAnalysis : undefined}
+                survivalAnalysis={hasSurvivalAnalysis ? survivalAnalysis : undefined}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Pricing Details */}
         <Card role="region" aria-labelledby="pricing-heading">
@@ -579,37 +542,7 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
         />
       )}
 
-      {/* Lifespan Factors */}
-      {hasLifespanAnalysis && (
-        <Card role="region" aria-labelledby="lifespan-factors-heading">
-          <CardHeader>
-            <CardTitle id="lifespan-factors-heading" className="text-lg flex items-center gap-2">
-              <Activity className="size-5 text-purple-500" aria-hidden="true" />
-              Lifespan Analysis
-            </CardTitle>
-            <CardDescription>How vehicle factors affect expected lifespan</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LifespanFactorsDisplay lifespanAnalysis={lifespanAnalysis} />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Survival Probability Analysis */}
-      {hasSurvivalAnalysis && survivalAnalysis && (
-        <Card role="region" aria-labelledby="survival-analysis-heading">
-          <CardHeader>
-            <CardTitle id="survival-analysis-heading" className="text-lg flex items-center gap-2">
-              <TrendingUp className="size-5 text-blue-500" aria-hidden="true" />
-              Survival Probability
-            </CardTitle>
-            <CardDescription>Probability of reaching mileage milestones</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SurvivalAnalysisDisplay survivalAnalysis={survivalAnalysis} />
-          </CardContent>
-        </Card>
-      )}
+      {/* Lifespan Factors and Survival Probability are now integrated into the unified "How Long Will It Last" card above */}
 
       {/* Price Impact */}
       {hasPriceThresholds && priceThresholds.priceImpact && (
