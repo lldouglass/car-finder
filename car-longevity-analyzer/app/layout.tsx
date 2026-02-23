@@ -47,7 +47,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      localization={{
+        signIn: {
+          start: {
+            title: "Sign in to Car Lifespan Check",
+            subtitle: "Welcome back! Please sign in to continue",
+          },
+        },
+        signUp: {
+          start: {
+            title: "Create your Car Lifespan Check account",
+            subtitle: "Welcome! Please fill in the details to get started",
+          },
+        },
+      }}
+    >
       <html lang="en">
         <head>
           <Script
