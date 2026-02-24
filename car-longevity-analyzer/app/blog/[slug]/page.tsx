@@ -27,10 +27,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       authors: [post.author],
-      url: `https://carlifespancheck.com/blog/${slug}`,
+      url: `https://www.carlifespancheck.com/blog/${slug}`,
     },
     alternates: {
-      canonical: `https://carlifespancheck.com/blog/${slug}`,
+      canonical: `/blog/${slug}`,
     },
   };
 }

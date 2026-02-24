@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     'Expert guides on used car reliability, longevity, maintenance tips, and buying advice. Make smarter used car decisions with data-driven insights.',
   alternates: {
-    canonical: 'https://carlifespancheck.com/blog',
+    canonical: '/blog',
   },
 };
 
