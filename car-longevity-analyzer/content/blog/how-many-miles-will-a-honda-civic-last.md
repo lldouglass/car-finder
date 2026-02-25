@@ -1,6 +1,6 @@
 ---
-title: "How Many Miles Will a Honda Civic Last? Generation-by-Generation Analysis"
-description: "Honda Civics typically last 250,000-300,000 miles with proper maintenance. Learn which generations are most reliable and what maintenance extends Civic lifespan."
+title: "How Many Miles Does a Honda Civic Last? (By Generation)"
+description: "Most Honda Civics last 250,000 to 300,000 miles. See generation-by-generation lifespan ranges, common failure points, and how to make a Civic last longer."
 date: "2026-02-15"
 author: "Car Lifespan Check Team"
 tags: ["honda", "civic", "reliability", "maintenance"]

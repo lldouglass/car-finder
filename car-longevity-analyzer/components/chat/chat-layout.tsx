@@ -46,7 +46,7 @@ export function ChatLayout() {
           >
             <Menu className="size-5" />
           </Button>
-          <h1 className="font-semibold text-lg">Car Analyzer</h1>
+          <span className="font-semibold text-lg">Car Analyzer</span>
         </header>
 
         {/* Chat area */}

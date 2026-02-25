@@ -292,6 +292,6 @@ Both brands have improved dramatically since their 2008-2012 struggles, but reli
 
 Ford holds a slight overall reliability advantage in 2026, primarily driven by truck and small SUV success. GM remains competitive in large SUV and mid-size segments but struggles with luxury and compact applications. 
 
-Both brands have improved significantly from their early 2010s lows, but buyers should research specific models rather than relying on brand loyalty. Use comprehensive reliability analysis tools to evaluate specific year/model combinations before making purchase decisions.
+Both brands have improved significantly from their early 2010s lows, but buyers should research specific models rather than relying on brand loyalty. Use comprehensive reliability analysis tools to evaluate specific year/model combinations before making purchase decisions. If ownership cost is the deciding factor, continue with our [Ford vs Chevy maintenance cost comparison over 10 years](/blog/ford-vs-chevy-maintenance-costs-10-year-2026).
 
 The "winner" depends entirely on your vehicle needs, with both brands offering reliable options in their strongest segments.
