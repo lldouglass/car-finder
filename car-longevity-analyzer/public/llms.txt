@@ -1,22 +1,39 @@
 # Car Lifespan Check
 
-## About
-Car Lifespan Check is a free tool that analyzes how long specific cars last using real NHTSA complaint data, reliability records, and owner reports. It helps buyers make informed decisions about used car purchases by providing data-driven lifespan estimates.
+> Free tool that estimates how long specific cars last using real NHTSA complaint data, recall history, and reliability records. Helps used car buyers make data-driven decisions.
 
-## What It Does
-- Estimates expected lifespan for specific make/model/year combinations
-- Uses NHTSA complaint data and recall history
-- Identifies common problems and failure points by model year
-- Provides maintenance cost estimates
-- Blog with detailed reliability guides for popular vehicles
+Car Lifespan Check analyzes any make/model/year combination and provides an estimated remaining lifespan in miles and years. The estimates are based on NHTSA complaint data, recall patterns, and known failure points for each vehicle. The site also hosts 70+ detailed reliability guides covering popular vehicles and buying strategies.
 
-## URL
-https://www.carlifespancheck.com
+## Analysis Tool
 
-## Key Pages
-- Homepage (Analysis Tool): https://www.carlifespancheck.com
-- Blog: https://www.carlifespancheck.com/blog
-- Example Articles: https://www.carlifespancheck.com/blog/most-reliable-used-cars-2026, https://www.carlifespancheck.com/blog/how-long-does-toyota-camry-last
+- [Car Lifespan Analyzer](https://www.carlifespancheck.com): Enter any vehicle (year, make, model, mileage) to get a data-driven lifespan estimate with remaining miles, years, and common failure points
 
-## Category
-Automotive, Car Buying, Vehicle Reliability, Used Cars, Car Maintenance
+## Reliability Guides
+
+- [Most Reliable Cars Under $15K](https://www.carlifespancheck.com/blog/most-reliable-cars-under-15k): Data-backed rankings of the most reliable used cars under $15,000 with expected lifespans and ownership costs
+- [How Long Does a Honda Civic Last?](https://www.carlifespancheck.com/blog/how-many-miles-will-a-honda-civic-last): Year-by-year Honda Civic lifespan analysis with mileage expectations and common issues by generation
+- [How Long Do Toyota Trucks Last?](https://www.carlifespancheck.com/blog/how-long-do-toyota-trucks-last): Tacoma and Tundra longevity data, expected mileage, and reliability comparison
+- [How Long Does a Subaru Outback Last?](https://www.carlifespancheck.com/blog/how-long-does-subaru-outback-last): Outback lifespan by model year with head gasket and CVT failure data
+- [Ford vs Chevy Reliability Comparison](https://www.carlifespancheck.com/blog/ford-vs-chevy-reliability-comparison): Head-to-head reliability data comparing Ford and Chevrolet trucks and SUVs
+- [Is Ford Reliable Long Term?](https://www.carlifespancheck.com/blog/is-ford-reliable-long-term): Ford reliability analysis across models using NHTSA complaint rates and recall data
+- [Most Reliable Used Cars 2026](https://www.carlifespancheck.com/blog/most-reliable-used-cars-2026): Top picks for reliable used cars across all price ranges
+- [Honda Civic Life Expectancy by Year](https://www.carlifespancheck.com/blog/honda-civic-life-expectancy-by-year): Detailed year-by-year breakdown of Honda Civic expected mileage and known issues
+- [Best Used SUVs Under $20K](https://www.carlifespancheck.com/blog/best-used-suvs-under-20k-2026): Ranked list of reliable SUVs under $20,000 with longevity data
+- [German vs Japanese Car Reliability](https://www.carlifespancheck.com/blog/german-vs-japanese-car-reliability): Data comparison of German vs Japanese vehicle reliability and long-term costs
+
+## Buying Guides
+
+- [Used Car Buying Guide](https://www.carlifespancheck.com/guide): Complete guide to buying a reliable used car with inspection checklists and red flags
+- [Best Used Cars Under $12K](https://www.carlifespancheck.com/blog/best-used-cars-under-12k-2026): Budget-friendly reliable cars ranked by total cost of ownership
+- [Cheapest Cars by Total Cost of Ownership](https://www.carlifespancheck.com/blog/cheapest-used-cars-total-cost-of-ownership): Cars ranked by true ownership cost including maintenance, insurance, and depreciation
+- [Best Used Cars for the Money](https://www.carlifespancheck.com/blog/best-used-cars-for-the-money-2026): Value-ranked used cars factoring in purchase price, reliability, and resale value
+
+## Blog
+
+- [All Articles](https://www.carlifespancheck.com/blog): 70+ articles on car reliability, vehicle lifespans, maintenance costs, and used car buying advice
+
+## Optional
+
+- [SUV vs Sedan: Which Lasts Longer?](https://www.carlifespancheck.com/blog/suv-vs-sedan-which-lasts-longer): Body style comparison with longevity data
+- [Hybrid vs Gas Car Longevity](https://www.carlifespancheck.com/blog/hybrid-vs-gas-cars-which-lasts-longer): Battery degradation vs engine wear comparison
+- [How Long Does a Lexus Last?](https://www.carlifespancheck.com/blog/how-long-does-a-lexus-last-reliability-guide): Lexus model-by-model reliability and lifespan guide
