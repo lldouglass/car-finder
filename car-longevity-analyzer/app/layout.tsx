@@ -31,11 +31,20 @@ export const metadata: Metadata = {
     url: "https://www.carlifespancheck.com",
     siteName: "Car Lifespan Check",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Car Lifespan Check - Free Car Reliability Analysis",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "How Long Will My Car Last? | Free Car Lifespan Check",
     description: "Check any car's expected lifespan, reliability score, and known problems. Free instant analysis for 200+ models.",
+    images: ["/og-image.png"],
   },
   other: {
     "impact-site-verification": "576c5c58-aa4c-4042-a769-6944b16c2e39",

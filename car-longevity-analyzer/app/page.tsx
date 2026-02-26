@@ -1,12 +1,12 @@
-'use client';
+import type { Metadata } from 'next';
+import HomeClient from './home-client';
 
-import { ChatLayout } from '@/components/chat/chat-layout';
-import { ErrorBoundary } from '@/components/error-boundary';
+export const metadata: Metadata = {
+  alternates: {
+    canonical: '/',
+  },
+};
 
 export default function Home() {
-  return (
-    <ErrorBoundary>
-      <ChatLayout />
-    </ErrorBoundary>
-  );
+  return <HomeClient />;
 }
