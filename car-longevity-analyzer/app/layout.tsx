@@ -76,6 +76,26 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebApplication',
+                name: 'Car Lifespan Check',
+                url: 'https://www.carlifespancheck.com',
+                applicationCategory: 'AutomotiveApplication',
+                description:
+                  'Free tool that estimates how long your car will last using NHTSA complaint data, recall history, and reliability records.',
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'USD',
+                },
+                operatingSystem: 'Web',
+              }),
+            }}
+          />
           <ToastProvider>
             <AnalysisProvider>
               {children}

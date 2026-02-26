@@ -65,16 +65,16 @@ export default async function BlogPostPage({ params }: Props) {
     author: {
       '@type': 'Organization',
       name: post.author,
-      url: 'https://carlifespancheck.com',
+      url: 'https://www.carlifespancheck.com',
     },
     publisher: {
       '@type': 'Organization',
       name: 'Car Lifespan Check',
-      url: 'https://carlifespancheck.com',
+      url: 'https://www.carlifespancheck.com',
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://carlifespancheck.com/blog/${slug}`,
+      '@id': `https://www.carlifespancheck.com/blog/${slug}`,
     },
   };
 
