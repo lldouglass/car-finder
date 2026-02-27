@@ -129,4 +129,4 @@ That said, the Outback offers something no competitor in its price range matches
 
 ---
 
-**Evaluating a specific Outback?** Use our [free car longevity analyzer](/analyzer) to check the reliability score, known issues, and estimated maintenance costs for the exact year you're considering.
+**Evaluating a specific Outback?** Use our [free car longevity analyzer](/analyzer) to check the reliability score, known issues, and estimated maintenance costs for the exact year you're considering. For a detailed year-by-year breakdown of which model years to buy and which to avoid, see our [Subaru Outback reliability by year guide](/blog/subaru-outback-reliability-by-year).

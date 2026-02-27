@@ -141,4 +141,4 @@ Want a full ownership-cost view, not just reliability? Read our detailed [Ford v
 
 ---
 
-**Comparing a specific Ford and Chevy model?** Use our [free car longevity analyzer](/analyzer) to see side-by-side reliability ratings, maintenance costs, and expected lifespan for both vehicles.
+**Comparing a specific Ford and Chevy model?** Use our [free car longevity analyzer](/analyzer) to see side-by-side reliability ratings, maintenance costs, and expected lifespan for both vehicles. Also see our deep dive into [Chevrolet maintenance costs vs other brands](/blog/chevrolet-maintenance-costs-vs-other-brands) for a broader comparison including Toyota and Honda.
