@@ -263,4 +263,6 @@ Toyota trucks justify their premium pricing through exceptional longevity and va
 
 For buyers seeking maximum reliability, focus on mature platform years (2010-2015 Tacoma, 2010-2021 Tundra) with complete maintenance records. Even high-mileage examples often provide years of reliable service when properly maintained.
 
-Use comprehensive reliability analysis tools to evaluate specific Toyota trucks before purchase, focusing on maintenance history and known issues for the particular model year. Toyota's truck reliability reputation is well-earned, but individual vehicle condition remains paramount for long-term satisfaction.
+Use our [free car lifespan tool](/) to evaluate specific Toyota trucks before purchase, focusing on maintenance history and known issues for the particular model year. Toyota's truck reliability reputation is well-earned, but individual vehicle condition remains paramount for long-term satisfaction.
+
+For a detailed deep dive on the Tundra specifically, including a year-by-year breakdown of which models to buy and which to avoid, see our [Toyota Tundra lifespan and reliability guide](/blog/toyota-tundra-lifespan-how-long-does-it-last).
