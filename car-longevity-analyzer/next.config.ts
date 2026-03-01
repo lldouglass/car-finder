@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
         destination: "/blog/how-long-does-subaru-outback-last",
         permanent: true, // 301
       },
+      {
+        source: "/blog/subaru-outback-lifespan-review",
+        destination: "/blog/how-long-does-subaru-outback-last",
+        permanent: true, // 301
+      },
+      {
+        source: "/blog/how-long-does-mazda-cx5-last-reliability",
+        destination: "/blog/how-long-does-mazda-cx5-last",
+        permanent: true, // 301
+      },
     ];
   },
 };
