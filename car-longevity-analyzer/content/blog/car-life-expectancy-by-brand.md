@@ -51,7 +51,7 @@ Our analysis combines NHTSA complaint data, Consumer Reports reliability surveys
 - **Corolla (2009-2023)**: Bulletproof 1.8L and 2.0L engines
 - **Camry V6 (2007-2017)**: 3.5L V6 engine legendary for durability
 - **4Runner (2010-2023)**: Truck-based SUV that lasts 400,000+ miles
-- **Tacoma (2005-2023)**: Compact pickup with cult-like following
+- **Tacoma (2005-2023)**: Compact pickup with cult-like following (see our [full Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last))
 
 **Avoid These Toyota Years:**
 - 2007-2009 Camry: Oil consumption issues with 2AZ-FE engine

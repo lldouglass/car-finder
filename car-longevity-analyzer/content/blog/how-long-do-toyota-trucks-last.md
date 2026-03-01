@@ -8,7 +8,7 @@ tags: ["toyota", "tacoma", "tundra", "trucks", "reliability"]
 
 ## How Long Do Toyota Trucks Last?
 
-Toyota trucks routinely last 300,000 to 500,000 miles with proper maintenance, significantly exceeding the industry average of 200,000 miles. The Toyota Tacoma lifespan averages 280,000-350,000 miles, while the Toyota Tundra reliability extends to 300,000-400,000 miles for most examples. According to iSeeCars data, 3.9% of Toyota Tacomas and 4.2% of Toyota Tundras reach 300,000+ miles, ranking them among the top 5 longest-lasting pickup trucks.
+Toyota trucks routinely last 300,000 to 500,000 miles with proper maintenance, significantly exceeding the industry average of 200,000 miles. The Toyota Tacoma lifespan averages 280,000-350,000 miles (see our full [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last) for detailed data by generation), while the Toyota Tundra reliability extends to 300,000-400,000 miles for most examples (covered in our [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last)). According to iSeeCars data, 3.9% of Toyota Tacomas and 4.2% of Toyota Tundras reach 300,000+ miles, ranking them among the top 5 longest-lasting pickup trucks.
 
 This exceptional longevity stems from conservative engineering, robust drivetrains, and Toyota's focus on proven technology over cutting-edge features. The combination of durable engines, reliable transmissions, and corrosion-resistant construction makes Toyota trucks among the safest used vehicle purchases available.
 
