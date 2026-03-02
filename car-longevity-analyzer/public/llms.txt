@@ -13,6 +13,7 @@ Car Lifespan Check analyzes any make/model/year combination and provides an esti
 - [Most Reliable Cars Under $15K](https://www.carlifespancheck.com/blog/most-reliable-cars-under-15k): Data-backed rankings of the most reliable used cars under $15,000 with expected lifespans and ownership costs
 - [How Long Does a Honda Civic Last?](https://www.carlifespancheck.com/blog/how-many-miles-will-a-honda-civic-last): Year-by-year Honda Civic lifespan analysis with mileage expectations and common issues by generation
 - [How Long Do Toyota Trucks Last?](https://www.carlifespancheck.com/blog/how-long-do-toyota-trucks-last): Tacoma and Tundra longevity data, expected mileage, and reliability comparison
+- [How Long Does a Toyota 4Runner Last?](https://www.carlifespancheck.com/blog/how-long-does-toyota-4runner-last): 4Runner lifespan by generation, common issues, and best years
 - [How Long Does a Subaru Outback Last?](https://www.carlifespancheck.com/blog/how-long-does-subaru-outback-last): Outback lifespan by model year with head gasket and CVT failure data
 - [Ford vs Chevy Reliability Comparison](https://www.carlifespancheck.com/blog/ford-vs-chevy-reliability-comparison): Head-to-head reliability data comparing Ford and Chevrolet trucks and SUVs
 - [Is Ford Reliable Long Term?](https://www.carlifespancheck.com/blog/is-ford-reliable-long-term): Ford reliability analysis across models using NHTSA complaint rates and recall data

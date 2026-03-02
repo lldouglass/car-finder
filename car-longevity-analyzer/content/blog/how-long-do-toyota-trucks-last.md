@@ -265,4 +265,4 @@ For buyers seeking maximum reliability, focus on mature platform years (2010-201
 
 Use our [free car lifespan tool](/) to evaluate specific Toyota trucks before purchase, focusing on maintenance history and known issues for the particular model year. Toyota's truck reliability reputation is well-earned, but individual vehicle condition remains paramount for long-term satisfaction.
 
-For a detailed deep dive on the Tundra specifically, including a year-by-year breakdown of which models to buy and which to avoid, see our [Toyota Tundra lifespan and reliability guide](/blog/toyota-tundra-lifespan-how-long-does-it-last).
+For a detailed deep dive on specific models, see our [Toyota Tundra lifespan and reliability guide](/blog/toyota-tundra-lifespan-how-long-does-it-last) and our new [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last).

@@ -139,4 +139,4 @@ The Toyota RAV4 is one of the most reliable compact SUVs you can buy, new or use
 
 If you want to check any specific RAV4 model year's reliability data, run it through our free [car lifespan checker](/) for a detailed report based on NHTSA complaint data.
 
-For more reliability guides, see [how long Toyota trucks last](/blog/how-long-do-toyota-trucks-last), [how long a Toyota Camry lasts](/blog/how-long-does-toyota-camry-last), and our ranking of the [most reliable SUVs in 2026](/blog/most-reliable-suvs-2026).
+For more reliability guides, see [how long Toyota trucks last](/blog/how-long-do-toyota-trucks-last), [how long a Toyota 4Runner lasts](/blog/how-long-does-toyota-4runner-last), [how long a Toyota Camry lasts](/blog/how-long-does-toyota-camry-last), and our ranking of the [most reliable SUVs in 2026](/blog/most-reliable-suvs-2026).

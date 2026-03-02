@@ -37,6 +37,7 @@ Toyota trucks routinely last 300,000 to 500,000 miles. 3.9% of Tacomas and 4.2% 
 | Tacoma | 1st Gen | 1995-2004 | 250,000-300,000 mi | Frame rust (northern climates) |
 | Tacoma | 2nd Gen | 2005-2015 | 280,000-350,000 mi | Frame rust (2005-2010, recall) |
 | Tacoma | 3rd Gen | 2016-present | 250,000+ (projected) | Transmission shift harshness (early models) |
+| 4Runner | 5th Gen | 2010-2024 | 250,000-350,000+ mi | Rust and suspension wear at high mileage |
 | Tundra | 1st Gen | 2000-2006 | 300,000-400,000 mi | Timing belt service (V6/V8) |
 | Tundra | 2nd Gen | 2007-2021 | 300,000-500,000 mi | Air injection system failure ($1,500-2,500) |
 | Tundra | 3rd Gen | 2022+ | 250,000+ (projected) | Twin-turbo V6 long-term data pending |
