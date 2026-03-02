@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useAnalysis } from '@/lib/analysis-context';
 import { ChatInput, type ChatInputHandle } from './chat-input';
 import { UserMessage } from './messages/user-message';
@@ -77,6 +78,16 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
               {/* Centered input */}
               <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm">
                 <ChatInput large inputRef={inputRef} />
+              </div>
+
+              {/* Quick browse actions */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <Button asChild variant="outline" size="sm" className="rounded-full">
+                  <Link href="/browse">Browse by Budget</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="rounded-full">
+                  <Link href="/explore">Explore All Cars</Link>
+                </Button>
               </div>
 
               {/* Trust indicators */}
