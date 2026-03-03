@@ -54,6 +54,17 @@ export default function BlogPage() {
             Data-driven guides to help you find reliable used cars, avoid costly
             mistakes, and keep your vehicle running longer.
           </p>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Tools:</span>
+            <Link href="/browse" className="underline text-primary hover:no-underline">
+              Browse by Budget
+            </Link>
+            <span className="text-muted-foreground">·</span>
+            <Link href="/explore" className="underline text-primary hover:no-underline">
+              Explore All Cars
+            </Link>
+          </div>
         </header>
 
         {/* Featured Post */}
