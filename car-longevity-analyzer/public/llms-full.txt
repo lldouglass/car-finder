@@ -90,6 +90,33 @@ Expected lifespan: 200,000 to 250,000 miles with proper maintenance. Less durabl
 
 ---
 
+## New 2026 Coverage
+
+### Most Reliable Used Cars Under $12,000
+Source: https://www.carlifespancheck.com/blog/most-reliable-used-cars-under-12000-2026
+
+The under-$12K reliability cluster focuses on proven compact sedans and hatchbacks with strong parts availability and low maintenance complexity. Top value picks include Toyota Corolla, Honda Civic, Mazda3, Honda Fit, and Toyota Camry model-year bands where drivetrain risk is lower and ownership cost is predictable.
+
+Key selection criteria:
+- Prioritize full maintenance history over cosmetic condition
+- Target 80,000-140,000 mile listings with clean inspection results
+- Reserve $600-$1,200 for immediate post-purchase maintenance
+- Avoid listings with missing records or repeated short-term ownership flips
+
+### Are Ford SUVs Reliable for Long-Term Ownership?
+Source: https://www.carlifespancheck.com/blog/are-ford-suvs-reliable-long-term-2026
+
+Ford SUV reliability in 2026 is model- and powertrain-specific rather than brand-uniform.
+
+High-confidence patterns:
+- Escape hybrid configurations show stronger long-term ownership outcomes than some turbo variants
+- Edge and Explorer can be good used buys when transmission and cooling-system maintenance is documented
+- Expedition ownership can be durable but carries materially higher long-run operating costs
+
+Critical purchase rule: evaluate year + engine + service history together. Badge-level assumptions are often wrong.
+
+---
+
 ## Data Sources
 
 All analysis is based on:
