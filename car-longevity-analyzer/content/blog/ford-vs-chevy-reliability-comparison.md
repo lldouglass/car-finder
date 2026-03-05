@@ -1,6 +1,6 @@
 ---
-title: "Ford vs Chevy Reliability: Real Data on 15 Models Shows a Clear Winner (2026)"
-description: "We compared Ford and Chevy across trucks, SUVs, and cars using J.D. Power, Consumer Reports, and owner complaint data. One brand edges ahead in 10 of 15 matchups."
+title: "Ford vs Chevy Reliability and 10-Year Maintenance Costs (2026)"
+description: "We compared Ford and Chevrolet using complaint data, dependability scores, and long-term maintenance costs. See which trucks and SUVs are safer used buys."
 date: "2026-02-12"
 category: "Brand Comparisons"
 slug: "ford-vs-chevy-reliability-comparison"
