@@ -117,4 +117,4 @@ Ford's reliability has genuinely improved from 2021 to 2026. This is not marketi
 
 Check any Ford model's expected lifespan and known problems using our [free car lifespan tool](/). It pulls real NHTSA complaint data to show you exactly what breaks on the model and year you are considering.
 
-For a detailed reliability history on Ford, our piece on [whether Ford is reliable long-term](/blog/is-ford-reliable-long-term) covers the full picture across decades of data.
+For a detailed reliability history on Ford, our piece on [whether Ford is reliable long-term](/blog/is-ford-reliable-long-term) covers the full picture across decades of data. And if your shortlist is all SUVs, see our breakdown of [whether Ford SUVs are reliable long term in 2026](/blog/are-ford-suvs-reliable-long-term-2026).

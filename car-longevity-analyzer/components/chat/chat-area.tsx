@@ -64,9 +64,9 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                 <div className="mx-auto mb-6 rounded-full bg-primary/10 p-4 w-fit">
                   <Car className="size-12 text-primary" />
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight mb-3">
+                <h2 className="text-3xl font-bold tracking-tight mb-3">
                   How Long Will Your Car Last?
-                </h1>
+                </h2>
                 <p className="text-muted-foreground text-lg mb-2">
                   Search any vehicle by make, model, and year — free, instant reliability reports.
                 </p>
