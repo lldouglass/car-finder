@@ -28,6 +28,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.date,
       authors: [post.author],
       url: `https://www.carlifespancheck.com/blog/${slug}`,
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      images: ['/og-image.png'],
     },
     alternates: {
       canonical: `/blog/${slug}`,
@@ -61,6 +75,7 @@ export default async function BlogPostPage({ params }: Props) {
     '@type': 'Article',
     headline: post.title,
     description: post.description,
+    image: 'https://www.carlifespancheck.com/og-image.png',
     datePublished: post.date,
     author: {
       '@type': 'Organization',

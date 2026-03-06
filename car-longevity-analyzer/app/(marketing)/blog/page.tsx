@@ -10,6 +10,29 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/blog',
   },
+  openGraph: {
+    title: 'Used Car Reliability Blog | Car Lifespan Check',
+    description:
+      'Expert guides on used car reliability, longevity, maintenance tips, and buying advice. Make smarter used car decisions with data-driven insights.',
+    url: 'https://www.carlifespancheck.com/blog',
+    siteName: 'Car Lifespan Check',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Car Lifespan Check - Used Car Reliability Blog',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Used Car Reliability Blog | Car Lifespan Check',
+    description:
+      'Expert guides on used car reliability, longevity, maintenance tips, and buying advice. Make smarter used car decisions with data-driven insights.',
+    images: ['/og-image.png'],
+  },
 };
 
 const TAG_COLORS: Record<string, string> = {

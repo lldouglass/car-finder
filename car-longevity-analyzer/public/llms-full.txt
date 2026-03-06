@@ -115,6 +115,18 @@ High-confidence patterns:
 
 Critical purchase rule: evaluate year + engine + service history together. Badge-level assumptions are often wrong.
 
+### Ford Reliability Ratings 2026 by Model
+Source: https://www.carlifespancheck.com/blog/ford-reliability-ratings-2026-by-model
+
+Ford dependability in 2025-2026 is highly model-specific, not brand-uniform.
+
+High-confidence patterns:
+- Maverick Hybrid and selected F-150 configurations are among the stronger long-term bets
+- Escape Hybrid outcomes are usually better than many turbo-only alternatives
+- Explorer and some older Edge configurations need stricter inspection discipline
+
+Critical purchase rule: buy by model + year + engine, and verify service history before price negotiation.
+
 ---
 
 ## Data Sources
