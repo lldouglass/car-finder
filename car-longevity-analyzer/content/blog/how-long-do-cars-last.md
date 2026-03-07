@@ -8,6 +8,9 @@ tags: ["car-lifespan", "maintenance", "longevity"]
 
 # How Long Do Cars Last? The Brutal Truth from the Data
 
+If you are deciding whether to keep or replace your car, start with the [Used Car Reliability Hub](/blog/used-car-reliability-hub-2026), compare [average lifespan by year](/blog/average-car-lifespan-by-year), then run the [free lifespan check](/).
+
+
 Based on NHTSA complaint records, owner reports, and real-world reliability data, the patterns are clear: certain things kill cars and certain practices keep them running past 300,000 miles. The answer to "how long do cars last" isn't what most people think, and it definitely isn't what manufacturers want you to believe.
 
 The average car today lasts 12.2 years and 200,000 miles. But that's just the average. Some die at 80,000 miles, others are still running strong at 400,000. The difference isn't luck; it's understanding what actually destroys cars and preventing it.
