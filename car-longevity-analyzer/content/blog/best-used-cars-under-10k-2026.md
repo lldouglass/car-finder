@@ -151,3 +151,11 @@ Head gasket failures on the naturally aspirated EJ25 are well-documented and ess
 ## Check Any Car Before You Buy
 
 Use [Car Lifespan Check](https://carlifespancheck.com) to look up the specific year, make, and model you're considering. You'll see NHTSA complaint data, common problems, and reliability ratings that help you avoid the lemons and find the gems in the under-$10K market.
+
+## Related Budget Car Guides
+
+- [Best Used Cars Under $12k (2016+)](/blog/best-used-cars-under-12000-2016-newer-2026)
+- [Most Reliable Used Cars Under $12k](/blog/most-reliable-used-cars-under-12000-2026)
+- [Best Used Cars for the Money](/blog/best-used-cars-for-the-money-2026)
+- [Used Car Inspection Checklist](/blog/used-car-inspection-checklist)
+- [Run a Free Reliability Check](/)
