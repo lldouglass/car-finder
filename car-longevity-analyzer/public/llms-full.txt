@@ -141,6 +141,18 @@ High-confidence patterns:
 
 Critical purchase rule: buy by model + year + engine, and verify service history before price negotiation.
 
+### Ford vs Chevy Trucks Reliability (2026)
+Source: https://www.carlifespancheck.com/blog/ford-vs-chevy-trucks-reliability-2026
+
+The truck-only comparison focuses on F-150 vs Silverado long-term ownership risk by powertrain, not by brand loyalty.
+
+High-confidence patterns:
+- F-150 5.0L V8 setups often show lower uncertainty for long-hold owners
+- Silverado outcomes depend heavily on year + valvetrain risk profile
+- Missing service history is a stronger red flag than badge choice
+
+Critical purchase rule: choose by engine-year-service-history combo, then confirm with an independent pre-purchase inspection.
+
 ---
 
 ## Data Sources

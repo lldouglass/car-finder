@@ -12,7 +12,7 @@ If you are comparing Ford and Chevrolet for long-term ownership, maintenance cos
 
 Across mainstream models, Ford and Chevy can both be reasonable to own. But over a 10-year period, specific powertrains can create a $2,000 to $6,000 gap in total maintenance and repair spending. This guide breaks down what that looks like in plain numbers.
 
-For a broader reliability breakdown, read our [Ford vs Chevy reliability comparison](/blog/ford-vs-chevy-reliability-comparison) and [GM vs Ford reliability guide](/blog/gm-vs-ford-reliability-compared).
+For a broader reliability breakdown, read our [Ford vs Chevy reliability comparison](/blog/ford-vs-chevy-reliability-comparison), [Ford vs Chevy trucks reliability guide](/blog/ford-vs-chevy-trucks-reliability-2026), and [GM vs Ford reliability guide](/blog/gm-vs-ford-reliability-compared).
 
 ## Quick Answer: Which Brand Is Cheaper to Maintain?
 
