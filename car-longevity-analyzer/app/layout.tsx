@@ -70,11 +70,10 @@ export default function RootLayout({
     >
       <html lang="en">
         <head>
-          <Script
+          <script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9718990890836395"
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         </head>
         <body
