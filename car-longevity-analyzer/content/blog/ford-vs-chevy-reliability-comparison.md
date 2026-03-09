@@ -29,7 +29,7 @@ They're essentially the same in aggregate. The interesting differences emerge wh
 
 ## Trucks: Where It Actually Matters
 
-For most buyers in the Ford vs. Chevy debate, the real question is F-150 vs. Silverado 1500. This is where the rivalry lives. If you want a truck-only breakdown, use our dedicated [Ford vs Chevy trucks reliability guide](/blog/ford-vs-chevy-trucks-reliability-2026).
+For most buyers in the Ford vs. Chevy debate, the real question is F-150 vs. Silverado 1500. This is where the rivalry lives. If you want a truck-only breakdown, use our dedicated [Ford vs Chevy trucks reliability guide](/blog/ford-vs-chevy-trucks-reliability-2026). For detailed ownership cost data, use [Chevrolet maintenance costs and reliability compared to other brands](/blog/chevrolet-maintenance-costs-vs-other-brands).
 
 ### Ford F-150 vs. Chevrolet Silverado 1500
 

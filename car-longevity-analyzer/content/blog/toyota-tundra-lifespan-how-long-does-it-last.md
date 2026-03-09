@@ -10,6 +10,8 @@ A Toyota Tundra typically lasts 300,000 to 400,000 miles with regular maintenanc
 
 The Tundra's longevity comes from Toyota's proven powertrain engineering, conservative design philosophy, and a frame designed for commercial-grade durability. Here is exactly what to expect from each generation.
 
+Need an engine-by-engine breakdown for used buying? Read our [Toyota Tundra 5.7L vs 4.6L vs 3.5L twin turbo reliability comparison](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026).
+
 ## Toyota Tundra Lifespan by Generation
 
 ### First Generation (2000-2006): 250,000-300,000 Miles

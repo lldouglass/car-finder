@@ -92,6 +92,18 @@ Expected lifespan: 200,000 to 250,000 miles with proper maintenance. Less durabl
 
 ## New 2026 Coverage
 
+### Toyota Tundra Engine Reliability: 5.7L vs 4.6L vs 3.5L Twin Turbo
+Source: https://www.carlifespancheck.com/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026
+
+Short answer for buyers in 2026: the 2014-2021 5.7L V8 still has the strongest long-run durability track record, the 4.6L V8 remains a dependable lower-cost alternative, and the 2022+ 3.5L twin turbo is promising but still building high-mileage history.
+
+High-confidence patterns:
+- 5.7L V8 trucks have the deepest 250k to 400k+ mile sample size in real ownership
+- 4.6L V8 trucks are reliable and often undervalued in used listings
+- 3.5L twin turbo trucks offer better efficiency but add complexity and unknown long-horizon repair variance
+
+Critical purchase rule: buy by engine + year + service history, not by badge alone.
+
 ### Most Reliable Used Cars Under $12,000
 Source: https://www.carlifespancheck.com/blog/most-reliable-used-cars-under-12000-2026
 
