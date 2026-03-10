@@ -1,6 +1,6 @@
 ---
-title: "Most Reliable Used Cars Under $15,000 in 2026 (15 Picks)"
-description: "Most reliable used cars under $15,000 in 2026, compare 15 picks by lifespan, annual repair cost, and the exact model years to buy or avoid."
+title: "Most Reliable Used Cars Under $15,000 in 2026: 15 Low-Repair Picks"
+description: "Looking for the most reliable used cars under $15,000 in 2026? Compare 15 picks by expected lifespan, annual repair cost, and the exact model years to buy or avoid."
 date: "2026-02-15"
 author: "Car Lifespan Check Team"
 tags: ["reliable", "used cars", "budget", "under 15000"]

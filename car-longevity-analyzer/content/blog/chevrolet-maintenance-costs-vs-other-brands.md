@@ -142,7 +142,7 @@ Chevy is a solid middle-of-the-road choice for maintenance costs. Not as cheap a
 **Best value Chevys for low maintenance:** Malibu, Colorado (4-cyl), Spark
 **Proceed with caution:** Tahoe/Suburban (budget for AFM repair), Equinox (avoid 2010-2017), Traverse (timing chain)
 
-If you are cross-shopping Chevy vs Japanese brands, use our [free car lifespan check tool](/) to compare expected longevity and maintenance profiles for the specific models and years you are considering. For [Ford vs Chevy specifically](/blog/ford-vs-chevy-reliability-comparison), the answer depends on segment: Chevy wins on trucks, Ford is competitive on small SUVs, and both are more expensive than Japanese alternatives.
+If you are cross-shopping Chevy vs Japanese brands, use our [free car lifespan check tool](/) to compare expected longevity and maintenance profiles for the specific models and years you are considering. For [Ford vs Chevy specifically](/blog/ford-vs-chevy-reliability-comparison), the answer depends on segment: Chevy wins on trucks, Ford is competitive on small SUVs, and both are more expensive than Japanese alternatives. For a model-by-model breakdown, use [Chevrolet reliability ratings 2026 by model](/blog/chevrolet-reliability-ratings-2026-by-model).
 
 The smart move: buy a Chevy for the lower purchase price, budget $400-$600/year for maintenance, and stay ahead of the known issues (AFM delete on V8s, timely fluid changes on transmissions). That formula delivers reliable transportation at a total cost that often beats paying more upfront for a Toyota.
 
