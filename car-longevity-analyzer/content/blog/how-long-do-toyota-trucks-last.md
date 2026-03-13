@@ -269,7 +269,7 @@ Use our [free car lifespan tool](/) to evaluate specific Toyota trucks before pu
 
 For a detailed deep dive on specific models, see our [Toyota Tundra lifespan and reliability guide](/blog/toyota-tundra-lifespan-how-long-does-it-last) and our new [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last).
 
-## Keep Reading
+## Related reliability guides
 
 - [How Long Does Toyota Tacoma Last?](/blog/how-long-does-toyota-tacoma-last)
 - [Ford vs Chevy Reliability Comparison](/blog/ford-vs-chevy-reliability-comparison)

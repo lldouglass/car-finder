@@ -163,7 +163,7 @@ The worst decision is buying a German car expecting Japanese maintenance costs. 
 
 **Comparing specific models?** Use our [free car longevity analyzer](/analyzer) to see head-to-head reliability data, maintenance cost estimates, and expected lifespan for any vehicle you're considering.
 
-## Keep Reading
+## Related reliability guides
 
 - [Most Reliable Cars Under $15k in 2026](/blog/most-reliable-cars-under-15k)
 - [Ford vs Chevy Reliability in 2026](/blog/ford-vs-chevy-reliability-comparison)
