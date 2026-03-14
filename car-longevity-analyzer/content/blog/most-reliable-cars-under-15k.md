@@ -50,6 +50,8 @@ The tenth-generation Civic combines reliability with more engaging driving dynam
 - CVT transmission shows good durability
 - Honda's reputation for 200,000+ mile longevity
 
+For deeper year-by-year data before you buy, see our [Honda Civic lifespan guide for 2026 buyers](/blog/how-many-miles-will-a-honda-civic-last).
+
 ### 3. Mazda3 Sedan (2017-2019) — $11,500-$13,500
 
 The Mazda3 offers premium interior quality and engaging driving dynamics with solid reliability scores. The Skyactiv engines prove durable and efficient.

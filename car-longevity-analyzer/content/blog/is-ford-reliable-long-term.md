@@ -29,6 +29,8 @@ Ford's transformation from its troubled 2008-2015 period shows genuine improveme
 - **Best-performing Ford:** F-150 (above segment average)
 - **Worst-performing Ford:** Explorer (significantly below average)
 
+If your purchase decision is really Ford vs Chevy, pair this page with our [Chevy vs Ford reliability comparison](/blog/ford-vs-chevy-reliability-comparison) and [Ford vs Chevrolet 10-year maintenance cost comparison](/blog/ford-vs-chevy-maintenance-costs-10-year-2026) so you can compare risk and ownership cost together.
+
 ## Ford's Most Reliable Models for Long-Term Ownership
 
 ### Excellent Long-Term Reliability

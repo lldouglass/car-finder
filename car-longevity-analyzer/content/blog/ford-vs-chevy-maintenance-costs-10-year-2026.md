@@ -1,6 +1,6 @@
 ---
-title: "Ford vs Chevy Maintenance Costs Over 10 Years (2026)"
-description: "Ford vs Chevrolet maintenance costs over 10 years, broken down by trucks, SUVs, and sedans. See real cost ranges, common repairs, and which models are cheaper to own long term."
+title: "Ford vs Chevrolet Maintenance Costs Over 10 Years: 2026 Comparison"
+description: "Ford vs Chevrolet maintenance costs over 10 years by trucks and SUVs, with real repair ranges and high-risk failures that swing ownership costs."
 date: "2026-02-25"
 author: "Car Lifespan Check Team"
 tags: ["ford", "chevy", "maintenance cost", "10 year ownership", "reliability"]
