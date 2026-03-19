@@ -103,7 +103,7 @@ export async function POST(request: Request) {
                     success: false,
                     error: 'Free limit reached',
                     upgrade: true,
-                    message: `You have used all ${usage.limit} free analyses this month. Upgrade to Premium for unlimited access.`,
+                    message: `You have used all ${usage.limit} free analyses this month. Get Buyer Pass for 30 days of unlimited access.`,
                     usage: {
                         used: usage.used,
                         limit: usage.limit,

@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { constructWebhookEvent } from '@/lib/stripe';
-import { upgradeUserToPremium, downgradeUserToFree, updateUserEmail } from '@/lib/usage';
+import { grantBuyerPassAccess, updateUserEmail } from '@/lib/usage';
 import { prisma } from '@/lib/db';
-import { STRIPE_SUBSCRIPTION_STATUS } from '@/lib/constants';
 
 /**
  * Helper to extract customer ID from Stripe customer field.
- * Handles string, Customer object, DeletedCustomer object, or null.
  */
 function getCustomerId(
   customer: string | Stripe.Customer | Stripe.DeletedCustomer | null
@@ -34,21 +32,17 @@ export async function POST(request: Request) {
       event = constructWebhookEvent(body, signature);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Idempotency check: skip if we've already processed this event
     const existingEvent = await prisma.stripeEvent.findUnique({
       where: { eventId: event.id },
     });
+
     if (existingEvent) {
       return NextResponse.json({ received: true });
     }
 
-    // Handle the event
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -56,53 +50,25 @@ export async function POST(request: Request) {
         const customerId = getCustomerId(session.customer);
         const customerEmail = session.customer_email || session.customer_details?.email;
 
-        if (clerkId && customerId) {
-          await upgradeUserToPremium(clerkId, customerId);
+        if (clerkId) {
+          await grantBuyerPassAccess(clerkId, customerId, customerEmail);
 
-          // Also update email if we have it
           if (customerEmail) {
             await updateUserEmail(clerkId, customerEmail);
           }
         } else {
-          console.error('Checkout completed but missing clerkId or customerId', {
-            hasClerkId: !!clerkId,
+          console.error('Checkout completed but missing clerkId', {
+            sessionId: session.id,
             hasCustomerId: !!customerId,
           });
         }
         break;
       }
 
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
-        const customerId = getCustomerId(subscription.customer);
-
-        if (customerId) {
-          await downgradeUserToFree(customerId);
-        } else {
-          console.error('Subscription deleted but no customerId found', {
-            subscriptionId: subscription.id,
-          });
-        }
+      default:
         break;
-      }
-
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        const customerId = getCustomerId(subscription.customer);
-
-        // If subscription is cancelled or unpaid, downgrade user
-        if (
-          customerId &&
-          (subscription.status === STRIPE_SUBSCRIPTION_STATUS.CANCELED ||
-            subscription.status === STRIPE_SUBSCRIPTION_STATUS.UNPAID)
-        ) {
-          await downgradeUserToFree(customerId);
-        }
-        break;
-      }
     }
 
-    // Record that we've processed this event (idempotency)
     await prisma.stripeEvent.create({
       data: { eventId: event.id, type: event.type },
     });

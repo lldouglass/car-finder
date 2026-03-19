@@ -147,9 +147,9 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     <div className="mx-auto mb-3 rounded-full bg-amber-100 dark:bg-amber-900/30 p-3 w-fit">
                       <TrendingUp className="size-6 text-amber-600 dark:text-amber-400" />
                     </div>
-                    <h3 className="font-semibold mb-2">Step 3: Upgrade</h3>
+                    <h3 className="font-semibold mb-2">Step 3: Unlock Buyer Pass</h3>
                     <p className="text-sm text-muted-foreground">
-                      Unlock full analysis with pricing, negotiation tips, and maintenance projections
+                      Get 30 days of unlimited full analysis with pricing, negotiation tips, and maintenance projections
                     </p>
                   </div>
                 </div>
@@ -184,9 +184,9 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                   <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-200 dark:border-amber-800 p-6">
                     <div className="flex items-center gap-2 mb-4">
                       <Crown className="size-5 text-amber-600" />
-                      <h3 className="text-lg font-semibold">Premium</h3>
-                      <span className="ml-auto text-xl font-bold text-amber-600">$19/mo</span>
-                      <span className="text-sm text-muted-foreground">/30 days</span>
+                      <h3 className="text-lg font-semibold">Buyer Pass</h3>
+                      <span className="ml-auto text-xl font-bold text-amber-600">$12</span>
+                      <span className="text-sm text-muted-foreground">one-time / 30 days</span>
                     </div>
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-center gap-2">
@@ -337,7 +337,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     className="bg-amber-500 hover:bg-amber-600 text-zinc-900"
                   >
                     <Crown className="size-4 mr-2" />
-                    Get 30 Days Unlimited
+Get Buyer Pass
                   </Button>
                 </div>
               ) : (

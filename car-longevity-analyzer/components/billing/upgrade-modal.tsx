@@ -2,21 +2,17 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Check, Crown, Zap, Shield, Clock, DollarSign, Target, FileText, BarChart3, TrendingUp } from 'lucide-react';
+import { X, Check, Crown, Zap, Clock, DollarSign, Target, FileText, BarChart3 } from 'lucide-react';
 
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  usageInfo?: {
-    used: number;
-    limit: number;
-  };
 }
 
-const PRICE = process.env.NEXT_PUBLIC_PREMIUM_PRICE || '$19';
+const PRICE = process.env.NEXT_PUBLIC_BUYER_PASS_PRICE || '$12';
 
 const features = [
-  { icon: Zap, text: 'Unlimited VIN analyses' },
+  { icon: Zap, text: 'Unlimited VIN analyses for 30 days' },
   { icon: DollarSign, text: 'Fair market price estimates' },
   { icon: Target, text: 'Negotiation talking points' },
   { icon: Clock, text: '10-year maintenance cost projections' },
@@ -24,7 +20,7 @@ const features = [
   { icon: BarChart3, text: 'Survival probability curves' },
 ];
 
-export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) {
+export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,15 +48,12 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-200 transition-colors"
@@ -68,28 +61,25 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
           <X className="size-5" />
         </button>
 
-        {/* Header */}
         <div className="px-6 pt-8 pb-6 text-center bg-gradient-to-b from-amber-500/10 to-transparent">
           <div className="inline-flex items-center justify-center size-16 rounded-2xl bg-amber-500/20 mb-4">
             <Crown className="size-8 text-amber-400" />
           </div>
           <h2 className="text-2xl font-bold text-zinc-100 mb-2">
-            Get 30 Days Unlimited
+            Unlock Buyer Pass
           </h2>
           <p className="text-zinc-400 text-sm">
-            Analyze every car on your list before you buy
+            One payment, 30 days of unlimited full car checks
           </p>
         </div>
 
-        {/* Content */}
         <div className="px-6 pb-6">
-          {/* Price */}
           <div className="text-center mb-6">
             <span className="text-4xl font-bold text-zinc-100">{PRICE}</span>
-            <span className="text-zinc-400"> for 30 days</span>
+            <span className="text-zinc-400"> one-time</span>
+            <div className="text-sm text-zinc-500 mt-1">30 days access</div>
           </div>
 
-          {/* Features */}
           <ul className="space-y-3 mb-6">
             {features.map((feature, i) => (
               <li key={i} className="flex items-center gap-3 text-zinc-300">
@@ -101,14 +91,12 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
             ))}
           </ul>
 
-          {/* Error message */}
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          {/* CTA */}
           <Button
             onClick={handleUpgrade}
             disabled={loading}
@@ -120,7 +108,7 @@ export function UpgradeModal({ isOpen, onClose, usageInfo }: UpgradeModalProps) 
                 Processing...
               </span>
             ) : (
-              'Start Analyzing'
+              'Get Buyer Pass'
             )}
           </Button>
 

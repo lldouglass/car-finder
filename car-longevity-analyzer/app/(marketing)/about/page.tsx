@@ -30,7 +30,7 @@ export default function AboutPage() {
               Buying a used car is stressful. You are spending thousands of dollars and most of the information out there is either behind paywalls, biased by advertising, or just too vague to be useful. We wanted something simple: search a car, see the data, make a better decision.
             </p>
             <p>
-              The free tier gives you everything you need for a basic check. Premium unlocks deeper analysis, full complaint breakdowns, and unlimited searches for people who are seriously shopping.
+              The free tier gives you everything you need for a basic check. Buyer Pass unlocks deeper analysis, full complaint breakdowns, and unlimited searches for 30 days while you shop.
             </p>
           </section>
 

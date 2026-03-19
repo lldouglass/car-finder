@@ -351,7 +351,7 @@ export class TimeoutError extends APIError {
 const ERROR_MESSAGES: Record<number, string> = {
     400: 'Invalid request. Please check your input.',
     401: 'Authentication error. Please try signing in again.',
-    403: 'Free analysis limit reached. Upgrade to Premium for unlimited access.',
+    403: 'Free analysis limit reached. Get Buyer Pass for 30 days of unlimited access.',
     404: 'Vehicle not found. Please verify the VIN.',
     429: 'Too many requests. Please wait a moment and try again.',
     500: 'Server error. Please try again later.',

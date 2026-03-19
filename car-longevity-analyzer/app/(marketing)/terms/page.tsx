@@ -25,7 +25,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-3">2. Description of Service</h2>
             <p>
-              Car Lifespan Check provides vehicle reliability analysis, lifespan estimates, and recall information based on publicly available data from the National Highway Traffic Safety Administration (NHTSA) and other sources. The Service is available in free and premium tiers.
+              Car Lifespan Check provides vehicle reliability analysis, lifespan estimates, and recall information based on publicly available data from the National Highway Traffic Safety Administration (NHTSA) and other sources. The Service is available in a free tier plus an optional paid Buyer Pass.
             </p>
           </section>
 
@@ -47,9 +47,9 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-3">5. Premium Subscriptions</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-3">5. Buyer Pass</h2>
             <p>
-              Premium subscriptions are billed monthly through Stripe. You can cancel your subscription at any time through your account settings. Refunds are handled on a case-by-case basis. Cancellation takes effect at the end of the current billing period.
+              Buyer Pass is a one-time purchase processed through Stripe. It provides 30 days of access to paid features from the purchase date. Buyer Pass does not auto-renew. Refunds are handled on a case-by-case basis.
             </p>
           </section>
 

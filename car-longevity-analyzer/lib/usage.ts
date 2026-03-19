@@ -2,19 +2,51 @@ import { prisma } from './db';
 import { clerkClient } from '@clerk/nextjs/server';
 import { Prisma } from '@prisma/client';
 
-// Validate FREE_LIMIT on module load to fail fast if misconfigured
 const FREE_LIMIT_RAW = parseInt(process.env.FREE_ANALYSES_PER_MONTH || '3');
 if (isNaN(FREE_LIMIT_RAW) || FREE_LIMIT_RAW < 1) {
   throw new Error(`Invalid FREE_ANALYSES_PER_MONTH: ${process.env.FREE_ANALYSES_PER_MONTH}`);
 }
 const FREE_LIMIT = FREE_LIMIT_RAW;
+const BUYER_PASS_DURATION_DAYS = 30;
+const BUYER_PASS_DURATION_MS = BUYER_PASS_DURATION_DAYS * 24 * 60 * 60 * 1000;
 
 export interface UsageCheckResult {
   allowed: boolean;
   remaining: number;
   isPremium: boolean;
+  isBuyerPassActive: boolean;
+  buyerPassExpiresAt: Date | null;
   used: number;
   limit: number;
+}
+
+function hasActiveBuyerPass(user: { buyerPassExpiresAt: Date | null | undefined }) {
+  return !!user.buyerPassExpiresAt && user.buyerPassExpiresAt.getTime() > Date.now();
+}
+
+function getMonthKey() {
+  return new Date().toISOString().slice(0, 7);
+}
+
+function getBuyerPassExpiry(baseDate?: Date | null) {
+  const startAt = baseDate && baseDate.getTime() > Date.now() ? baseDate : new Date();
+  return new Date(startAt.getTime() + BUYER_PASS_DURATION_MS);
+}
+
+async function getUserEmail(clerkId: string, fallbackEmail?: string | null) {
+  if (fallbackEmail) {
+    return fallbackEmail;
+  }
+
+  const client = await clerkClient();
+  const clerkUser = await client.users.getUser(clerkId);
+  const email = clerkUser.emailAddresses[0]?.emailAddress;
+
+  if (!email) {
+    throw new Error('User has no email address');
+  }
+
+  return email;
 }
 
 /**
@@ -23,22 +55,14 @@ export interface UsageCheckResult {
  * Uses atomic operations to prevent race conditions.
  */
 export async function checkAndIncrementUsage(clerkId: string): Promise<UsageCheckResult> {
-  const month = new Date().toISOString().slice(0, 7); // "2026-01"
+  const month = getMonthKey();
 
-  // Get or create user (with race condition handling)
   let user = await prisma.user.findUnique({
     where: { clerkId },
   });
 
   if (!user) {
-    // Fetch email from Clerk API
-    const client = await clerkClient();
-    const clerkUser = await client.users.getUser(clerkId);
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
-
-    if (!email) {
-      throw new Error('User has no email address');
-    }
+    const email = await getUserEmail(clerkId);
 
     try {
       user = await prisma.user.create({
@@ -48,7 +72,6 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
         },
       });
     } catch (error) {
-      // Handle race condition - another request may have created the user
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         user = await prisma.user.findUnique({ where: { clerkId } });
         if (!user) {
@@ -60,14 +83,18 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
     }
   }
 
-  // Verify premium status - must have stripeCustomerId to be considered premium
-  // This prevents accidental premium access without payment
-  if (user.plan === 'PREMIUM' && user.stripeCustomerId) {
-    return { allowed: true, remaining: Infinity, isPremium: true, used: 0, limit: Infinity };
+  if (hasActiveBuyerPass(user)) {
+    return {
+      allowed: true,
+      remaining: FREE_LIMIT,
+      isPremium: true,
+      isBuyerPassActive: true,
+      buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
+      used: 0,
+      limit: FREE_LIMIT,
+    };
   }
 
-  // Use atomic conditional update to prevent race conditions (TOCTOU fix)
-  // This atomically increments only if the count is below the limit
   const result = await prisma.usageRecord.updateMany({
     where: {
       userId: user.id,
@@ -78,23 +105,22 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
   });
 
   if (result.count === 0) {
-    // Either record doesn't exist or limit is already reached
     const existing = await prisma.usageRecord.findUnique({
       where: { userId_month: { userId: user.id, month } },
     });
 
     if (existing && existing.analysisCount >= FREE_LIMIT) {
-      // Limit reached
       return {
         allowed: false,
         remaining: 0,
         isPremium: false,
+        isBuyerPassActive: false,
+        buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
         used: existing.analysisCount,
         limit: FREE_LIMIT,
       };
     }
 
-    // Record doesn't exist - create it with count 1 (use upsert for race safety)
     const newUsage = await prisma.usageRecord.upsert({
       where: { userId_month: { userId: user.id, month } },
       update: { analysisCount: { increment: 1 } },
@@ -105,12 +131,13 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
       allowed: true,
       remaining: FREE_LIMIT - newUsage.analysisCount,
       isPremium: false,
+      isBuyerPassActive: false,
+      buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
       used: newUsage.analysisCount,
       limit: FREE_LIMIT,
     };
   }
 
-  // Successfully incremented - fetch updated count
   const updatedUsage = await prisma.usageRecord.findUnique({
     where: { userId_month: { userId: user.id, month } },
   });
@@ -119,6 +146,8 @@ export async function checkAndIncrementUsage(clerkId: string): Promise<UsageChec
     allowed: true,
     remaining: FREE_LIMIT - (updatedUsage?.analysisCount || 1),
     isPremium: false,
+    isBuyerPassActive: false,
+    buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
     used: updatedUsage?.analysisCount || 1,
     limit: FREE_LIMIT,
   };
@@ -131,9 +160,11 @@ export async function getUsageStatus(clerkId: string): Promise<{
   used: number;
   limit: number;
   isPremium: boolean;
+  isBuyerPassActive: boolean;
+  buyerPassExpiresAt: Date | null;
   remaining: number;
 }> {
-  const month = new Date().toISOString().slice(0, 7);
+  const month = getMonthKey();
 
   const user = await prisma.user.findUnique({
     where: { clerkId },
@@ -141,12 +172,25 @@ export async function getUsageStatus(clerkId: string): Promise<{
   });
 
   if (!user) {
-    return { used: 0, limit: FREE_LIMIT, isPremium: false, remaining: FREE_LIMIT };
+    return {
+      used: 0,
+      limit: FREE_LIMIT,
+      isPremium: false,
+      isBuyerPassActive: false,
+      buyerPassExpiresAt: null,
+      remaining: FREE_LIMIT,
+    };
   }
 
-  // Verify premium status - must have stripeCustomerId to be considered premium
-  if (user.plan === 'PREMIUM' && user.stripeCustomerId) {
-    return { used: 0, limit: Infinity, isPremium: true, remaining: Infinity };
+  if (hasActiveBuyerPass(user)) {
+    return {
+      used: 0,
+      limit: FREE_LIMIT,
+      isPremium: true,
+      isBuyerPassActive: true,
+      buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
+      remaining: FREE_LIMIT,
+    };
   }
 
   const used = user.usageRecords[0]?.analysisCount || 0;
@@ -154,43 +198,58 @@ export async function getUsageStatus(clerkId: string): Promise<{
     used,
     limit: FREE_LIMIT,
     isPremium: false,
+    isBuyerPassActive: false,
+    buyerPassExpiresAt: user.buyerPassExpiresAt ?? null,
     remaining: Math.max(0, FREE_LIMIT - used),
   };
 }
 
 /**
- * Upgrade a user to premium plan.
- * Uses upsert to handle race conditions between webhook and user signup.
+ * Grant or extend Buyer Pass access for 30 days.
  */
-export async function upgradeUserToPremium(clerkId: string, stripeCustomerId: string): Promise<void> {
-  // Fetch email from Clerk (needed for create case in upsert)
-  const client = await clerkClient();
-  const clerkUser = await client.users.getUser(clerkId);
-  const email = clerkUser.emailAddresses[0]?.emailAddress;
+export async function grantBuyerPassAccess(
+  clerkId: string,
+  stripeCustomerId?: string | null,
+  fallbackEmail?: string | null
+): Promise<void> {
+  const email = await getUserEmail(clerkId, fallbackEmail);
+  const existingUser = await prisma.user.findUnique({
+    where: { clerkId },
+    select: { buyerPassExpiresAt: true },
+  });
 
-  if (!email) {
-    throw new Error('User has no email address');
-  }
+  const buyerPassExpiresAt = getBuyerPassExpiry(existingUser?.buyerPassExpiresAt);
 
   await prisma.user.upsert({
     where: { clerkId },
-    update: { plan: 'PREMIUM', stripeCustomerId },
-    create: { clerkId, email, plan: 'PREMIUM', stripeCustomerId },
+    update: {
+      plan: 'PREMIUM',
+      buyerPassExpiresAt,
+      ...(stripeCustomerId ? { stripeCustomerId } : {}),
+      ...(fallbackEmail ? { email: fallbackEmail } : {}),
+    },
+    create: {
+      clerkId,
+      email,
+      plan: 'PREMIUM',
+      stripeCustomerId: stripeCustomerId ?? undefined,
+      buyerPassExpiresAt,
+    },
   });
 }
 
 /**
- * Downgrade a user to free plan (on subscription cancellation).
+ * Clear paid access for a customer. Kept for future refund/support handling.
  */
 export async function downgradeUserToFree(stripeCustomerId: string): Promise<void> {
   await prisma.user.updateMany({
     where: { stripeCustomerId },
-    data: { plan: 'FREE' },
+    data: { plan: 'FREE', buyerPassExpiresAt: null },
   });
 }
 
 /**
- * Update user email from Clerk webhook.
+ * Update user email from Clerk or Stripe webhook context.
  */
 export async function updateUserEmail(clerkId: string, email: string): Promise<void> {
   await prisma.user.upsert({

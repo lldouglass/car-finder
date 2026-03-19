@@ -32,9 +32,9 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold mt-8 mb-3">Common Questions</h2>
             <div className="space-y-4">
               <div>
-                <p className="font-medium">How do I cancel my Premium subscription?</p>
+                <p className="font-medium">Is Buyer Pass a subscription?</p>
                 <p className="text-muted-foreground">
-                  Sign in to your account, go to Settings, and click &quot;Manage Subscription.&quot; You can cancel anytime and keep access through the end of your billing period.
+                  No. Buyer Pass is a one-time payment that gives you 30 days of unlimited access. There is no recurring billing to cancel.
                 </p>
               </div>
               <div>

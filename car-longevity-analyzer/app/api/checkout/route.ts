@@ -31,10 +31,17 @@ export async function POST() {
   } catch (error) {
     console.error('Checkout Error:', error);
 
-    // Handle Stripe-specific errors
-    if (error instanceof Error && error.message.includes('PREMIUM_PRICE_ID')) {
+    // Handle Stripe/config-specific errors
+    if (
+      error instanceof Error &&
+      (
+        error.message.includes('BUYER_PASS_PRICE_ID') ||
+        error.message.includes('one-time Stripe price') ||
+        error.message.includes('active Stripe price')
+      )
+    ) {
       return NextResponse.json(
-        { success: false, error: 'Payment system not configured' },
+        { success: false, error: 'Buyer Pass price is misconfigured' },
         { status: 503 }
       );
     }

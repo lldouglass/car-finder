@@ -25,7 +25,7 @@ export default function PrivacyPage() {
               <li><strong>Vehicle searches:</strong> The year, make, and model of vehicles you search for, used to generate reliability reports.</li>
               <li><strong>Usage data:</strong> Pages visited, features used, and general interaction patterns collected through analytics tools.</li>
               <li><strong>Device information:</strong> Browser type, operating system, and screen size for improving your experience.</li>
-              <li><strong>Payment information:</strong> If you subscribe to Premium, payment details are processed securely by Stripe. We do not store your credit card numbers.</li>
+              <li><strong>Payment information:</strong> If you purchase Buyer Pass, payment details are processed securely by Stripe. We do not store your credit card numbers.</li>
             </ul>
           </section>
 
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold mt-8 mb-3">2. How We Use Your Information</h2>
             <ul className="list-disc pl-5 space-y-1">
               <li>To provide vehicle reliability reports and lifespan estimates.</li>
-              <li>To manage your account and process Premium subscriptions.</li>
+              <li>To manage your account and process Buyer Pass payments.</li>
               <li>To improve our service based on usage patterns.</li>
               <li>To send important updates about your account (we do not send marketing emails without consent).</li>
               <li>To display relevant advertisements through Google AdSense.</li>

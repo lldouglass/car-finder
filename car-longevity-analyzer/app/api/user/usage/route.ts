@@ -22,6 +22,8 @@ export async function GET() {
         limit: usage.limit,
         remaining: usage.remaining,
         isPremium: usage.isPremium,
+        isBuyerPassActive: usage.isBuyerPassActive,
+        buyerPassExpiresAt: usage.buyerPassExpiresAt,
       },
     });
   } catch (error) {

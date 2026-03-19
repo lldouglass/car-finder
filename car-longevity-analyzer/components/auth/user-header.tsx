@@ -17,6 +17,19 @@ interface UsageData {
   limit: number;
   remaining: number;
   isPremium: boolean;
+  isBuyerPassActive?: boolean;
+  buyerPassExpiresAt?: string | null;
+}
+
+function formatBuyerPassExpiry(dateString?: string | null) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 export function UserHeader({ onUpgradeClick }: { onUpgradeClick?: () => void }) {
@@ -41,6 +54,8 @@ export function UserHeader({ onUpgradeClick }: { onUpgradeClick?: () => void }) 
     }
   }
 
+  const expiryLabel = formatBuyerPassExpiry(usage?.buyerPassExpiresAt);
+
   return (
     <div className="flex items-center gap-3">
       <SignedOut>
@@ -53,13 +68,19 @@ export function UserHeader({ onUpgradeClick }: { onUpgradeClick?: () => void }) 
 
       <SignedIn>
         <div className="flex items-center gap-3">
-          {/* Usage/Plan indicator */}
           <div className="flex flex-col items-end text-right">
             {usage?.isPremium ? (
-              <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs px-2 py-0.5">
-                <Crown className="size-3 mr-1" />
-                Premium
-              </Badge>
+              <>
+                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-xs px-2 py-0.5">
+                  <Crown className="size-3 mr-1" />
+                  Buyer Pass
+                </Badge>
+                {expiryLabel && (
+                  <span className="mt-1 text-[11px] text-zinc-500">
+                    Active until {expiryLabel}
+                  </span>
+                )}
+              </>
             ) : (
               <button
                 onClick={onUpgradeClick}
@@ -70,7 +91,6 @@ export function UserHeader({ onUpgradeClick }: { onUpgradeClick?: () => void }) 
             )}
           </div>
 
-          {/* Clerk UserButton with custom menu items */}
           <UserButton
             appearance={{
               elements: {
@@ -85,22 +105,9 @@ export function UserHeader({ onUpgradeClick }: { onUpgradeClick?: () => void }) 
             <UserButton.MenuItems>
               {!usage?.isPremium && (
                 <UserButton.Action
-                  label="Upgrade to Premium"
+                  label="Get Buyer Pass"
                   labelIcon={<Crown className="size-4 text-amber-400" />}
                   onClick={() => onUpgradeClick?.()}
-                />
-              )}
-              {usage?.isPremium && (
-                <UserButton.Action
-                  label="Manage Subscription"
-                  labelIcon={<Crown className="size-4 text-amber-400" />}
-                  onClick={async () => {
-                    const res = await fetch('/api/billing/portal', { method: 'POST' });
-                    const data = await res.json();
-                    if (data.success && data.url) {
-                      window.location.href = data.url;
-                    }
-                  }}
                 />
               )}
             </UserButton.MenuItems>

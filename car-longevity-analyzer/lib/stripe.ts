@@ -4,15 +4,10 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing STRIPE_SECRET_KEY environment variable');
 }
 
-// Trim whitespace/newlines that may have been accidentally copied
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY.trim();
 
 export const stripe = new Stripe(stripeSecretKey);
 
-/**
- * Get the application URL for Stripe redirects.
- * Handles missing env var, trimming, and protocol normalization.
- */
 function getAppUrl(): string {
   const url = process.env.NEXT_PUBLIC_APP_URL?.trim();
 
@@ -23,7 +18,6 @@ function getAppUrl(): string {
     return 'http://localhost:3000';
   }
 
-  // Ensure URL has protocol
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return `https://${url}`;
   }
@@ -31,45 +25,53 @@ function getAppUrl(): string {
   return url;
 }
 
-/**
- * Create a Stripe Checkout session for Premium subscription.
- */
-export async function createCheckoutSession(clerkId: string, email: string) {
-  const priceId = process.env.PREMIUM_PRICE_ID?.trim();
+function getBuyerPassPriceId(): string {
+  const priceId =
+    process.env.BUYER_PASS_PRICE_ID?.trim() ||
+    process.env.PREMIUM_PRICE_ID?.trim() ||
+    process.env.STRIPE_PRICE_ID?.trim();
 
   if (!priceId) {
-    throw new Error('Missing PREMIUM_PRICE_ID environment variable');
+    throw new Error('Missing BUYER_PASS_PRICE_ID environment variable');
   }
 
+  return priceId;
+}
+
+/**
+ * Create a Stripe Checkout session for the one-time Buyer Pass.
+ */
+export async function createCheckoutSession(clerkId: string, email: string) {
+  const priceId = getBuyerPassPriceId();
   const appUrl = getAppUrl();
+  const price = await stripe.prices.retrieve(priceId);
+
+  if (!price.active) {
+    throw new Error('BUYER_PASS_PRICE_ID must reference an active Stripe price');
+  }
+
+  if (price.type !== 'one_time' || price.recurring) {
+    throw new Error('BUYER_PASS_PRICE_ID must reference a one-time Stripe price');
+  }
 
   const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
+    mode: 'payment',
     payment_method_types: ['card'],
+    customer_creation: 'always',
     customer_email: email,
-    metadata: { clerkId },
+    metadata: {
+      clerkId,
+      purchaseType: 'buyer_pass',
+      buyerPassPriceId: price.id,
+    },
     line_items: [
       {
         price: priceId,
         quantity: 1,
       },
     ],
-    success_url: `${appUrl}/?upgraded=true`,
-    cancel_url: `${appUrl}/?cancelled=true`,
-  });
-
-  return session;
-}
-
-/**
- * Create a Stripe Customer Portal session for managing subscription.
- */
-export async function createCustomerPortal(customerId: string) {
-  const appUrl = getAppUrl();
-
-  const session = await stripe.billingPortal.sessions.create({
-    customer: customerId,
-    return_url: `${appUrl}/`,
+    success_url: `${appUrl}/?buyerPass=success`,
+    cancel_url: `${appUrl}/?buyerPass=cancelled`,
   });
 
   return session;
