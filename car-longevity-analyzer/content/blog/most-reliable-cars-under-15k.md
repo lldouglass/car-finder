@@ -29,8 +29,9 @@ If your shortlist mixes domestic options with the import-heavy picks in this gui
 - [Is Ford still reliable in 2026?](/blog/is-ford-reliable-long-term)
 - [Ford reliability 2026 models vs 2021 models](/blog/ford-reliability-2026-how-much-has-it-improved)
 - [Chevrolet maintenance costs vs other brands](/blog/chevrolet-maintenance-costs-vs-other-brands)
+- [Toyota vs Ford vs Chevy reliability for 2026 SUV and truck buyers](/blog/toyota-vs-ford-vs-chevy-reliability-2026)
 
-This keeps the under-$15k decision grounded in both reliability risk and ownership cost, not just listing price.
+This keeps the under-$15k decision grounded in both reliability risk and ownership cost, not just listing price. If your shortlist is crossing over into compact SUVs and older trucks, use the three-brand benchmark before you decide: [Toyota vs Ford vs Chevy reliability in 2026](/blog/toyota-vs-ford-vs-chevy-reliability-2026).
 
 ## If your under-$15k search includes older trucks
 
