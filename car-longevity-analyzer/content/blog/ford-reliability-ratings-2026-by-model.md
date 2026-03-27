@@ -69,6 +69,8 @@ Why it can be a strong used buy:
 - strong ownership satisfaction when maintained properly
 - often better long-run value than similarly priced competitors
 
+If your shortlist also includes Ford's off-road SUV line, use our dedicated [2026 Ford Bronco reliability rating guide](/blog/ford-bronco-reliability-rating-2026) before choosing between Bronco and Bronco Sport.
+
 ## Ford Models That Need More Caution
 
 ### Explorer

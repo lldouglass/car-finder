@@ -23,7 +23,7 @@ If your budget is under $15k and you are cross-shopping older examples, pair thi
 - **Buying a crossover on a tighter maintenance budget:** Chevy is often cheaper to run year to year.
 - **Not locked to domestic brands:** Toyota usually offers lower long-term reliability volatility, use the [Toyota vs Ford vs Chevy comparison](/blog/toyota-vs-ford-vs-chevy-reliability-2026) before deciding.
 
-If your choice is between repairing an older Ford/Chevy or replacing it, run the [fix vs sell decision guide](/blog/when-to-sell-car-vs-repair-decision-guide) before taking a large repair quote.
+If your choice is between repairing an older Ford/Chevy or replacing it, run the [fix vs sell decision guide](/blog/when-to-sell-car-vs-repair-decision-guide) before taking a large repair quote. If your shortlist includes off-road SUVs, check the [2026 Ford Bronco reliability rating guide](/blog/ford-bronco-reliability-rating-2026) before committing to a modified unit.
 
 ## Next steps for 2026 buyers (fast path)
 
@@ -152,7 +152,7 @@ The F-150's aluminum body (no rust), broader engine selection, and higher sales 
 **Best Ford purchases:**
 1. **F-150 with 5.0L Coyote V8 (2018+):** Best reliability/durability in the full-size truck class
 2. **Maverick Hybrid:** Outstanding fuel economy, Toyota-derived hybrid system, and practical size
-3. **Bronco Sport (2021+):** The 1.5L three-cylinder base engine is surprisingly capable and reliable
+3. **Bronco Sport (2021+):** The 1.5L three-cylinder base engine is surprisingly capable and reliable. If you are considering full Bronco trims too, use our [Ford Bronco reliability rating 2026 guide](/blog/ford-bronco-reliability-rating-2026) for engine-level risk checks.
 
 **Best Chevy purchases:**
 1. **Silverado with 6.2L V8 (2021+, DFM):** The updated lifter design addresses the biggest reliability concern

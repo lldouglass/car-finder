@@ -54,7 +54,7 @@ Ford SUV reliability is mixed by model:
 - Explorer remains a higher-risk lane than many buyers expect, especially when maintenance history is weak.
 - Engine selection matters more than badge loyalty.
 
-For model-level details, use [Ford reliability ratings 2026 by model](/blog/ford-reliability-ratings-2026-by-model).
+For model-level details, use [Ford reliability ratings 2026 by model](/blog/ford-reliability-ratings-2026-by-model). If an off-road SUV is in your decision set, add the [Ford Bronco reliability rating 2026 guide](/blog/ford-bronco-reliability-rating-2026) before finalizing trim and engine.
 
 ### Chevy SUV profile
 Chevy SUVs are often easier to buy at a discount, but reliability varies:

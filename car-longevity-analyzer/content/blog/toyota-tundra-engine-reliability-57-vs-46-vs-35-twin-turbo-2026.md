@@ -1,6 +1,6 @@
 ---
-title: "Toyota Tundra 5.7 vs 4.6 vs 3.5 Twin Turbo Reliability in 2026"
-description: "Toyota Tundra 5.7L vs 4.6L vs 3.5L twin-turbo reliability and maintenance issues, with lifespan ranges and long-term ownership cost differences."
+title: "Toyota Tundra 5.7 vs 4.6 vs 3.5 Reliability: Which Engine Lasts Longer?"
+description: "Toyota Tundra 5.7L vs 4.6L vs 3.5L reliability comparison with maintenance risk, lifespan ranges, and long-term ownership cost tradeoffs."
 date: "2026-03-09"
 author: "Car Lifespan Check Team"
 tags: ["toyota tundra reliability", "5.7 vs 4.6 vs 3.5 twin turbo", "tundra maintenance issues", "tundra engine comparison", "long term truck reliability"]
