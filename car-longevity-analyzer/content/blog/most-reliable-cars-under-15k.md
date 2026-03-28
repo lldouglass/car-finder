@@ -65,6 +65,15 @@ Use this handoff if you are deciding between $12k and $15k options:
 - Validate durability with [car life expectancy by brand](/blog/car-life-expectancy-by-brand)
 - If your alternatives include domestic models, compare [Chevy vs Ford reliability](/blog/ford-vs-chevy-reliability-comparison) and [Ford long-term reliability](/blog/is-ford-reliable-long-term)
 
+## Import vs European cross-shop check before you buy
+
+If your shortlist mixes Japanese and German options in the same price band, run this before final offer:
+- [German vs Japanese car reliability in 2026](/blog/german-vs-japanese-car-reliability)
+- [How many miles will a Honda Civic last?](/blog/how-many-miles-will-a-honda-civic-last)
+- [Fix or sell car in 2026?](/blog/when-to-sell-car-vs-repair-decision-guide)
+
+This catches cases where a lower upfront listing price hides a much higher 2-year ownership cost.
+
 ## Sedans: Maximum Reliability Per Dollar
 
 ### 1. Toyota Corolla (2017-2020) — $11,000-$14,500

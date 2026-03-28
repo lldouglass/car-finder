@@ -1,6 +1,6 @@
 ---
-title: "Fix or Sell Car in 2026? Repair vs Replace Decision Guide"
-description: "Fix or sell your car in 2026? Use a clear repair-vs-replace framework, cost thresholds, and examples before you spend."
+title: "Fix or Sell Car in 2026? Repair vs Replace Guide (35% to 50% Rule)"
+description: "Fix or sell your car in 2026 using a practical 35% to 50% threshold, 12-month repair-risk check, and real repair-vs-replace examples."
 date: "2026-02-12"
 author: "Car Lifespan Check Team"
 tags: ["car-repair", "selling", "financial-decision", "maintenance"]
@@ -24,6 +24,14 @@ Use this with related pages while you decide:
 - [Used Car Inspection Checklist](/blog/used-car-inspection-checklist)
 - [How Long Do Toyota Trucks Last?](/blog/how-long-do-toyota-trucks-last)
 - [Is Ford Reliable for Long-Term Ownership in 2026?](/blog/is-ford-reliable-long-term)
+
+## If your repair quote landed today, do this first
+
+1. Verify real replacement options in your budget with [Most Reliable Cars Under $15k in 2026](/blog/most-reliable-cars-under-15k).
+2. If your fallback is a compact sedan, benchmark expected lifespan on [How Many Miles Will a Honda Civic Last?](/blog/how-many-miles-will-a-honda-civic-last).
+3. If you are cross-shopping domestic options, compare [Ford vs Chevy reliability](/blog/ford-vs-chevy-reliability-comparison) before you commit.
+
+This keeps the decision grounded in replacement quality, not just the emotional pain of one big repair bill.
 
 ---
 
