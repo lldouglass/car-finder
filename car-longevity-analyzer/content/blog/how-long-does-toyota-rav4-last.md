@@ -12,6 +12,8 @@ A well-maintained Toyota RAV4 typically lasts 250,000 to 300,000 miles, with som
 
 The RAV4's reliability comes from Toyota's conservative engineering philosophy: proven powertrains, simple mechanical designs, and a focus on durability over cutting-edge features. Since its launch in 1996, the RAV4 has grown from a quirky small SUV to the best-selling non-truck vehicle in America, and reliability is a big reason why.
 
+If you are deciding between Toyota's compact SUV lane and its body-on-frame durability lane, compare this page with our [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last) before paying the 4Runner premium.
+
 Different generations have different strengths and weaknesses. Here is what to expect from each.
 
 ## Toyota RAV4 Reliability by Generation

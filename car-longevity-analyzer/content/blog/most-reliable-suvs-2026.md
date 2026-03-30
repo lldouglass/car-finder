@@ -27,7 +27,9 @@ A "reliable" SUV is not just one that avoids recalls. It is one that requires mi
 
 ### Toyota 4Runner
 
-The 4Runner is arguably the most reliable SUV ever built. The fifth-generation model (2010 to 2024) used Toyota's 4.0L 1GR-FE V6, an engine with a documented track record of exceeding 300,000 miles with basic maintenance. The five-speed automatic in these models is similarly bulletproof.
+The [Toyota 4Runner](/blog/how-long-does-toyota-4runner-last) is arguably the most reliable SUV ever built. The fifth-generation model (2010 to 2024) used Toyota's 4.0L 1GR-FE V6, an engine with a documented track record of exceeding 300,000 miles with basic maintenance. The five-speed automatic in these models is similarly bulletproof.
+
+If you want the dedicated mileage-by-generation breakdown, best years to buy, and used-buyer inspection points, use our full [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last).
 
 **Best model years:** 2015 to 2023. These years benefit from mid-cycle refinements while avoiding the first-year teething issues of the 2010 model. NHTSA complaint counts for 2015 to 2020 models average fewer than 150 complaints per model year, which is remarkably low for a vehicle sold in these volumes.
 
@@ -44,6 +46,8 @@ The RAV4 has been one of the best-selling SUVs in America for years, and reliabi
 **Common problems to watch for:** The 2019 to 2020 RAV4 had a notable issue with transmission hesitation during low-speed acceleration. Toyota issued a TSB (Technical Service Bulletin) with a software update that largely resolved the issue. Make sure any used 2019 to 2020 has had this update applied. Some 2013 to 2015 models had excessive oil consumption on the 2.5L engine; check service records for oil consumption complaints.
 
 **What to avoid:** The 2006 to 2012 RAV4 V6 models used the 2GR-FE engine, which is reliable, but was paired with a transmission that some owners reported failing between 100,000 and 150,000 miles. Stick with the four-cylinder for maximum longevity in those years.
+
+If you are deciding between body-on-frame durability and compact-SUV efficiency, compare our [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last) with the [Toyota RAV4 lifespan guide](/blog/how-long-does-toyota-rav4-last) before you pay the 4Runner resale premium.
 
 ### Lexus GX
 
