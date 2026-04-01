@@ -19,7 +19,7 @@ If you want the shortest possible answer for 2026 budget shopping, start with:
 - 2016-2019 Honda Civic (2.0L trims)
 - 2017-2019 Mazda3 Sedan
 
-These year ranges consistently show lower repair frequency than most same-price alternatives. If your shortlist includes older trucks, compare [how long Toyota trucks last](/blog/how-long-do-toyota-trucks-last) and [Tundra engine reliability by 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026) before paying a truck premium.
+These year ranges consistently show lower repair frequency than most same-price alternatives. If your shortlist includes older trucks, compare [how long Toyota trucks last](/blog/how-long-do-toyota-trucks-last), [Toyota Tundra lifespan by year](/blog/toyota-tundra-lifespan-how-long-does-it-last), and [Tundra engine reliability by 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026) before paying a truck premium.
 
 ## Ford or Chevy shopper shortcut under $15k
 
