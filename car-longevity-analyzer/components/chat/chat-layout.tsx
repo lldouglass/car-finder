@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Sidebar } from './sidebar';
 import { ChatArea } from './chat-area';
 import { UpgradeModal } from '@/components/billing/upgrade-modal';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function ChatLayout() {
@@ -46,7 +47,10 @@ export function ChatLayout() {
           >
             <Menu className="size-5" />
           </Button>
-          <span className="font-semibold text-lg">Car Analyzer</span>
+          <span className="flex-1 font-semibold text-base">Car Lifespan Check</span>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/pricing">Buyer Pass</Link>
+          </Button>
         </header>
 
         {/* Chat area */}

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { SignUpButton, useUser } from '@clerk/nextjs';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { SafetyRatingsDisplay, NoSafetyRatings } from '@/components/safety-ratings-display';
 import { KnownIssuesDisplay } from '@/components/known-issues-display';
 import { LifespanFactorsDisplay } from '@/components/lifespan-factors-display';
@@ -35,6 +37,9 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Crown,
+  Lock,
+  ArrowRight,
 } from 'lucide-react';
 import { InlineVinUpsell } from '@/components/inline-vin-upsell';
 import type { AnalysisResponse, RedFlag, MaintenanceProjectionApi, ExpectedLifespan as ExpectedLifespanType } from '@/lib/api';
@@ -42,7 +47,10 @@ import type { AnalysisResponse, RedFlag, MaintenanceProjectionApi, ExpectedLifes
 interface ResultsDisplayProps {
   result: AnalysisResponse;
   onSwitchToVin?: () => void;
+  onUpgradeClick?: () => void;
 }
+
+const BUYER_PASS_PRICE = process.env.NEXT_PUBLIC_BUYER_PASS_PRICE || '$12';
 
 function formatNumber(num: number | null | undefined): string {
   if (num === null || num === undefined) return 'N/A';
@@ -265,7 +273,8 @@ function RedFlagItem({ flag }: { flag: RedFlag }) {
   );
 }
 
-export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
+export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: ResultsDisplayProps) {
+  const { isSignedIn } = useUser();
   const {
     vehicle,
     longevity,
@@ -307,9 +316,85 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
 
   const isVehicleSearch = result.analysisType === 'vehicle';
 
+  const premiumPreviewCards: Array<{
+    title: string;
+    teaser: string;
+    bullets: string[];
+    icon: typeof DollarSign;
+  }> = [
+    {
+      title: 'Fair Price Analysis',
+      teaser: 'See if the asking price is competitive before you start texting the seller.',
+      bullets: [
+        'Compare likely market value against the listing price',
+        'Spot overpay risk and see a buyer-friendly target range',
+      ],
+      icon: DollarSign,
+    },
+    {
+      title: 'Negotiation Plan',
+      teaser: 'Walk in with a number, leverage points, and a walk-away price.',
+      bullets: [
+        'Get a suggested opening offer based on the vehicle profile',
+        'Use buyer talking points instead of guessing what to say',
+      ],
+      icon: MessageCircle,
+    },
+    {
+      title: 'Maintenance Outlook',
+      teaser: 'Understand what this car may cost after you bring it home.',
+      bullets: [
+        'Preview likely near-term repairs and maintenance pressure points',
+        'Estimate annual and multi-year ownership costs before you buy',
+      ],
+      icon: Wrench,
+    },
+    {
+      title: 'Inspection Checklist',
+      teaser: 'Show up knowing exactly what to inspect on this vehicle family.',
+      bullets: [
+        'Bring model-specific trouble spots to your test drive',
+        'Use a mechanic-ready checklist so expensive issues are harder to miss',
+      ],
+      icon: Clipboard,
+    },
+  ];
+
+  const upgradeButton = (
+    label: string,
+    variant: 'default' | 'outline' = 'default',
+    className?: string
+  ) => {
+    if (isSignedIn) {
+      return (
+        <Button onClick={onUpgradeClick} disabled={!onUpgradeClick} variant={variant} className={className}>
+          <Crown className="size-4" />
+          {label}
+        </Button>
+      );
+    }
+
+    return (
+      <SignUpButton mode="modal">
+        <Button variant={variant} className={className}>
+          <Crown className="size-4" />
+          {label}
+        </Button>
+      </SignUpButton>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Debug info in development */}
+
+      {isVehicleSearch && (
+        <InlineVinUpsell
+          onSwitchToVin={onSwitchToVin}
+          onUpgradeClick={onUpgradeClick}
+          vehicleName={hasVehicleData ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : undefined}
+        />
+      )}
 
       {/* Unified Lifespan + Price - hidden for free vehicle searches */}
       {!isVehicleSearch && (
@@ -502,14 +587,6 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
             </p>
           </CardContent>
         </Card>
-      )}
-
-      {/* Inline VIN upsell for free vehicle searches */}
-      {isVehicleSearch && (
-        <InlineVinUpsell
-          onSwitchToVin={onSwitchToVin}
-          vehicleName={hasVehicleData ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : undefined}
-        />
       )}
 
       {/* Lifespan Factors and Survival Probability are now integrated into the unified "How Long Will It Last" card above */}
@@ -900,6 +977,77 @@ export function ResultsDisplay({ result, onSwitchToVin }: ResultsDisplayProps) {
           )}
         </CardContent>
       </Card>
+
+      {isVehicleSearch && (
+        <Card className="border-amber-200 dark:border-amber-900/60" role="region" aria-labelledby="premium-preview-heading">
+          <CardHeader>
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle id="premium-preview-heading" className="text-lg flex items-center gap-2">
+                <Lock className="size-5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+                Buyer Pass Preview
+              </CardTitle>
+              <Badge className="bg-amber-500 text-zinc-900 hover:bg-amber-500">
+                {BUYER_PASS_PRICE} one-time
+              </Badge>
+            </div>
+            <CardDescription>
+              Free search gives you reliability, safety, recalls, and buyer questions. Buyer Pass adds the paid decision tools below for 30 days, no recurring subscription.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              {premiumPreviewCards.map(({ title, teaser, bullets, icon: Icon }) => (
+                <div key={title} className="rounded-xl border border-dashed border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-lg bg-background/90 p-2 shadow-sm dark:bg-zinc-900/90">
+                        <Icon className="size-4 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-sm">{title}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">{teaser}</p>
+                      </div>
+                    </div>
+                    <Lock className="size-4 text-muted-foreground shrink-0" />
+                  </div>
+
+                  <div className="mt-4 space-y-2">
+                    {bullets.map((bullet) => (
+                      <div key={bullet} className="flex items-start gap-2 rounded-lg bg-background/80 px-3 py-2 text-sm dark:bg-zinc-900/70">
+                        <span className="mt-1 size-2 rounded-full bg-amber-500 shrink-0" />
+                        <span className="text-muted-foreground">{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                    <span>Unlocked with Buyer Pass</span>
+                    <span className="font-medium text-foreground">30 days access</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-3 rounded-xl bg-zinc-950 px-4 py-4 text-zinc-100 dark:border dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold">Before you buy, unlock the parts that help you avoid overpaying.</p>
+                <p className="mt-1 text-sm text-zinc-300">
+                  Buyer Pass is {BUYER_PASS_PRICE} one-time for 30 days. No recurring subscription.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {upgradeButton(`Unlock Buyer Pass, ${BUYER_PASS_PRICE}`, 'default', 'bg-amber-500 hover:bg-amber-600 text-zinc-900')}
+                {onSwitchToVin && (
+                  <Button onClick={onSwitchToVin} variant="outline" className="border-zinc-700 bg-transparent text-zinc-100 hover:bg-zinc-900 hover:text-zinc-100">
+                    Use a VIN now
+                    <ArrowRight className="size-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Disclaimer */}
       <Alert className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">

@@ -42,15 +42,15 @@ export function SignUpGate({ children, previewHeight = 400 }: SignUpGateProps) {
           </div>
           <h3 className="text-lg font-semibold mb-2">See the Full Analysis</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Create a free account to unlock detailed pricing, negotiation strategies, maintenance projections, and more.
+            Free account access lets you save reports and preview limited VIN analysis. Buyer Pass is the paid buyer toolkit, $12 one-time for 30 days of unlimited pricing, negotiation strategy, maintenance outlook, and inspection planning.
           </p>
           <SignUpButton mode="modal">
             <Button className="w-full mb-2">
-              Create Free Account
+              Create Free Account to Continue
             </Button>
           </SignUpButton>
           <p className="text-xs text-muted-foreground">
-            No credit card required. 3 free VIN reports per month.
+            No credit card required to start. Free gets you limited VIN reports, Buyer Pass removes the cap for 30 days.
           </p>
         </div>
       </div>

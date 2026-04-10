@@ -2,23 +2,28 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { SignUpButton, useUser } from '@clerk/nextjs';
 import { useAnalysis } from '@/lib/analysis-context';
 import { ChatInput, type ChatInputHandle } from './chat-input';
 import { UserMessage } from './messages/user-message';
 import { VehicleHeader } from './messages/vehicle-header';
 import { ResultsDisplay } from './results-display';
 import { LoadingMessage } from './messages/loading-message';
-import { Car, Crown, Shield, Database, Zap, Search, CheckCircle, TrendingUp, DollarSign, FileText, BarChart3, Target, Users, Star, CheckSquare, Archive } from 'lucide-react';
+import { Car, Crown, Shield, Database, Zap, Search, CheckCircle, TrendingUp, DollarSign, BarChart3, Target, Users, CheckSquare } from 'lucide-react';
 import { DemoResult } from './demo-result';
 import { Button } from '@/components/ui/button';
 import { SignUpGate } from '@/components/sign-up-gate';
 import { SignUpBanner } from '@/components/sign-up-banner';
+import { BUYER_PASS_OFFER, buyerPassComparison } from '@/lib/buyer-pass';
 
 interface ChatAreaProps {
   onUpgradeClick?: () => void;
 }
 
+const homepageComparison = buyerPassComparison.slice(0, 4);
+
 export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
+  const { isSignedIn } = useUser();
   const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -64,14 +69,17 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                 <div className="mx-auto mb-6 rounded-full bg-primary/10 p-4 w-fit">
                   <Car className="size-12 text-primary" />
                 </div>
+                <div className="mx-auto mb-3 inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
+                  Free car checks + Buyer Pass
+                </div>
                 <h2 className="text-3xl font-bold tracking-tight mb-3">
-                  How Long Will Your Car Last?
+                  Run a free car check, then unlock Buyer Pass when the deal gets real.
                 </h2>
-                <p className="text-muted-foreground text-lg mb-2">
-                  Search any vehicle by make, model, and year — free, instant reliability reports.
+                <p className="text-muted-foreground text-lg mb-2 max-w-2xl mx-auto">
+                  Search any vehicle by year, make, and model for free. When you have a VIN or listing you might actually buy, Buyer Pass gives you the deeper pricing, negotiation, and ownership report.
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  Or use your VIN for a detailed analysis with pricing and lifespan projections.
+                <p className="text-muted-foreground text-sm max-w-xl mx-auto">
+                  Buyer Pass is {BUYER_PASS_OFFER}, no recurring subscription.
                 </p>
               </div>
 
@@ -82,6 +90,26 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
 
               {/* Quick browse actions */}
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {isSignedIn ? (
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+                    onClick={onUpgradeClick}
+                  >
+                    <Crown className="size-4 mr-1" />
+                    Get Buyer Pass, $12
+                  </Button>
+                ) : (
+                  <SignUpButton mode="modal">
+                    <Button size="sm" className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
+                      <Crown className="size-4 mr-1" />
+                      Unlock Buyer Pass, $12
+                    </Button>
+                  </SignUpButton>
+                )}
+                <Button asChild variant="outline" size="sm" className="rounded-full">
+                  <Link href="/pricing">See Pricing</Link>
+                </Button>
                 <Button asChild variant="outline" size="sm" className="rounded-full">
                   <Link href="/browse">Browse by Budget</Link>
                 </Button>
@@ -90,8 +118,28 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                 </Button>
               </div>
 
+              <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="grid grid-cols-[1.2fr_0.8fr_0.8fr] bg-zinc-50 text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:bg-zinc-800/80 dark:text-zinc-300">
+                  <div className="p-3 text-left">What you get</div>
+                  <div className="p-3 text-left">Free</div>
+                  <div className="p-3 text-left text-amber-700 dark:text-amber-300">Buyer Pass</div>
+                </div>
+                {homepageComparison.map((row, index) => (
+                  <div
+                    key={row.feature}
+                    className={`grid grid-cols-[1.2fr_0.8fr_0.8fr] text-sm ${
+                      index !== homepageComparison.length - 1 ? 'border-t border-zinc-200 dark:border-zinc-800' : ''
+                    }`}
+                  >
+                    <div className="p-3 font-medium">{row.feature}</div>
+                    <div className="p-3 text-muted-foreground">{row.free}</div>
+                    <div className="p-3 text-muted-foreground">{row.buyerPass}</div>
+                  </div>
+                ))}
+              </div>
+
               {/* Trust indicators */}
-              <div className="flex items-center justify-center gap-6 mt-4 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-6 mt-4 text-sm text-muted-foreground flex-wrap">
                 <span className="flex items-center gap-1">
                   <Search className="size-4" />
                   Free Search
@@ -210,6 +258,30 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                         Pre-purchase checklists
                       </li>
                     </ul>
+                    <div className="mt-5">
+                      {isSignedIn ? (
+                        <Button
+                          onClick={onUpgradeClick}
+                          className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+                        >
+                          <Crown className="size-4 mr-2" />
+                          Get Buyer Pass
+                        </Button>
+                      ) : (
+                        <SignUpButton mode="modal">
+                          <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
+                            <Crown className="size-4 mr-2" />
+                            Create Account to Buy
+                          </Button>
+                        </SignUpButton>
+                      )}
+                      <Button asChild variant="outline" className="mt-2 w-full">
+                        <Link href="/pricing">See full pricing details</Link>
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Visible paid option, one-time checkout, no recurring subscription.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -337,7 +409,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     className="bg-amber-500 hover:bg-amber-600 text-zinc-900"
                   >
                     <Crown className="size-4 mr-2" />
-Get Buyer Pass
+                    Get Buyer Pass
                   </Button>
                 </div>
               ) : (
@@ -353,12 +425,12 @@ Get Buyer Pass
               <VehicleHeader result={result} />
               {result.analysisType === 'vehicle' ? (
                 <>
-                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
-                  <SignUpBanner />
+                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} onUpgradeClick={onUpgradeClick} />
+                  <SignUpBanner onUpgradeClick={onUpgradeClick} />
                 </>
               ) : (
                 <SignUpGate>
-                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} />
+                  <ResultsDisplay result={result} onSwitchToVin={handleSwitchToVin} onUpgradeClick={onUpgradeClick} />
                 </SignUpGate>
               )}
             </>

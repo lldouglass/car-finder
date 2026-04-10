@@ -69,7 +69,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             Unlock Buyer Pass
           </h2>
           <p className="text-zinc-400 text-sm">
-            One payment, 30 days of unlimited full car checks
+            One payment, 30 days of full buyer reports
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           <div className="text-center mb-6">
             <span className="text-4xl font-bold text-zinc-100">{PRICE}</span>
             <span className="text-zinc-400"> one-time</span>
-            <div className="text-sm text-zinc-500 mt-1">30 days access</div>
+            <div className="text-sm text-zinc-500 mt-1">30 days access, no subscription</div>
           </div>
 
           <ul className="space-y-3 mb-6">
@@ -113,7 +113,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           </Button>
 
           <p className="text-center text-xs text-zinc-500 mt-4">
-            One-time payment. Secure checkout via Stripe.
+            One-time payment, secure checkout via Stripe, no recurring billing.
           </p>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { UserHeader } from '@/components/auth/user-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { PlusCircle, Search, X, Car, BookOpen, FileText, DollarSign, Table } from 'lucide-react';
+import { PlusCircle, Search, X, Car, BookOpen, FileText, DollarSign, Table, Crown } from 'lucide-react';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -47,7 +47,7 @@ export function Sidebar({ onClose, onUpgradeClick }: SidebarProps) {
       <div className="flex items-center justify-between p-4 border-b border-zinc-800">
         <div className="flex items-center gap-2">
           <Car className="size-5 text-primary" />
-          <span className="font-semibold">Car Analyzer</span>
+          <span className="font-semibold">Car Lifespan Check</span>
         </div>
         {/* Close button - mobile only */}
         {onClose && (
@@ -147,6 +147,21 @@ export function Sidebar({ onClose, onUpgradeClick }: SidebarProps) {
 
       {/* Footer with User Info */}
       <div className="border-t border-zinc-800 p-3 space-y-3">
+        <Link
+          href="/pricing"
+          className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-left transition-colors hover:bg-amber-500/15"
+        >
+          <div className="rounded-md bg-amber-500/20 p-2">
+            <Crown className="size-4 text-amber-400" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-100">Buyer Pass pricing</p>
+            <p className="mt-1 text-xs text-zinc-400">
+              $12 one-time for 30 days, no subscription.
+            </p>
+          </div>
+        </Link>
+
         <div className="grid grid-cols-2 gap-2">
           <Link
             href="/browse"
@@ -176,10 +191,17 @@ export function Sidebar({ onClose, onUpgradeClick }: SidebarProps) {
             <FileText className="size-3.5" />
             Guide
           </Link>
+          <Link
+            href="/pricing"
+            className="col-span-2 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-amber-400 hover:bg-zinc-800 transition-colors"
+          >
+            <Crown className="size-3.5" />
+            Buyer Pass Pricing
+          </Link>
         </div>
         <UserHeader onUpgradeClick={onUpgradeClick} />
         <p className="text-xs text-zinc-500 text-center">
-          Data from NHTSA & AI analysis
+          Practical reliability, recall, and pricing help for used car buyers.
         </p>
       </div>
     </div>
