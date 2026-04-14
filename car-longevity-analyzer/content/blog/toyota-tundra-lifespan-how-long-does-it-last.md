@@ -15,11 +15,13 @@ The Tundra's longevity comes from Toyota's proven powertrain engineering, conser
 If you are deciding whether a Tundra is worth the truck premium, compare these before you buy:
 
 1. [How long Toyota trucks last (Tacoma vs Tundra)](/blog/how-long-do-toyota-trucks-last)
-2. [Toyota Tundra engine reliability: 5.7L vs 4.6L vs 3.5L twin turbo](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
+2. [Most reliable Toyota Tundra engine: 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
 3. [How long does Toyota 4Runner last?](/blog/how-long-does-toyota-4runner-last)
 4. [Most reliable cars under $15k in 2026](/blog/most-reliable-cars-under-15k)
 
 This gives you the truck-vs-SUV and truck-vs-budget-car tradeoff before you overpay for capability you may not actually need.
+
+If you already have a real Tundra VIN or listing, [Buyer Pass pricing](/pricing) shows the exact-car report that adds fair pricing, negotiation notes, and the buyer checklist.
 
 ## Toyota Tundra Lifespan by Generation
 
@@ -128,7 +130,7 @@ The Tundras that reach 400,000+ miles all share common maintenance habits:
 3. **Service records.** Tundras with documented maintenance histories at 100,000+ miles are worth a premium. Regular transmission fluid changes are the key indicator.
 4. **Towing history.** Ask about towing. Tundras used primarily for heavy towing will have more wear on transmission, brakes, and suspension. Not a dealbreaker but worth knowing.
 
-Use our [free car lifespan calculator](/) to check any specific Tundra model year's expected lifespan, reliability score, and known problems based on NHTSA complaint data.
+Use our [free car lifespan calculator](/) to check any specific Tundra model year's expected lifespan, reliability score, and known problems based on NHTSA complaint data. If the deal is real and you are down to one truck, use [Buyer Pass](/pricing) for the decision layer before you buy.
 
 ## Bottom Line
 
