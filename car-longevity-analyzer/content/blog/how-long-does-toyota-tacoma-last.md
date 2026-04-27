@@ -8,7 +8,17 @@ tags: ["toyota", "tacoma", "trucks", "reliability", "lifespan"]
 
 A Toyota Tacoma typically lasts 250,000 to 350,000 miles with regular maintenance. Some owners report 400,000+ miles on the original drivetrain. According to iSeeCars data, 3.7% of Tacomas reach 200,000 miles, ranking in the top 10 of all vehicles (not just trucks) for longevity.
 
-The Tacoma's reputation for lasting forever is well earned, but not every model year is equal. Frame rust, head gasket failures, and transmission problems affect specific generations. Here is what to expect from each one.
+The Tacoma's reputation for lasting forever is well earned, but the real used-buyer question is whether the truck in front of you is still a smart buy at 150,000, 200,000, or 250,000 miles. Frame rust, head gasket trouble on older trucks, and transmission behavior on some third-generation models matter more than Toyota's general reputation.
+
+## Toyota Tacoma quick answer for used buyers
+
+- **Typical lifespan:** 250,000 to 350,000 miles
+- **Safest used-buy years:** 2010-2013 and 2020-2023
+- **150k-200k miles:** usually still a normal buying range if service history is clean
+- **200k+ miles:** fine only if frame condition, transmission behavior, and maintenance records all check out
+- **Cross-shopping bigger Toyota durability lanes:** compare this page with our [Toyota truck lifespan hub](/blog/how-long-do-toyota-trucks-last), [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last), and [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last)
+
+If you are already looking at one specific used Tacoma, skip the generic guessing and check [Buyer Pass pricing](/pricing) so you can run the exact-car workflow before you buy.
 
 ## Toyota Tacoma Lifespan by Generation
 

@@ -14,6 +14,12 @@ The 4Runner's strength is simple engineering: body-on-frame construction, proven
 
 If you want the shortest honest answer to **how long a Toyota 4Runner lasts**, a clean example with regular fluid service and rust prevention usually reaches **250,000 to 350,000 miles**, and late fifth-generation trucks are still the safest used-buy lane for 2026 shoppers.
 
+For used-buyer decisions, treat mileage like this:
+- **150k-200k miles:** normal 4Runner shopping range if the frame and service history are clean
+- **200k+ miles:** still buyable, but only if rust, suspension wear, and cooling-system maintenance all check out
+- **Cross-shopping Toyota durability lanes:** compare our [Toyota truck lifespan hub](/blog/how-long-do-toyota-trucks-last), [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last), and [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last)
+- **Need a real-listing decision instead of generic advice?** See [Buyer Pass pricing](/pricing)
+
 If you are deciding whether a 4Runner is the right Toyota durability play, use this fast path:
 - Want the lower-cost daily-driver option? Compare [how long a Toyota RAV4 lasts](/blog/how-long-does-toyota-rav4-last).
 - Need a truck bed or heavier towing flexibility? Read [how long Toyota trucks last](/blog/how-long-do-toyota-trucks-last).

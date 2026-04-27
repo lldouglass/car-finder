@@ -15,11 +15,12 @@ The Tundra's longevity comes from Toyota's proven powertrain engineering, conser
 If you are deciding whether a Tundra is worth the truck premium, compare these before you buy:
 
 1. [How long Toyota trucks last (Tacoma vs Tundra)](/blog/how-long-do-toyota-trucks-last)
-2. [Most reliable Toyota Tundra engine: 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
-3. [How long does Toyota 4Runner last?](/blog/how-long-does-toyota-4runner-last)
-4. [Most reliable cars under $15k in 2026](/blog/most-reliable-cars-under-15k)
+2. [How long does a Toyota Tacoma last?](/blog/how-long-does-toyota-tacoma-last)
+3. [Most reliable Toyota Tundra engine: 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
+4. [How long does Toyota 4Runner last?](/blog/how-long-does-toyota-4runner-last)
+5. [Most reliable cars under $15k in 2026](/blog/most-reliable-cars-under-15k)
 
-This gives you the truck-vs-SUV and truck-vs-budget-car tradeoff before you overpay for capability you may not actually need.
+This gives you the full-size-vs-midsize-truck and truck-vs-SUV tradeoff before you overpay for capability you may not actually need.
 
 If you already have a real Tundra VIN or listing, [Buyer Pass pricing](/pricing) shows the exact-car report that adds fair pricing, negotiation notes, and the buyer checklist.
 
