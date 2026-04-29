@@ -17,6 +17,7 @@ If you want the shortest honest answer to **how long a Toyota 4Runner lasts**, a
 For used-buyer decisions, treat mileage like this:
 - **150k-200k miles:** normal 4Runner shopping range if the frame and service history are clean
 - **200k+ miles:** still buyable, but only if rust, suspension wear, and cooling-system maintenance all check out
+- **Want the model-year version first?** See [Best Toyota 4Runner years to buy](/blog/best-toyota-4runner-years-to-buy)
 - **Cross-shopping Toyota durability lanes:** compare our [Toyota truck lifespan hub](/blog/how-long-do-toyota-trucks-last), [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last), and [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last)
 - **Need a real-listing decision instead of generic advice?** See [Buyer Pass pricing](/pricing)
 

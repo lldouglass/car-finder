@@ -16,9 +16,10 @@ If you are deciding whether a Tundra is worth the truck premium, compare these b
 
 1. [How long Toyota trucks last (Tacoma vs Tundra)](/blog/how-long-do-toyota-trucks-last)
 2. [How long does a Toyota Tacoma last?](/blog/how-long-does-toyota-tacoma-last)
-3. [Most reliable Toyota Tundra engine: 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
-4. [How long does Toyota 4Runner last?](/blog/how-long-does-toyota-4runner-last)
-5. [Most reliable cars under $15k in 2026](/blog/most-reliable-cars-under-15k)
+3. [Best Toyota Tundra years to buy](/blog/best-toyota-tundra-years-to-buy)
+4. [Most reliable Toyota Tundra engine: 5.7L vs 4.6L vs 3.5L](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
+5. [How long does Toyota 4Runner last?](/blog/how-long-does-toyota-4runner-last)
+6. [Most reliable cars under $15k in 2026](/blog/most-reliable-cars-under-15k)
 
 This gives you the full-size-vs-midsize-truck and truck-vs-SUV tradeoff before you overpay for capability you may not actually need.
 

@@ -33,9 +33,10 @@ If you want the shortest useful answer before you buy:
 
 If you want the fastest route based on what you are cross-shopping:
 - **Tacoma first:** read our [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last)
+- **Tacoma year and mileage decision:** use [Best Toyota Tacoma years to buy](/blog/best-toyota-tacoma-years-to-buy) and [Is 150k miles too much for a Toyota Tacoma?](/blog/is-150k-miles-too-much-for-a-toyota-tacoma)
 - **Tundra first:** read our [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last)
-- **Tundra engine choice:** use the [5.7L vs 4.6L vs 3.5L twin turbo reliability guide](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
-- **Truck vs SUV decision:** compare against our [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last)
+- **Tundra year and engine decision:** use [Best Toyota Tundra years to buy](/blog/best-toyota-tundra-years-to-buy) and the [5.7L vs 4.6L vs 3.5L twin turbo reliability guide](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
+- **Truck vs SUV decision:** compare against our [Toyota 4Runner lifespan guide](/blog/how-long-does-toyota-4runner-last) and [Best Toyota 4Runner years to buy](/blog/best-toyota-4runner-years-to-buy)
 - **Domestic truck fallback:** compare against our [Chevy vs Ford reliability guide](/blog/ford-vs-chevy-reliability-comparison), [Ford long-term reliability breakdown](/blog/is-ford-reliable-long-term), and the full [Toyota vs Ford vs Chevy reliability comparison](/blog/toyota-vs-ford-vs-chevy-reliability-2026)
 - **Real listing in front of you:** skip the guessing and check [Buyer Pass pricing](/pricing) so you can run the exact-car workflow before you buy
 
