@@ -33,6 +33,7 @@ If you want the shortest useful answer before you buy:
 
 If you want the fastest route based on what you are cross-shopping:
 - **Tacoma first:** read our [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last)
+- **Tacoma mileage thresholds first:** the [Toyota Tacoma lifespan guide](/blog/how-long-does-toyota-tacoma-last) now breaks down what 150k, 200k, and 250k+ miles usually mean for buyers
 - **Tacoma year and mileage decision:** use [Best Toyota Tacoma years to buy](/blog/best-toyota-tacoma-years-to-buy) and [Is 150k miles too much for a Toyota Tacoma?](/blog/is-150k-miles-too-much-for-a-toyota-tacoma)
 - **Tundra first:** read our [Toyota Tundra lifespan guide](/blog/toyota-tundra-lifespan-how-long-does-it-last)
 - **Tundra year and engine decision:** use [Best Toyota Tundra years to buy](/blog/best-toyota-tundra-years-to-buy) and the [5.7L vs 4.6L vs 3.5L twin turbo reliability guide](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
