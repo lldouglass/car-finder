@@ -69,7 +69,7 @@ Our analysis combines NHTSA complaint data, Consumer Reports reliability surveys
 **Best Honda Models for Longevity:**
 - **Civic (2006-2015, 2016-2023)**: Si models especially durable
 - **Accord V6 (2003-2017)**: J35 V6 engine extremely reliable
-- **CR-V (2007-2016)**: Simple AWD system, proven powertrains
+- **CR-V (2007-2016)**: Simple AWD system, proven powertrains (see [Honda CR-V lifespan](/blog/how-long-does-honda-cr-v-last))
 - **Pilot (2009-2015)**: Solid family SUV with good track record
 - **Fit (2009-2020)**: Small car, big reliability
 
@@ -107,7 +107,7 @@ Our analysis combines NHTSA complaint data, Consumer Reports reliability surveys
 
 **Best Subaru Models:**
 - **Outback (2010-2023)**: Wagon that thinks it's an SUV, lasts like a truck
-- **Forester (2009-2023)**: Simple SUV with bulletproof record
+- **Forester (2009-2023)**: Simple SUV with bulletproof record (see [Subaru Forester lifespan](/blog/how-long-does-subaru-forester-last))
 - **Legacy (2010-2019)**: Underrated sedan with excellent longevity
 - **Impreza (2012-2023)**: Base model more reliable than WRX
 
@@ -160,7 +160,7 @@ Like Kia, massive quality improvements in recent years with industry-leading war
 
 **Ford's Strengths and Weaknesses:**
 - **Excellent**: F-150 pickup, Mustang V8 models, Escape hybrid
-- **Good**: Explorer (2020+), Edge, most trucks
+- **Good**: Explorer (2020+), Edge, most trucks (see [Ford Explorer lifespan](/blog/how-long-does-ford-explorer-last))
 - **Avoid**: Focus (2012-2018), Fiesta (2011-2019), EcoSport
 
 ### 10. Nissan - Average Lifespan: 190,000 Miles
@@ -173,7 +173,7 @@ Like Kia, massive quality improvements in recent years with industry-leading war
 ### 11. Chevrolet - Average Lifespan: 185,000 Miles
 
 **Chevy's Variable Quality:**
-- **Excellent**: Silverado pickup, Corvette, Suburban
+- **Excellent**: Silverado pickup, Corvette, Suburban (see [Chevy Silverado 1500 lifespan](/blog/how-long-does-chevy-silverado-1500-last) and [Chevy Tahoe lifespan](/blog/how-long-does-chevy-tahoe-last))
 - **Good**: Malibu (2016+), Equinox (2018+)
 - **Avoid**: Cruze, Sonic, Trax
 

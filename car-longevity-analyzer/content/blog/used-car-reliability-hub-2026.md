@@ -39,9 +39,14 @@ This is your central map for used car reliability research. If you are buying a 
 
 - [How Long Does Toyota Camry Last](/blog/how-long-does-toyota-camry-last)
 - [How Long Does Honda Accord Last](/blog/how-long-does-honda-accord-last)
+- [How Long Does Honda CR-V Last](/blog/how-long-does-honda-cr-v-last)
 - [How Long Does Toyota RAV4 Last](/blog/how-long-does-toyota-rav4-last)
 - [How Long Does Toyota Tacoma Last](/blog/how-long-does-toyota-tacoma-last)
 - [How Long Do Subaru Outbacks Last](/blog/how-long-does-subaru-outback-last)
+- [How Long Does Subaru Forester Last](/blog/how-long-does-subaru-forester-last)
+- [How Long Does Chevy Silverado 1500 Last](/blog/how-long-does-chevy-silverado-1500-last)
+- [How Long Does Chevy Tahoe Last](/blog/how-long-does-chevy-tahoe-last)
+- [How Long Does Ford Explorer Last](/blog/how-long-does-ford-explorer-last)
 
 ## Quick Workflow Before You Buy
 

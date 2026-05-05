@@ -41,17 +41,18 @@ The main watch items are automatic transmission service, oil consumption, suspen
 
 ### Small and midsize SUVs
 
-Most SUVs last **170,000 to 240,000 miles**, but the best examples can reach 250,000+ miles. Toyota RAV4, Honda CR-V, Mazda CX-5, Lexus RX, and carefully maintained Subaru Outback or Forester models are stronger than average.
+Most SUVs last **170,000 to 240,000 miles**, but the best examples can reach 250,000+ miles. Toyota RAV4, [Honda CR-V](/blog/how-long-does-honda-cr-v-last), Mazda CX-5, Lexus RX, and carefully maintained [Subaru Outback](/blog/how-long-does-subaru-outback-last) or [Subaru Forester](/blog/how-long-does-subaru-forester-last) models are stronger than average.
 
-SUV ownership cost rises faster because tires, brakes, AWD service, and suspension parts cost more than on a compact sedan. If you are shopping, start with [best used SUVs under $20K in 2026](/blog/best-used-suvs-under-20k-2026).
+SUV ownership cost rises faster because tires, brakes, AWD service, and suspension parts cost more than on a compact sedan. If you are shopping, start with [best used SUVs under $20K in 2026](/blog/best-used-suvs-under-20k-2026), then compare model-specific guides like [Ford Explorer lifespan](/blog/how-long-does-ford-explorer-last) and [Chevy Tahoe lifespan](/blog/how-long-does-chevy-tahoe-last).
 
 ### Pickup trucks
 
 Pickup trucks often last **200,000 to 300,000 miles**, and the best Toyota truck platforms can run beyond that. The catch is that truck condition varies sharply because some are used as commuters and others spend years towing, hauling, or working in harsh conditions.
 
-For Toyota truck specifics, use:
+For truck specifics, use:
 - [How long do Toyota trucks last](/blog/how-long-do-toyota-trucks-last)
 - [How long does Toyota Tacoma last](/blog/how-long-does-toyota-tacoma-last)
+- [Chevy Silverado 1500 lifespan](/blog/how-long-does-chevy-silverado-1500-last)
 - [Toyota Tundra engine reliability: 5.7 vs 4.6 vs 3.5](/blog/toyota-tundra-engine-reliability-57-vs-46-vs-35-twin-turbo-2026)
 
 ### Hybrids
