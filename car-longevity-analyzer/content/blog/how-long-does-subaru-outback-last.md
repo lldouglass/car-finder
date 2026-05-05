@@ -1,19 +1,29 @@
 ---
-title: "How Long Does a Subaru Outback Last? Complete Reliability and Longevity Analysis"
-description: "Comprehensive analysis of Subaru Outback lifespan by generation. Expected mileage, common issues, maintenance schedules, and tips to maximize reliability."
+title: "How Long Do Subaru Outbacks Last? Lifespan by Year in 2026"
+description: "How long do Subaru Outbacks last? Expect 200k to 250k miles for most, with best years, years to avoid, CVT risk, head gasket issues, and maintenance tips."
 date: "2026-02-12"
 author: "Car Lifespan Check Team"
 tags: ["subaru", "outback", "reliability", "longevity"]
 featured: false
 ---
 
-# How Long Does a Subaru Outback Last? Complete Reliability and Longevity Analysis
+# How Long Do Subaru Outbacks Last? Lifespan by Year in 2026
 
-The Subaru Outback occupies a unique niche: all-wheel-drive wagon/crossover with a loyal fanbase that insists it's the most reliable car on the road. The reality is more nuanced. The Outback can absolutely last 200,000-300,000 miles, but Subaru's history with head gasket failures and oil consumption means you need to know exactly which years and engines to target. Buying the wrong Outback can cost you $3,000+ in engine repairs before you hit 150,000 miles.
+Subaru Outbacks usually last **200,000 to 250,000 miles**, or about **13 to 17 years**, when maintenance is consistent and the right model year is chosen. Some Outbacks reach 300,000 miles, but that is less common than with Toyota or Honda equivalents because Subaru's boxer engines, AWD system, and CVT need more careful upkeep.
 
-## Expected Lifespan: 200,000 to 250,000 Miles (With Caveats)
+The fastest 2026 answer is simple: target **2018-2019 Outback** models for used value, consider **2020+** if you want newer safety tech, and be cautious with **2005-2011** head-gasket years and early **2010-2013** CVTs. For a year-by-year buy and avoid list, use our [Subaru Outback reliability by year guide](/blog/subaru-outback-reliability-by-year).
 
-A properly maintained Outback will deliver 200,000-250,000 miles. Some owners report 300,000+, but that's less common than with Toyota or Honda equivalents. The Outback's boxer engine design, while great for handling and a low center of gravity, introduces maintenance complexity and specific failure modes that inline-four competitors don't have.
+## Quick answer: how long do Subaru Outbacks last?
+
+- **Typical lifespan:** 200,000 to 250,000 miles
+- **Strong examples:** 250,000 to 300,000 miles with excellent maintenance
+- **Best used years to start with:** 2018-2019 for value, 2020+ for newer tech
+- **Main risks:** older EJ25 head gaskets, oil consumption on some FB25 years, neglected CVT fluid, rust in salt states
+- **Best maintenance move:** oil every 5,000 miles and CVT fluid every 30,000 to 40,000 miles
+
+## Expected lifespan: 200,000 to 250,000 miles with caveats
+
+A properly maintained Outback will deliver 200,000 to 250,000 miles. Some owners report 300,000+, but that is less common than with Toyota or Honda equivalents. The Outback's boxer engine design, while great for handling and a low center of gravity, introduces maintenance complexity and specific failure modes that inline-four competitors do not have.
 
 ## The Head Gasket Problem: Subaru's Achilles Heel
 
@@ -129,4 +139,4 @@ That said, the Outback offers something no competitor in its price range matches
 
 ---
 
-**Evaluating a specific Outback?** Use our [free car longevity analyzer](/analyzer) to check the reliability score, known issues, and estimated maintenance costs for the exact year you're considering. For a detailed year-by-year breakdown of which model years to buy and which to avoid, see our [Subaru Outback reliability by year guide](/blog/subaru-outback-reliability-by-year).
+**Evaluating a specific Outback?** Use our [free car longevity analyzer](/) to check the reliability score, known issues, and estimated maintenance costs for the exact year you are considering. For a detailed year-by-year breakdown of which model years to buy and which to avoid, see our [Subaru Outback reliability by year guide](/blog/subaru-outback-reliability-by-year).

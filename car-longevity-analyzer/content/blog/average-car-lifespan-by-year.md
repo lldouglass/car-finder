@@ -16,7 +16,7 @@ tags: ["car lifespan", "historical data", "longevity trends", "model years"]
 
 ---
 
-Car longevity has improved dramatically over the past three decades. A typical 1990 car was considered "high-mileage" at 100,000 miles, while today's vehicles routinely exceed 200,000 miles with proper maintenance.
+Car longevity has improved dramatically over the past three decades. A typical 1990 car was considered "high-mileage" at 100,000 miles, while today's vehicles routinely exceed 200,000 miles with proper maintenance. For the shorter current answer, use [average car lifespan in 2026 by miles and years](/blog/average-car-lifespan-miles-years-2026).
 
 Using data from insurance companies, government databases, and real-world owner surveys, we've analyzed how car lifespan varies by model year and what factors drive these improvements.
 

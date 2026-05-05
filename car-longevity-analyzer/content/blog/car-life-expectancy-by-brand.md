@@ -1,6 +1,6 @@
 ---
-title: "Car Life Expectancy by Brand: Complete 2026 Reliability Rankings"
-description: "Comprehensive brand-by-brand analysis of car life expectancy with data from NHTSA, Consumer Reports, and real-world owner surveys. Find out which brands last longest."
+title: "Car Life Expectancy by Brand in 2026: Which Cars Last Longest"
+description: "Car life expectancy by brand in 2026, with average mileage ranges, best long-lasting models, brands to avoid, and data-backed reliability rankings."
 date: "2026-02-15"
 author: "Car Lifespan Check Team"
 tags: ["reliability", "brand comparison", "car lifespan", "rankings"]
@@ -16,7 +16,7 @@ tags: ["reliability", "brand comparison", "car lifespan", "rankings"]
 
 ---
 
-When shopping for a reliable vehicle, brand reputation matters more than you might think. While individual models vary, certain manufacturers have consistently produced vehicles that last 200,000, 300,000, or even 500,000+ miles with proper maintenance.
+Car life expectancy by brand in 2026 ranges from about **120,000-180,000 miles for many German luxury cars** to **250,000-300,000+ miles for Toyota, Honda, Mazda, Lexus, and the strongest Subaru models**. Brand reputation matters, but the exact model year and maintenance history still decide the outcome.
 
 Our analysis combines NHTSA complaint data, Consumer Reports reliability surveys, and real-world owner experiences to rank every major automotive brand by life expectancy.
 

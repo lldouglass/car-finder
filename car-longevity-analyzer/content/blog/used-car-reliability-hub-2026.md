@@ -15,12 +15,14 @@ This is your central map for used car reliability research. If you are buying a 
 
 - [How Long Do Cars Last](/blog/how-long-do-cars-last)
 - [How Long Will My Car Last](/blog/how-long-will-my-car-last)
+- [Average Car Lifespan in 2026: Miles and Years](/blog/average-car-lifespan-miles-years-2026)
 - [Average Car Lifespan by Year](/blog/average-car-lifespan-by-year)
 - [Car Life Expectancy by Brand](/blog/car-life-expectancy-by-brand)
 
 ## Best Budget Buying Guides
 
 - [Best Used Cars Under $12k (2016+)](/blog/best-used-cars-under-12000-2016-newer-2026)
+- [Most Reliable Used Cars Under $12,000](/blog/most-reliable-used-cars-under-12000-2026)
 - [Best Used Cars Under $10k](/blog/best-used-cars-under-10k-2026)
 - [Best Used Cars Under $15k Reliability](/blog/best-used-cars-under-15k-2026-reliability)
 - [Most Reliable Cars Under $15k](/blog/most-reliable-cars-under-15k)
@@ -39,6 +41,7 @@ This is your central map for used car reliability research. If you are buying a 
 - [How Long Does Honda Accord Last](/blog/how-long-does-honda-accord-last)
 - [How Long Does Toyota RAV4 Last](/blog/how-long-does-toyota-rav4-last)
 - [How Long Does Toyota Tacoma Last](/blog/how-long-does-toyota-tacoma-last)
+- [How Long Do Subaru Outbacks Last](/blog/how-long-does-subaru-outback-last)
 
 ## Quick Workflow Before You Buy
 

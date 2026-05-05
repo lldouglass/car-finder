@@ -1,12 +1,14 @@
 ---
-title: "Total Cost of Ownership: The 15 Cheapest Used Cars to Own Over 5 Years"
-description: "Which used cars actually cost the least to own? We break down purchase price, fuel, insurance, maintenance, repairs, and depreciation to find the true cheapest cars per mile and per year."
+title: "Cheapest Used Cars to Own in 2026: 5-Year Cost Rankings"
+description: "Cheapest used cars to own in 2026 ranked by 5-year total cost, cost per mile, fuel, insurance, depreciation, maintenance, and repair risk."
 date: "2026-02-23"
 author: "Car Lifespan Check Team"
 tags: ["cost of ownership", "cheapest cars to own", "cost per mile", "buying guide", "2026"]
 ---
 
-# Total Cost of Ownership: The Cheapest Used Cars to Own for 5 Years
+# Cheapest Used Cars to Own in 2026: 5-Year Cost Rankings
+
+The cheapest used cars to own in 2026 are usually Toyota Prius, Toyota Corolla, Honda Civic, Mazda3, and Toyota Camry when you compare 5-year fuel, insurance, depreciation, maintenance, and repair costs. The lowest purchase price is not always the lowest total cost.
 
 Everyone focuses on the sticker price. But the price you pay at the dealership is just the beginning. Insurance, fuel, maintenance, repairs, and depreciation add up to thousands per year, and the cheapest car to buy is rarely the cheapest car to own.
 
