@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Calendar, ChevronRight } from 'lucide-react';
+import { BlogBuyerPassBottomCard, BlogBuyerPassTopBanner } from '@/components/marketing/blog-buyer-pass-cta';
 import { getPostBySlug, getAllSlugs, getAllPosts } from '@/lib/blog';
 import type { Metadata } from 'next';
 
@@ -117,20 +118,7 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Top CTA Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800">
-          <div className="max-w-3xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-white font-semibold text-sm sm:text-base text-center sm:text-left">
-              🚗 Check Your Car&apos;s Lifespan Free
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-white text-blue-700 px-5 py-2 text-sm font-semibold hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap"
-            >
-              Try the Analysis Tool →
-            </Link>
-          </div>
-        </div>
+        <BlogBuyerPassTopBanner />
 
         <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
           <header className="mb-10">
@@ -178,25 +166,7 @@ export default async function BlogPostPage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
 
-          {/* CTA Card */}
-          <div className="mt-12 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-950 p-8 text-center space-y-4 shadow-sm">
-            <div className="inline-flex items-center justify-center size-12 rounded-full bg-blue-100 dark:bg-blue-900 mb-2">
-              <span className="text-2xl">🔍</span>
-            </div>
-            <h2 className="text-2xl font-bold">
-              Want to Know How Long Your Car Will Last?
-            </h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Try our free analysis tool. Get instant reliability scores, safety ratings,
-              recall data, and longevity predictions for any vehicle.
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-8 py-3.5 text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
-            >
-              Try the Free Analysis Tool →
-            </Link>
-          </div>
+          <BlogBuyerPassBottomCard />
 
           {/* Related Posts */}
           {suggestedPosts.length > 0 && (

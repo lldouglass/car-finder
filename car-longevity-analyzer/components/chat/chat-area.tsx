@@ -97,13 +97,13 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     onClick={onUpgradeClick}
                   >
                     <Crown className="size-4 mr-1" />
-                    Get Buyer Pass, $12
+                    Check the VIN before you buy — $12
                   </Button>
                 ) : (
                   <SignUpButton mode="modal">
                     <Button size="sm" className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
                       <Crown className="size-4 mr-1" />
-                      Unlock Buyer Pass, $12
+                      Check the VIN before you buy — $12
                     </Button>
                   </SignUpButton>
                 )}
@@ -195,7 +195,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                     <div className="mx-auto mb-3 rounded-full bg-amber-100 dark:bg-amber-900/30 p-3 w-fit">
                       <TrendingUp className="size-6 text-amber-600 dark:text-amber-400" />
                     </div>
-                    <h3 className="font-semibold mb-2">Step 3: Unlock Buyer Pass</h3>
+                    <h3 className="font-semibold mb-2">Step 3: Check the VIN before you buy</h3>
                     <p className="text-sm text-muted-foreground">
                       Get 30 days of unlimited full analysis with pricing, negotiation tips, and maintenance projections
                     </p>
@@ -265,13 +265,13 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                           className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
                         >
                           <Crown className="size-4 mr-2" />
-                          Get Buyer Pass
+                          Check the VIN before you buy
                         </Button>
                       ) : (
                         <SignUpButton mode="modal">
                           <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
                             <Crown className="size-4 mr-2" />
-                            Create Account to Buy
+                            Create account to check the VIN
                           </Button>
                         </SignUpButton>
                       )}

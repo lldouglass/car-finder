@@ -1036,7 +1036,7 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row">
-                {upgradeButton(`Unlock Buyer Pass, ${BUYER_PASS_PRICE}`, 'default', 'bg-amber-500 hover:bg-amber-600 text-zinc-900')}
+                {upgradeButton(`Check the VIN before you buy — ${BUYER_PASS_PRICE}`, 'default', 'bg-amber-500 hover:bg-amber-600 text-zinc-900')}
                 {onSwitchToVin && (
                   <Button onClick={onSwitchToVin} variant="outline" className="border-zinc-700 bg-transparent text-zinc-100 hover:bg-zinc-900 hover:text-zinc-100">
                     Use a VIN now

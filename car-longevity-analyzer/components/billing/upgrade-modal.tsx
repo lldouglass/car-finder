@@ -66,7 +66,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             <Crown className="size-8 text-amber-400" />
           </div>
           <h2 className="text-2xl font-bold text-zinc-100 mb-2">
-            Unlock Buyer Pass
+            Check the VIN before you buy
           </h2>
           <p className="text-zinc-400 text-sm">
             One payment, 30 days of full buyer reports
@@ -108,7 +108,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
                 Processing...
               </span>
             ) : (
-              'Get Buyer Pass'
+              `Unlock the buyer report — ${PRICE}`
             )}
           </Button>
 

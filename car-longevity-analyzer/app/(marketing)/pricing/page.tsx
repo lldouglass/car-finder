@@ -19,8 +19,27 @@ export const metadata: Metadata = {
 };
 
 export default function PricingPage() {
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': 'https://www.carlifespancheck.com/pricing#faq',
+    url: 'https://www.carlifespancheck.com/pricing',
+    mainEntity: buyerPassFaqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="min-h-screen bg-white dark:bg-zinc-950">
         <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16">
           <div className="mb-10 rounded-3xl border bg-gradient-to-br from-white via-amber-50 to-orange-50 p-8 shadow-sm dark:from-zinc-900 dark:via-amber-950/20 dark:to-orange-950/20">
@@ -39,11 +58,9 @@ export default function PricingPage() {
                   <BuyerPassCTAButton
                     className="bg-amber-500 text-zinc-900 hover:bg-amber-600"
                     size="lg"
-                    signedOutLabel="Create free account to buy"
-                    signedInLabel="Buy Buyer Pass now"
                   >
                     <Crown className="size-4" />
-                    Buy Buyer Pass now
+                    Check the VIN before you buy — {BUYER_PASS_PRICE}
                   </BuyerPassCTAButton>
                   <Link
                     href="/"
@@ -148,11 +165,9 @@ export default function PricingPage() {
               <BuyerPassCTAButton
                 className="bg-amber-500 text-zinc-900 hover:bg-amber-600"
                 size="lg"
-                signedOutLabel="Create free account to buy"
-                signedInLabel="Buy Buyer Pass"
               >
                 <Crown className="size-4" />
-                Buy Buyer Pass
+                Unlock the buyer report — {BUYER_PASS_PRICE}
               </BuyerPassCTAButton>
             </div>
           </section>

@@ -77,13 +77,13 @@ export function SignUpBanner({ onUpgradeClick }: SignUpBannerProps) {
                   className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
                 >
                   <Crown className="size-4" />
-                  Unlock Buyer Pass
+                  Check the VIN before you buy — {BUYER_PASS_PRICE}
                 </Button>
               ) : (
                 <SignUpButton mode="modal">
                   <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
                     <Crown className="size-4" />
-                    Unlock Buyer Pass
+                    Check the VIN before you buy — {BUYER_PASS_PRICE}
                   </Button>
                 </SignUpButton>
               )}
