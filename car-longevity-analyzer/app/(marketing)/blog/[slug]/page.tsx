@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Calendar, ChevronRight } from 'lucide-react';
-import { BlogBuyerPassBottomCard, BlogBuyerPassTopBanner } from '@/components/marketing/blog-buyer-pass-cta';
+import { BlogBuyerPassBottomCard, BlogBuyerPassTopBanner, BlogInlineCheckCta } from '@/components/marketing/blog-buyer-pass-cta';
 import { getPostBySlug, getAllSlugs, getAllPosts } from '@/lib/blog';
+import { resolveVehicleFromText } from '@/lib/blog-vehicle';
+import { splitArticleHtml } from '@/lib/split-article-html';
 import type { Metadata } from 'next';
 
 interface Props {
@@ -65,6 +67,8 @@ export default async function BlogPostPage({ params }: Props) {
   }
 
   const readTime = estimateReadTime(post.content);
+  const vehicle = resolveVehicleFromText(`${post.title} ${slug}`);
+  const [articleFirstHalf, articleSecondHalf] = splitArticleHtml(post.content);
   const allPosts = getAllPosts().filter((p) => p.slug !== slug);
   const relatedPosts = allPosts
     .filter((p) => p.tags.some((t) => post.tags.includes(t)))
@@ -118,7 +122,7 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
 
-        <BlogBuyerPassTopBanner />
+        <BlogBuyerPassTopBanner vehicle={vehicle} slug={slug} />
 
         <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
           <header className="mb-10">
@@ -163,10 +167,20 @@ export default async function BlogPostPage({ params }: Props) {
 
           <article
             className="blog-article max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: articleFirstHalf }}
           />
 
-          <BlogBuyerPassBottomCard />
+          {articleSecondHalf && (
+            <>
+              <BlogInlineCheckCta vehicle={vehicle} slug={slug} />
+              <article
+                className="blog-article max-w-none"
+                dangerouslySetInnerHTML={{ __html: articleSecondHalf }}
+              />
+            </>
+          )}
+
+          <BlogBuyerPassBottomCard vehicle={vehicle} slug={slug} />
 
           {/* Related Posts */}
           {suggestedPosts.length > 0 && (

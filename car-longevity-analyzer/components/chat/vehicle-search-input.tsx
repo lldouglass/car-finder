@@ -33,6 +33,23 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
   const makeRef = useRef<HTMLDivElement>(null);
   const modelRef = useRef<HTMLDivElement>(null);
 
+  // Vehicle deep-linked from a blog CTA (?make=X&model=Y): pre-fill the form so
+  // the reader only has to pick a year, then run the check automatically.
+  const prefillRef = useRef<{ make: string; model: string } | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const makeParam = params.get('make');
+    const modelParam = params.get('model');
+    if (makeParam && modelParam && !params.get('year')) {
+      prefillRef.current = { make: makeParam, model: modelParam };
+      setMake(makeParam);
+      setMakeFilter(makeParam);
+      setModel(modelParam);
+      setModelFilter(modelParam);
+    }
+  }, []);
+
   // Fetch makes when year changes
   useEffect(() => {
     if (!year) {
@@ -125,14 +142,11 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
 
   const canSubmit = year && make && model && !isLoading;
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!canSubmit) return;
-
+  const runAnalysis = useCallback(async (analysisYear: number, analysisMake: string, analysisModel: string) => {
     try {
       await submitAnalysis(
         'vehicle',
-        JSON.stringify({ year, make, model }),
+        JSON.stringify({ year: analysisYear, make: analysisMake, model: analysisModel }),
       );
       setYear('');
       setMake('');
@@ -142,6 +156,12 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
     } catch {
       // Error handled by context
     }
+  }, [submitAnalysis]);
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!canSubmit) return;
+    await runAnalysis(year as number, make, model);
   };
 
   return (
@@ -153,7 +173,17 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
             value={year}
             onChange={(e) => {
               const val = e.target.value;
-              setYear(val ? parseInt(val, 10) : '');
+              const nextYear = val ? parseInt(val, 10) : '';
+              setYear(nextYear);
+              const prefill = prefillRef.current;
+              if (prefill) {
+                // Deep-linked vehicle: keep it and run as soon as a year is picked
+                if (nextYear) {
+                  prefillRef.current = null;
+                  void runAnalysis(nextYear, prefill.make, prefill.model);
+                }
+                return;
+              }
               setMake('');
               setMakeFilter('');
               setModel('');
