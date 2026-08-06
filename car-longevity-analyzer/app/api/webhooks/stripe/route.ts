@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { constructWebhookEvent } from '@/lib/stripe';
-import { grantBuyerPassAccess, updateUserEmail } from '@/lib/usage';
+import {
+  grantBuyerPassAccess,
+  grantBuyerPassAccessForEmail,
+} from '@/lib/usage';
 import { prisma } from '@/lib/db';
 
 /**
@@ -46,21 +49,26 @@ export async function POST(request: Request) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (session.metadata?.purchaseType !== 'buyer_pass') {
+          break;
+        }
+
         const clerkId = session.metadata?.clerkId;
         const customerId = getCustomerId(session.customer);
         const customerEmail = session.customer_email || session.customer_details?.email;
 
         if (clerkId) {
           await grantBuyerPassAccess(clerkId, customerId, customerEmail);
-
-          if (customerEmail) {
-            await updateUserEmail(clerkId, customerEmail);
-          }
+        } else if (customerEmail) {
+          await grantBuyerPassAccessForEmail(
+            customerEmail,
+            customerId,
+            session.id
+          );
         } else {
-          console.error('Checkout completed but missing clerkId', {
-            sessionId: session.id,
-            hasCustomerId: !!customerId,
-          });
+          throw new Error(
+            `Guest checkout ${session.id} completed without a customer email`
+          );
         }
         break;
       }

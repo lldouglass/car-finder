@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@clerk/nextjs/server';
 import { checkAndIncrementUsage } from '@/lib/usage';
+import { gatePremiumAnalysis } from '@/lib/premium-gate';
 import { decodeVin, getRecalls, getComplaints, getSafetyRatings } from '@/lib/nhtsa';
 import {
     calculateLongevityScore,
@@ -50,9 +51,14 @@ export async function POST(request: Request) {
         // Auth check (optional — unauthenticated users get preview results)
         const { userId } = await auth();
 
+        // Buyer Pass holders get the full report; everyone else gets the
+        // gated preview (paid fields stripped server-side below).
+        let hasActiveBuyerPass = false;
+
         if (userId) {
             // Authenticated: check usage quota (3 free/month)
             const usage = await checkAndIncrementUsage(userId);
+            hasActiveBuyerPass = usage.isBuyerPassActive;
             if (!usage.allowed) {
                 return NextResponse.json({
                     success: false,
@@ -312,8 +318,8 @@ export async function POST(request: Request) {
             mileage
         );
 
-        // Response
-        return NextResponse.json({
+        // Response — paid fields are stripped for non-Buyer-Pass callers
+        return NextResponse.json(gatePremiumAnalysis({
             success: true,
             vehicle,
             scores: {
@@ -390,7 +396,7 @@ export async function POST(request: Request) {
             warrantyValue,
             priceThresholds,
             survivalAnalysis,
-        });
+        }, hasActiveBuyerPass));
 
     } catch (error) {
         console.error("Analysis Error:", error);

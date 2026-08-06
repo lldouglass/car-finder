@@ -5,6 +5,7 @@ import { AnalysisProvider, useAnalysis } from '@/lib/analysis-context';
 import { ToastProvider } from '@/components/ui/toast';
 import { ChatLayout } from '@/components/chat/chat-layout';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { BuyerPassCheckoutNotice } from '@/components/billing/buyer-pass-checkout-notice';
 
 /**
  * Runs a free check automatically when the page is opened via a full deep link
@@ -45,6 +46,7 @@ export default function HomeApp() {
       <ToastProvider>
         <ErrorBoundary>
           <DeepLinkAutoRun />
+          <BuyerPassCheckoutNotice />
           <ChatLayout />
         </ErrorBoundary>
       </ToastProvider>

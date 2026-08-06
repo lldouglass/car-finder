@@ -41,7 +41,10 @@ function getBuyerPassPriceId(): string {
 /**
  * Create a Stripe Checkout session for the one-time Buyer Pass.
  */
-export async function createCheckoutSession(clerkId: string, email: string) {
+export async function createCheckoutSession(
+  clerkId?: string | null,
+  email?: string | null
+) {
   const priceId = getBuyerPassPriceId();
   const appUrl = getAppUrl();
   const price = await stripe.prices.retrieve(priceId);
@@ -58,11 +61,11 @@ export async function createCheckoutSession(clerkId: string, email: string) {
     mode: 'payment',
     payment_method_types: ['card'],
     customer_creation: 'always',
-    customer_email: email,
+    ...(email ? { customer_email: email } : {}),
     metadata: {
-      clerkId,
       purchaseType: 'buyer_pass',
       buyerPassPriceId: price.id,
+      ...(clerkId ? { clerkId } : {}),
     },
     line_items: [
       {

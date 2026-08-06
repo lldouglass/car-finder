@@ -9,6 +9,7 @@ if (isNaN(FREE_LIMIT_RAW) || FREE_LIMIT_RAW < 1) {
 const FREE_LIMIT = FREE_LIMIT_RAW;
 const BUYER_PASS_DURATION_DAYS = 30;
 const BUYER_PASS_DURATION_MS = BUYER_PASS_DURATION_DAYS * 24 * 60 * 60 * 1000;
+const STRIPE_GUEST_ID_PREFIX = 'stripe_guest:';
 
 export interface UsageCheckResult {
   allowed: boolean;
@@ -33,9 +34,17 @@ function getBuyerPassExpiry(baseDate?: Date | null) {
   return new Date(startAt.getTime() + BUYER_PASS_DURATION_MS);
 }
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+function isStripeGuestId(clerkId: string) {
+  return clerkId.startsWith(STRIPE_GUEST_ID_PREFIX);
+}
+
 async function getUserEmail(clerkId: string, fallbackEmail?: string | null) {
   if (fallbackEmail) {
-    return fallbackEmail;
+    return normalizeEmail(fallbackEmail);
   }
 
   const client = await clerkClient();
@@ -46,7 +55,70 @@ async function getUserEmail(clerkId: string, fallbackEmail?: string | null) {
     throw new Error('User has no email address');
   }
 
-  return email;
+  return normalizeEmail(email);
+}
+
+async function findUserByEmail(email: string) {
+  return prisma.user.findFirst({
+    where: {
+      email: {
+        equals: normalizeEmail(email),
+        mode: 'insensitive',
+      },
+    },
+  });
+}
+
+/**
+ * Resolve a Clerk identity to the existing database user. A Buyer Pass bought
+ * before signup is stored under a Stripe guest ID and adopted when a verified
+ * Clerk account with the same email first uses the app.
+ */
+async function ensureUserRecord(clerkId: string) {
+  const userByClerkId = await prisma.user.findUnique({
+    where: { clerkId },
+  });
+
+  if (userByClerkId) {
+    return userByClerkId;
+  }
+
+  const email = await getUserEmail(clerkId);
+  const userByEmail = await findUserByEmail(email);
+
+  if (userByEmail) {
+    return prisma.user.update({
+      where: { id: userByEmail.id },
+      data: { clerkId, email },
+    });
+  }
+
+  try {
+    return await prisma.user.create({
+      data: { clerkId, email },
+    });
+  } catch (error) {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002') {
+      throw error;
+    }
+
+    const racedUser =
+      await prisma.user.findUnique({ where: { clerkId } }) ??
+      await findUserByEmail(email);
+
+    if (!racedUser) {
+      throw new Error('User creation race condition unresolved');
+    }
+
+    if (racedUser.clerkId === clerkId) {
+      return racedUser;
+    }
+
+    return prisma.user.update({
+      where: { id: racedUser.id },
+      data: { clerkId, email },
+    });
+  }
 }
 
 /**
@@ -56,32 +128,7 @@ async function getUserEmail(clerkId: string, fallbackEmail?: string | null) {
  */
 export async function checkAndIncrementUsage(clerkId: string): Promise<UsageCheckResult> {
   const month = getMonthKey();
-
-  let user = await prisma.user.findUnique({
-    where: { clerkId },
-  });
-
-  if (!user) {
-    const email = await getUserEmail(clerkId);
-
-    try {
-      user = await prisma.user.create({
-        data: {
-          clerkId,
-          email,
-        },
-      });
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        user = await prisma.user.findUnique({ where: { clerkId } });
-        if (!user) {
-          throw new Error('User creation race condition unresolved');
-        }
-      } else {
-        throw error;
-      }
-    }
-  }
+  const user = await ensureUserRecord(clerkId);
 
   if (hasActiveBuyerPass(user)) {
     return {
@@ -166,21 +213,11 @@ export async function getUsageStatus(clerkId: string): Promise<{
 }> {
   const month = getMonthKey();
 
-  const user = await prisma.user.findUnique({
+  await ensureUserRecord(clerkId);
+  const user = await prisma.user.findUniqueOrThrow({
     where: { clerkId },
     include: { usageRecords: { where: { month } } },
   });
-
-  if (!user) {
-    return {
-      used: 0,
-      limit: FREE_LIMIT,
-      isPremium: false,
-      isBuyerPassActive: false,
-      buyerPassExpiresAt: null,
-      remaining: FREE_LIMIT,
-    };
-  }
 
   if (hasActiveBuyerPass(user)) {
     return {
@@ -213,29 +250,81 @@ export async function grantBuyerPassAccess(
   fallbackEmail?: string | null
 ): Promise<void> {
   const email = await getUserEmail(clerkId, fallbackEmail);
-  const existingUser = await prisma.user.findUnique({
+  const userByClerkId = await prisma.user.findUnique({
     where: { clerkId },
-    select: { buyerPassExpiresAt: true },
   });
+  const existingUser = userByClerkId ?? await findUserByEmail(email);
 
   const buyerPassExpiresAt = getBuyerPassExpiry(existingUser?.buyerPassExpiresAt);
 
-  await prisma.user.upsert({
-    where: { clerkId },
-    update: {
-      plan: 'PREMIUM',
-      buyerPassExpiresAt,
-      ...(stripeCustomerId ? { stripeCustomerId } : {}),
-      ...(fallbackEmail ? { email: fallbackEmail } : {}),
-    },
-    create: {
-      clerkId,
-      email,
-      plan: 'PREMIUM',
-      stripeCustomerId: stripeCustomerId ?? undefined,
-      buyerPassExpiresAt,
-    },
-  });
+  if (existingUser) {
+    const shouldAdoptClerkId =
+      isStripeGuestId(existingUser.clerkId) && !isStripeGuestId(clerkId);
+
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        ...(shouldAdoptClerkId ? { clerkId } : {}),
+        email,
+        plan: 'PREMIUM',
+        buyerPassExpiresAt,
+        ...(stripeCustomerId ? { stripeCustomerId } : {}),
+      },
+    });
+    return;
+  }
+
+  try {
+    await prisma.user.create({
+      data: {
+        clerkId,
+        email,
+        plan: 'PREMIUM',
+        stripeCustomerId: stripeCustomerId ?? undefined,
+        buyerPassExpiresAt,
+      },
+    });
+  } catch (error) {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002') {
+      throw error;
+    }
+
+    const racedUser =
+      await prisma.user.findUnique({ where: { clerkId } }) ??
+      await findUserByEmail(email);
+
+    if (!racedUser) {
+      throw new Error('Buyer Pass grant race condition unresolved');
+    }
+
+    await prisma.user.update({
+      where: { id: racedUser.id },
+      data: {
+        ...(
+          isStripeGuestId(racedUser.clerkId) && !isStripeGuestId(clerkId)
+            ? { clerkId }
+            : {}
+        ),
+        email,
+        plan: 'PREMIUM',
+        buyerPassExpiresAt: getBuyerPassExpiry(racedUser.buyerPassExpiresAt),
+        ...(stripeCustomerId ? { stripeCustomerId } : {}),
+      },
+    });
+  }
+}
+
+/**
+ * Persist a guest purchase by Stripe checkout email until the buyer creates or
+ * signs into a Clerk account with that same verified email.
+ */
+export async function grantBuyerPassAccessForEmail(
+  email: string,
+  stripeCustomerId: string | null,
+  checkoutSessionId: string
+): Promise<void> {
+  const guestId = `${STRIPE_GUEST_ID_PREFIX}${stripeCustomerId ?? checkoutSessionId}`;
+  await grantBuyerPassAccess(guestId, stripeCustomerId, email);
 }
 
 /**
@@ -252,9 +341,27 @@ export async function downgradeUserToFree(stripeCustomerId: string): Promise<voi
  * Update user email from Clerk or Stripe webhook context.
  */
 export async function updateUserEmail(clerkId: string, email: string): Promise<void> {
-  await prisma.user.upsert({
-    where: { clerkId },
-    update: { email },
-    create: { clerkId, email },
+  const normalizedEmail = normalizeEmail(email);
+  const existingUser =
+    await prisma.user.findUnique({ where: { clerkId } }) ??
+    await findUserByEmail(normalizedEmail);
+
+  if (existingUser) {
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        ...(
+          isStripeGuestId(existingUser.clerkId) && !isStripeGuestId(clerkId)
+            ? { clerkId }
+            : {}
+        ),
+        email: normalizedEmail,
+      },
+    });
+    return;
+  }
+
+  await prisma.user.create({
+    data: { clerkId, email: normalizedEmail },
   });
 }

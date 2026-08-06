@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ComponentProps } from 'react';
-import { SignUpButton, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -45,16 +45,6 @@ export function BuyerPassCTAButton({
     } finally {
       setLoading(false);
     }
-  }
-
-  if (!isSignedIn) {
-    return (
-      <SignUpButton mode="modal">
-        <Button className={cn(className)} disabled={disabled} {...restButtonProps}>
-          {label}
-        </Button>
-      </SignUpButton>
-    );
   }
 
   return (

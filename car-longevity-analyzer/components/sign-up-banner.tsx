@@ -1,6 +1,5 @@
 'use client';
 
-import { SignUpButton, useUser } from '@clerk/nextjs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,8 +19,6 @@ const premiumFeatures = [
 ];
 
 export function SignUpBanner({ onUpgradeClick }: SignUpBannerProps) {
-  const { isSignedIn } = useUser();
-
   return (
     <Card className="overflow-hidden border-amber-200 bg-gradient-to-br from-zinc-950 via-zinc-900 to-amber-950/80 text-zinc-50 dark:border-amber-900/60">
       <CardContent className="p-6 md:p-7">
@@ -70,29 +67,18 @@ export function SignUpBanner({ onUpgradeClick }: SignUpBannerProps) {
             <p className="mt-1 text-sm text-zinc-300">30 days of Buyer Pass access. No subscription to cancel.</p>
 
             <div className="mt-5">
-              {isSignedIn ? (
-                <Button
-                  onClick={onUpgradeClick}
-                  disabled={!onUpgradeClick}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
-                >
-                  <Crown className="size-4" />
-                  Check the VIN before you buy — {BUYER_PASS_PRICE}
-                </Button>
-              ) : (
-                <SignUpButton mode="modal">
-                  <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
-                    <Crown className="size-4" />
-                    Check the VIN before you buy — {BUYER_PASS_PRICE}
-                  </Button>
-                </SignUpButton>
-              )}
+              <Button
+                onClick={onUpgradeClick}
+                disabled={!onUpgradeClick}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+              >
+                <Crown className="size-4" />
+                Check the VIN before you buy — {BUYER_PASS_PRICE}
+              </Button>
             </div>
 
             <p className="mt-3 text-xs text-zinc-400">
-              {isSignedIn
-                ? 'Secure one-time checkout via Stripe.'
-                : 'Create your free account first, then complete the one-time Buyer Pass checkout.'}
+              Secure one-time checkout via Stripe. No account required to pay.
             </p>
           </div>
         </div>

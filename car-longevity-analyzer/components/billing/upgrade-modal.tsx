@@ -39,7 +39,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       } else {
         setError(data.error || 'Failed to start checkout');
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -113,7 +113,8 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           </Button>
 
           <p className="text-center text-xs text-zinc-500 mt-4">
-            One-time payment, secure checkout via Stripe, no recurring billing.
+            No account required to pay. Sign in with your checkout email afterward
+            to use the pass. No recurring billing.
           </p>
         </div>
       </div>

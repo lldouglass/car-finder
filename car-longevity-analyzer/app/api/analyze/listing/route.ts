@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@clerk/nextjs/server';
 import { checkAndIncrementUsage } from '@/lib/usage';
+import { gatePremiumAnalysis } from '@/lib/premium-gate';
 import { analyzeListingWithAI } from '@/lib/ai-analyzer';
 import { getComplaints, getSafetyRatings, getRecalls, type Recall } from '@/lib/nhtsa';
 import {
@@ -95,9 +96,14 @@ export async function POST(request: Request) {
         // Auth check (optional — unauthenticated users get preview results)
         const { userId } = await auth();
 
+        // Buyer Pass holders get the full report; everyone else gets the
+        // gated preview (paid fields stripped server-side below).
+        let hasActiveBuyerPass = false;
+
         if (userId) {
             // Authenticated: check usage quota (3 free/month)
             const usage = await checkAndIncrementUsage(userId);
+            hasActiveBuyerPass = usage.isBuyerPassActive;
             if (!usage.allowed) {
                 return NextResponse.json({
                     success: false,
@@ -388,7 +394,8 @@ export async function POST(request: Request) {
             )
             : null;
 
-        return NextResponse.json({
+        // Response — paid fields are stripped for non-Buyer-Pass callers
+        return NextResponse.json(gatePremiumAnalysis({
             success: true,
             vehicle: {
                 year: extracted?.year,
@@ -470,7 +477,7 @@ export async function POST(request: Request) {
             warrantyValue,
             priceThresholds,
             survivalAnalysis,
-        });
+        }, hasActiveBuyerPass));
 
     } catch (error) {
         // Log detailed error info for debugging

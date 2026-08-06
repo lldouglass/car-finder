@@ -1,6 +1,5 @@
 'use client';
 
-import { SignUpButton, useUser } from '@clerk/nextjs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,8 +30,6 @@ const vinFeatures = [
 ];
 
 export function InlineVinUpsell({ onSwitchToVin, onUpgradeClick, vehicleName }: InlineVinUpsellProps) {
-  const { isSignedIn } = useUser();
-
   return (
     <Card className="border-amber-200 bg-gradient-to-br from-amber-50 via-background to-orange-50 dark:border-amber-900/60 dark:from-amber-950/40 dark:via-zinc-950 dark:to-orange-950/20">
       <CardContent className="pt-6 pb-6 space-y-5">
@@ -62,23 +59,14 @@ export function InlineVinUpsell({ onSwitchToVin, onUpgradeClick, vehicleName }: 
           </div>
 
           <div className="flex w-full flex-col gap-2 lg:w-auto lg:min-w-[260px]">
-            {isSignedIn ? (
-              <Button
-                onClick={onUpgradeClick}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
-                disabled={!onUpgradeClick}
-              >
-                <Crown className="size-4" />
-                Check the VIN before you buy — {BUYER_PASS_PRICE}
-              </Button>
-            ) : (
-              <SignUpButton mode="modal">
-                <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
-                  <Crown className="size-4" />
-                  Check the VIN before you buy — {BUYER_PASS_PRICE}
-                </Button>
-              </SignUpButton>
-            )}
+            <Button
+              onClick={onUpgradeClick}
+              className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+              disabled={!onUpgradeClick}
+            >
+              <Crown className="size-4" />
+              Check the VIN before you buy — {BUYER_PASS_PRICE}
+            </Button>
 
             {onSwitchToVin && (
               <Button onClick={onSwitchToVin} variant="outline" className="w-full">
@@ -88,7 +76,7 @@ export function InlineVinUpsell({ onSwitchToVin, onUpgradeClick, vehicleName }: 
             )}
 
             <p className="text-xs text-muted-foreground">
-              Best once you have the VIN from the listing, dashboard, or door jamb.
+              Checkout without an account. Sign in with the checkout email to use your pass.
             </p>
           </div>
         </div>

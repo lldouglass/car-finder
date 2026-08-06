@@ -5,22 +5,8 @@ import { createCheckoutSession } from '@/lib/stripe';
 export async function POST() {
   try {
     const { userId } = await auth();
-    const user = await currentUser();
-
-    if (!userId || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const email = user.emailAddresses[0]?.emailAddress;
-    if (!email) {
-      return NextResponse.json(
-        { success: false, error: 'No email address found' },
-        { status: 400 }
-      );
-    }
+    const user = userId ? await currentUser() : null;
+    const email = user?.emailAddresses[0]?.emailAddress ?? null;
 
     const session = await createCheckoutSession(userId, email);
 

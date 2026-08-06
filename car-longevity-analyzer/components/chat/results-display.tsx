@@ -418,7 +418,8 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
           </Card>
         )}
 
-        {/* Pricing Details */}
+        {/* Pricing Details — hidden when premium-locked; the Buyer Pass preview card covers it */}
+        {!result.premiumLocked && (
         <Card role="region" aria-labelledby="pricing-heading">
           <CardHeader>
             <CardTitle id="pricing-heading" className="text-lg flex items-center gap-2">
@@ -476,6 +477,7 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
             )}
           </CardContent>
         </Card>
+        )}
       </div>
       )}
 
@@ -978,7 +980,7 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
         </CardContent>
       </Card>
 
-      {isVehicleSearch && (
+      {(isVehicleSearch || result.premiumLocked) && (
         <Card className="border-amber-200 dark:border-amber-900/60" role="region" aria-labelledby="premium-preview-heading">
           <CardHeader>
             <div className="flex flex-wrap items-center gap-2">
@@ -991,7 +993,9 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
               </Badge>
             </div>
             <CardDescription>
-              Free search gives you reliability, safety, recalls, and buyer questions. Buyer Pass adds the paid decision tools below for 30 days, no recurring subscription.
+              {isVehicleSearch
+                ? 'Free search gives you reliability, safety, recalls, and buyer questions. Buyer Pass adds the paid decision tools below for 30 days, no recurring subscription.'
+                : 'Your free report includes reliability, lifespan, safety, recalls, and buyer questions. Buyer Pass unlocks the paid decision tools below for 30 days, no recurring subscription.'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">

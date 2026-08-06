@@ -3,6 +3,8 @@
 import { useUser, SignUpButton } from '@clerk/nextjs';
 import { Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BuyerPassCTAButton } from '@/components/billing/buyer-pass-cta-button';
+import { BUYER_PASS_PRICE } from '@/lib/buyer-pass';
 
 interface SignUpGateProps {
   children: React.ReactNode;
@@ -49,6 +51,9 @@ export function SignUpGate({ children, previewHeight = 400 }: SignUpGateProps) {
               Create Free Account to Continue
             </Button>
           </SignUpButton>
+          <BuyerPassCTAButton variant="outline" className="w-full mb-2">
+            Or get Buyer Pass now — {BUYER_PASS_PRICE}, no account needed
+          </BuyerPassCTAButton>
           <p className="text-xs text-muted-foreground">
             No credit card required to start. Free gets you limited VIN reports, Buyer Pass removes the cap for 30 days.
           </p>

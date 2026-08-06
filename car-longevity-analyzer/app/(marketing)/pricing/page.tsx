@@ -70,7 +70,8 @@ export default function PricingPage() {
                   </Link>
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">
-                  {BUYER_PASS_OFFER}, no recurring subscription.
+                  {BUYER_PASS_OFFER}, no recurring subscription. No account is
+                  required until after checkout.
                 </p>
               </div>
 

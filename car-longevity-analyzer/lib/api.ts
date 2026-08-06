@@ -319,6 +319,8 @@ export interface AnalysisResponse {
     warrantyValue?: WarrantyValueResult;
     priceThresholds?: PriceThresholds;
     survivalAnalysis?: SurvivalAnalysis;
+    /** Set by the server when paid fields were stripped (no active Buyer Pass). */
+    premiumLocked?: boolean;
 }
 
 export class APIError extends Error {

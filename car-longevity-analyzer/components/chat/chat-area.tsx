@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { SignUpButton, useUser } from '@clerk/nextjs';
 import { useAnalysis } from '@/lib/analysis-context';
 import { ChatInput, type ChatInputHandle } from './chat-input';
 import { UserMessage } from './messages/user-message';
@@ -23,7 +22,6 @@ interface ChatAreaProps {
 const homepageComparison = buyerPassComparison.slice(0, 4);
 
 export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
-  const { isSignedIn } = useUser();
   const { result, isLoading, error, history, currentId, needsUpgrade, clearNeedsUpgrade } = useAnalysis();
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -90,23 +88,14 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
 
               {/* Quick browse actions */}
               <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                {isSignedIn ? (
-                  <Button
-                    size="sm"
-                    className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
-                    onClick={onUpgradeClick}
-                  >
-                    <Crown className="size-4 mr-1" />
-                    Check the VIN before you buy — $12
-                  </Button>
-                ) : (
-                  <SignUpButton mode="modal">
-                    <Button size="sm" className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
-                      <Crown className="size-4 mr-1" />
-                      Check the VIN before you buy — $12
-                    </Button>
-                  </SignUpButton>
-                )}
+                <Button
+                  size="sm"
+                  className="rounded-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+                  onClick={onUpgradeClick}
+                >
+                  <Crown className="size-4 mr-1" />
+                  Check the VIN before you buy — $12
+                </Button>
                 <Button asChild variant="outline" size="sm" className="rounded-full">
                   <Link href="/pricing">See Pricing</Link>
                 </Button>
@@ -259,22 +248,13 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                       </li>
                     </ul>
                     <div className="mt-5">
-                      {isSignedIn ? (
-                        <Button
-                          onClick={onUpgradeClick}
-                          className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
-                        >
-                          <Crown className="size-4 mr-2" />
-                          Check the VIN before you buy
-                        </Button>
-                      ) : (
-                        <SignUpButton mode="modal">
-                          <Button className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900">
-                            <Crown className="size-4 mr-2" />
-                            Create account to check the VIN
-                          </Button>
-                        </SignUpButton>
-                      )}
+                      <Button
+                        onClick={onUpgradeClick}
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-900"
+                      >
+                        <Crown className="size-4 mr-2" />
+                        Check the VIN before you buy
+                      </Button>
                       <Button asChild variant="outline" className="mt-2 w-full">
                         <Link href="/pricing">See full pricing details</Link>
                       </Button>
@@ -340,7 +320,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                           <Target className="size-3 text-red-600 dark:text-red-400" />
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          "Saved me from buying a 2017 Nissan Altima with known CVT transmission issues"
+                          &ldquo;Saved me from buying a 2017 Nissan Altima with known CVT transmission issues&rdquo;
                         </p>
                       </div>
                     </div>
@@ -351,7 +331,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                           <TrendingUp className="size-3 text-green-600 dark:text-green-400" />
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          "Found out my Toyota Camry has 150,000+ miles of life left"
+                          &ldquo;Found out my Toyota Camry has 150,000+ miles of life left&rdquo;
                         </p>
                       </div>
                     </div>
@@ -362,7 +342,7 @@ export function ChatArea({ onUpgradeClick }: ChatAreaProps) {
                           <DollarSign className="size-3 text-blue-600 dark:text-blue-400" />
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          "The fair price estimate helped me negotiate $2,000 off the asking price"
+                          &ldquo;The fair price estimate helped me negotiate $2,000 off the asking price&rdquo;
                         </p>
                       </div>
                     </div>

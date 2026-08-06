@@ -59,6 +59,6 @@ export const buyerPassFaqs = [
   {
     question: 'How fast do I get access?',
     answer:
-      'Immediately after checkout. Once Buyer Pass is active, VIN reports and paid buyer tools are available right away for the next 30 days.',
+      'Immediately after checkout. You can pay as a guest, then create an account or sign in with the same checkout email to use your 30 days of access.',
   },
 ] as const;
