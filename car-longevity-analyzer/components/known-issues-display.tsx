@@ -72,9 +72,15 @@ function IssueCard({ issue }: { issue: KnownIssue }) {
             >
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <span className="font-medium text-sm">{issue.component}</span>
                             <SeverityBadge severity={issue.severity} />
+                            {issue.addressed && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    <CheckCircle className="size-3" aria-hidden="true" />
+                                    Serviced per owner
+                                </span>
+                            )}
                         </div>
                         <p className="text-xs text-muted-foreground">{issue.description}</p>
                     </div>

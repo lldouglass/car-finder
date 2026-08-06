@@ -34,6 +34,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
   const [mileage, setMileage] = useState('');
   const [price, setPrice] = useState('');
   const [sellerType, setSellerType] = useState('');
+  const [serviceHistory, setServiceHistory] = useState('');
 
   useImperativeHandle(ref, () => ({
     switchToVin: () => setActiveTab('vin'),
@@ -78,7 +79,8 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
         isVin ? trimmedInput : input.trim(),
         mileage ? parseInt(mileage, 10) : undefined,
         price ? parseInt(price, 10) : undefined,
-        sellerType || undefined
+        sellerType || undefined,
+        serviceHistory.trim() || undefined
       );
 
       // Clear form on success
@@ -86,6 +88,7 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
       setMileage('');
       setPrice('');
       setSellerType('');
+      setServiceHistory('');
     } catch {
       // Error is handled by context
     }
@@ -228,6 +231,18 @@ export const ChatInput = forwardRef<ChatInputHandle, ChatInputProps>(function Ch
               </select>
             </div>
           </div>
+
+          {/* Service history (optional) */}
+          <Textarea
+            placeholder="Work already done on the car (optional) — e.g. timing belt at 90k, new brakes, head gaskets replaced"
+            value={serviceHistory}
+            onChange={(e) => setServiceHistory(e.target.value)}
+            disabled={isLoading}
+            maxLength={1000}
+            rows={2}
+            className="text-sm resize-none"
+            aria-label="Service history"
+          />
 
           {/* Help text */}
           {!isVin && (

@@ -32,6 +32,7 @@ import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
 import { calculateMaintenanceProjections } from '@/lib/maintenance-data';
 import { calculateSurvivalProbabilities } from '@/lib/survival-model';
+import { analyzeServiceHistory } from '@/lib/service-history';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -42,6 +43,7 @@ const AnalyzeVinSchema = z.object({
     mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage, "Mileage exceeds maximum"),
     askingPrice: z.number().nonnegative().max(INPUT_LIMITS.maxPrice, "Price exceeds maximum"),
     listingText: z.string().max(INPUT_LIMITS.maxListingLength).optional(),
+    serviceHistory: z.string().max(INPUT_LIMITS.maxServiceHistoryLength).optional(),
     location: z.string().max(100).optional(),
     sellerType: SellerTypeEnum.optional(),
 });
@@ -98,7 +100,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { vin, mileage, askingPrice, listingText, location, sellerType } = result.data;
+        const { vin, mileage, askingPrice, listingText, location, sellerType, serviceHistory } = result.data;
 
         const vehicle = await decodeVin(vin);
         if (!vehicle) {
@@ -139,12 +141,19 @@ export async function POST(request: Request) {
             ...curatedIssues,
         ];
 
+        // Owner-stated service history: infers maintenance quality and marks
+        // which documented issues the completed work addresses
+        const serviceAnalysis = analyzeServiceHistory(serviceHistory, [
+            ...(relData?.knownIssues || []),
+            ...knownIssues,
+        ]);
+
         const vinFactors = mapVinToLifespanFactors(vehicle, vehicle.transmissionStyle);
         const climateRegion = getClimateRegion(location);
 
         const lifespanFactors: LifespanFactors = mergeLifespanFactors(
             vinFactors,
-            {},
+            serviceAnalysis?.maintenanceQuality ? { maintenance: serviceAnalysis.maintenanceQuality } : {},
             climateRegion
         );
 
@@ -364,7 +373,16 @@ export async function POST(request: Request) {
                 confidence: safetyScoreResult.confidence,
                 hasCrashTestData: safetyScoreResult.hasCrashTestData,
             },
-            knownIssues,
+            knownIssues: knownIssues.map(issue =>
+                serviceAnalysis?.addressedIssueDescriptions.includes(issue.description)
+                    ? { ...issue, addressed: true }
+                    : issue
+            ),
+            serviceHistory: serviceAnalysis ? {
+                recognized: serviceAnalysis.recognized,
+                maintenanceQuality: serviceAnalysis.maintenanceQuality,
+                addressedIssueDescriptions: serviceAnalysis.addressedIssueDescriptions,
+            } : undefined,
             componentIssues,
             maintenanceCost,
             reliabilityBreakdown: reliabilityResult.factors,

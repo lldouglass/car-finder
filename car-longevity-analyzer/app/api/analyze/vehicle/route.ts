@@ -13,11 +13,14 @@ import { LIFESPAN_ADJUSTMENT_LIMITS, UNAUTH_VEHICLE_SEARCH_RATE_LIMIT } from '@/
 import { calculateYearSpecificLifespan } from '@/lib/year-lifespan-adjuster';
 import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
+import { analyzeServiceHistory } from '@/lib/service-history';
+import { INPUT_LIMITS } from '@/lib/constants';
 
 const AnalyzeVehicleSchema = z.object({
     year: z.number().int().min(1981).max(new Date().getFullYear() + 1),
     make: z.string().min(1).max(100),
     model: z.string().min(1).max(100),
+    serviceHistory: z.string().max(INPUT_LIMITS.maxServiceHistoryLength).optional(),
 });
 
 export async function POST(request: Request) {
@@ -51,7 +54,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { year, make, model } = result.data;
+        const { year, make, model, serviceHistory } = result.data;
 
         // Parallel NHTSA calls
         const [recallsResult, complaintsResult, safetyResult] = await Promise.allSettled([
@@ -72,6 +75,13 @@ export async function POST(request: Request) {
 
         // Extract known issues from NHTSA complaints
         const knownIssues = extractKnownIssues(complaints);
+
+        // Owner-stated service history: marks which documented issues the
+        // completed work addresses (quick search has no factor pipeline)
+        const serviceAnalysis = analyzeServiceHistory(serviceHistory, [
+            ...(relData?.knownIssues || []),
+            ...knownIssues,
+        ]);
 
         // Calculate reliability using dynamic system
         const reliabilityResult = calculateDynamicReliability(
@@ -193,7 +203,16 @@ export async function POST(request: Request) {
                 confidence: safetyScoreResult.confidence,
                 hasCrashTestData: safetyScoreResult.hasCrashTestData,
             },
-            knownIssues,
+            knownIssues: knownIssues.map(issue =>
+                serviceAnalysis?.addressedIssueDescriptions.includes(issue.description)
+                    ? { ...issue, addressed: true }
+                    : issue
+            ),
+            serviceHistory: serviceAnalysis ? {
+                recognized: serviceAnalysis.recognized,
+                maintenanceQuality: serviceAnalysis.maintenanceQuality,
+                addressedIssueDescriptions: serviceAnalysis.addressedIssueDescriptions,
+            } : undefined,
             componentIssues,
             reliabilityBreakdown: reliabilityResult.factors,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),

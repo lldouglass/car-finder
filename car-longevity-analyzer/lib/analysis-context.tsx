@@ -31,7 +31,8 @@ interface AnalysisContextType {
     input: string,
     mileage?: number,
     price?: number,
-    sellerType?: string
+    sellerType?: string,
+    serviceHistory?: string
   ) => Promise<void>;
   loadAnalysis: (id: string) => void;
   toggleStar: (id: string) => void;
@@ -78,7 +79,8 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       input: string,
       mileage?: number,
       price?: number,
-      sellerType?: string
+      sellerType?: string,
+      serviceHistory?: string
     ) => {
       setError(null);
       setNeedsUpgrade(false);
@@ -95,6 +97,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             mileage: mileage || 0,
             askingPrice: price || 0,
             sellerType: sellerType as SellerType | undefined,
+            serviceHistory,
           });
         } else if (inputType === 'vehicle') {
           const vehicleData = JSON.parse(input);
@@ -102,6 +105,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             year: vehicleData.year,
             make: vehicleData.make,
             model: vehicleData.model,
+            serviceHistory,
           });
         } else {
           analysisResult = await analyzeByListing({
@@ -109,6 +113,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
             mileage,
             askingPrice: price,
             sellerType: sellerType as SellerType | undefined,
+            serviceHistory,
           });
         }
 

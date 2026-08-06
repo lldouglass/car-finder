@@ -19,6 +19,8 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
   const [year, setYear] = useState<number | ''>('');
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
+  const [serviceHistory, setServiceHistory] = useState('');
+  const [showServiceHistory, setShowServiceHistory] = useState(false);
 
   const [makes, setMakes] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
@@ -147,16 +149,22 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
       await submitAnalysis(
         'vehicle',
         JSON.stringify({ year: analysisYear, make: analysisMake, model: analysisModel }),
+        undefined,
+        undefined,
+        undefined,
+        serviceHistory.trim() || undefined,
       );
       setYear('');
       setMake('');
       setModel('');
       setMakeFilter('');
       setModelFilter('');
+      setServiceHistory('');
+      setShowServiceHistory(false);
     } catch {
       // Error handled by context
     }
-  }, [submitAnalysis]);
+  }, [submitAnalysis, serviceHistory]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -285,6 +293,27 @@ export function VehicleSearchInput({ large = false }: VehicleSearchInputProps) {
           )}
         </Button>
       </div>
+
+      {showServiceHistory ? (
+        <textarea
+          placeholder="Work already done on the car — e.g. timing belt at 90k, new brakes, head gaskets replaced"
+          value={serviceHistory}
+          onChange={(e) => setServiceHistory(e.target.value)}
+          disabled={isLoading}
+          maxLength={1000}
+          rows={2}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+          aria-label="Service history"
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setShowServiceHistory(true)}
+          className="text-xs text-blue-600 hover:underline dark:text-blue-400 text-left"
+        >
+          + Add work already done on the car (optional)
+        </button>
+      )}
 
       <p className="text-xs text-muted-foreground">
         Free reliability report with recalls, safety ratings, and known issues.

@@ -39,6 +39,7 @@ import { generateInspectionChecklist } from '@/lib/inspection-checklist';
 import { calculateWarrantyValue, detectWarrantyFromListing, type WarrantyInfo } from '@/lib/warranty-value';
 import { extractKnownIssues } from '@/lib/complaint-analyzer';
 import { calculateSurvivalProbabilities, type SurvivalAnalysis } from '@/lib/survival-model';
+import { analyzeServiceHistory } from '@/lib/service-history';
 
 // Seller type enum for validation
 const SellerTypeEnum = z.enum(['cpo', 'franchise_same', 'franchise_other', 'independent_lot', 'private', 'auction', 'unknown']);
@@ -51,6 +52,7 @@ const AnalyzeListingSchema = z.object({
     mileage: z.number().nonnegative().max(INPUT_LIMITS.maxMileage).optional(),
     location: z.string().max(100).optional(), // State code or name for climate region
     sellerType: SellerTypeEnum.optional(),
+    serviceHistory: z.string().max(INPUT_LIMITS.maxServiceHistoryLength).optional(),
 });
 
 // Helper to map AI usage pattern to DrivingConditions type
@@ -144,7 +146,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { listingText, location, sellerType } = result.data;
+        const { listingText, location, sellerType, serviceHistory } = result.data;
         let { askingPrice, mileage } = result.data;
 
         // 2. AI Analysis to extract info
@@ -163,9 +165,12 @@ export async function POST(request: Request) {
         // 3. Extract lifespan factors from AI analysis
         const aiLifespanFactors = aiResult.lifespanFactors;
 
+        // Owner-typed service history outranks AI listing inference when present
+        const serviceQuality = analyzeServiceHistory(serviceHistory, [])?.maintenanceQuality ?? null;
+
         // Convert AI-extracted data to lifespan factor types
         const aiFactors: Partial<LifespanFactors> = {
-            maintenance: aiLifespanFactors.maintenanceQuality as MaintenanceQuality | undefined,
+            maintenance: serviceQuality ?? (aiLifespanFactors.maintenanceQuality as MaintenanceQuality | undefined),
             drivingConditions: mapUsagePatternToConditions(aiLifespanFactors.usagePattern),
             accidentHistory: mapAccidentToSeverity(aiLifespanFactors.accidentHistory),
             ownerCount: ownerCountToHistory(aiLifespanFactors.ownerCount),
@@ -216,6 +221,12 @@ export async function POST(request: Request) {
 
         // Extract known issues from NHTSA complaints (for lifespan adjustment)
         const knownIssues = extractKnownIssues(complaints);
+
+        // Full service-history analysis now that this model's issues are known
+        const serviceAnalysis = analyzeServiceHistory(serviceHistory, [
+            ...(getReliabilityData(make, model)?.knownIssues || []),
+            ...knownIssues,
+        ]);
 
         // Longevity with adjusted lifespan
         if (mileage !== undefined) {
@@ -461,7 +472,16 @@ export async function POST(request: Request) {
                 extractedLifespanFactors: aiResult.lifespanFactors,
             },
             redFlags: allRedFlags,
-            knownIssues,
+            knownIssues: knownIssues.map(issue =>
+                serviceAnalysis?.addressedIssueDescriptions.includes(issue.description)
+                    ? { ...issue, addressed: true }
+                    : issue
+            ),
+            serviceHistory: serviceAnalysis ? {
+                recognized: serviceAnalysis.recognized,
+                maintenanceQuality: serviceAnalysis.maintenanceQuality,
+                addressedIssueDescriptions: serviceAnalysis.addressedIssueDescriptions,
+            } : undefined,
             recalls: recalls.map(r => ({ component: r.Component, summary: r.Summary, date: r.ReportReceivedDate })).slice(0, 5),
             recallNote: extracted?.make ? "Recall lookup based on extracted vehicle info. Use VIN analysis for most accurate results." : undefined,
             recommendation: {

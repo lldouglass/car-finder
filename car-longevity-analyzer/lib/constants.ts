@@ -69,6 +69,7 @@ export const INPUT_LIMITS = {
     vinLength: 17,
     maxMileage: 1000000,
     maxPrice: 10000000,
+    maxServiceHistoryLength: 1000,
 } as const;
 
 // Rate limiting defaults

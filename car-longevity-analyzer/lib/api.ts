@@ -8,6 +8,7 @@ export interface VinAnalysisRequest {
     askingPrice: number;
     listingText?: string;
     sellerType?: SellerType;
+    serviceHistory?: string;
 }
 
 export interface ListingAnalysisRequest {
@@ -15,6 +16,7 @@ export interface ListingAnalysisRequest {
     askingPrice?: number;
     mileage?: number;
     sellerType?: SellerType;
+    serviceHistory?: string;
 }
 
 // Seller Risk types
@@ -272,6 +274,14 @@ export interface KnownIssue {
     description: string;
     hasSafetyIncidents: boolean;
     sampleComplaints: string[];  // 2-3 actual complaint summaries from NHTSA
+    /** True when the owner's stated service history covers this issue */
+    addressed?: boolean;
+}
+
+export interface ServiceHistorySummary {
+    recognized: { label: string; component: string }[];
+    maintenanceQuality: 'excellent' | 'good' | 'average' | 'poor' | 'unknown' | null;
+    addressedIssueDescriptions: string[];
 }
 
 // Survival Analysis types (Weibull-based probability model)
@@ -305,6 +315,7 @@ export interface AnalysisResponse {
     reliabilityAnalysis?: ReliabilityAnalysis;
     pricing?: Pricing | null;
     knownIssues?: KnownIssue[];
+    serviceHistory?: ServiceHistorySummary;
     componentIssues?: ComponentIssue[];
     maintenanceCost?: MaintenanceCostSummaryApi;
     recalls?: Recall[];
@@ -462,6 +473,7 @@ export interface VehicleSearchRequest {
     year: number;
     make: string;
     model: string;
+    serviceHistory?: string;
 }
 
 export async function analyzeByVehicle(data: VehicleSearchRequest): Promise<AnalysisResponse> {

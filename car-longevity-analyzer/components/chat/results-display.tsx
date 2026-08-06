@@ -285,6 +285,7 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
     aiAnalysis,
     safetyRating,
     knownIssues,
+    serviceHistory,
     lifespanAnalysis,
     expectedLifespan,
     maintenanceCost,
@@ -511,6 +512,32 @@ export function ResultsDisplay({ result, onSwitchToVin, onUpgradeClick }: Result
             <CardDescription>Common problems from NHTSA complaints</CardDescription>
           </CardHeader>
           <CardContent>
+            {serviceHistory && serviceHistory.recognized.length > 0 && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-900 dark:bg-green-950/30">
+                <p className="text-sm font-semibold text-green-800 dark:text-green-200 mb-1.5">
+                  ✓ Work already done (per owner)
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {serviceHistory.recognized.map((item) => (
+                    <span
+                      key={item.label}
+                      className="inline-flex items-center rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-green-800 border border-green-200 dark:bg-green-950 dark:text-green-200 dark:border-green-800"
+                    >
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+                {serviceHistory.addressedIssueDescriptions.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {serviceHistory.addressedIssueDescriptions.map((desc) => (
+                      <li key={desc} className="text-xs text-green-700 dark:text-green-300">
+                        ✓ Addresses documented risk: {desc}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             <KnownIssuesDisplay issues={knownIssues || []} />
           </CardContent>
         </Card>
