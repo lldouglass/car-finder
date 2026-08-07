@@ -110,4 +110,4 @@ At current used car prices, a clean 2009-2011 Civic for $5,000-$7,000 or a 2019-
 
 ---
 
-**Considering a specific Civic?** Run it through our [free car longevity analyzer](/analyzer) to get year-specific reliability data, common problems, and estimated maintenance costs before you buy.
+**Considering a specific Civic?** Run it through our [free car longevity analyzer](/?make=Honda&model=Civic&utm_source=blog&utm_medium=body_link&utm_content=honda-civic-lifespan-how-many-miles) to get year-specific reliability data, common problems, and estimated maintenance costs before you buy.

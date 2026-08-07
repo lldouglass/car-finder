@@ -111,4 +111,4 @@ At the end of the day, the F-150's biggest longevity advantage is its ubiquity. 
 
 ---
 
-**Looking at a specific F-150?** Run it through our [free car longevity analyzer](/analyzer) to check year-specific reliability ratings, known problems, and estimated ownership costs before you commit.
+**Looking at a specific F-150?** Run it through our [free car longevity analyzer](/?make=Ford&model=F-150&utm_source=blog&utm_medium=body_link&utm_content=how-long-does-ford-f150-last-reliability-guide) to check year-specific reliability ratings, known problems, and estimated ownership costs before you commit.

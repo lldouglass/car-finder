@@ -5,7 +5,7 @@ export const BUYER_PASS_OFFER = `${BUYER_PASS_PRICE} one-time for ${BUYER_PASS_T
 export const buyerPassComparison = [
   {
     feature: 'Year, make, model reliability check',
-    free: 'Unlimited',
+    free: 'Unlimited with a free account',
     buyerPass: 'Included',
   },
   {

@@ -126,4 +126,4 @@ The real question isn't "how long do electric cars last?" but "how long does the
 
 ---
 
-**Curious about a specific EV's longevity?** Use our [free car longevity analyzer](/analyzer) to check reliability ratings, battery life expectations, and ownership costs for any electric vehicle.
+**Curious about a specific EV's longevity?** Use our [free car longevity analyzer](/?utm_source=blog&utm_medium=body_link&utm_content=how-long-do-electric-cars-last) to check reliability ratings, battery life expectations, and ownership costs for any electric vehicle.

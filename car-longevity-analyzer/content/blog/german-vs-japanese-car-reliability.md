@@ -171,7 +171,7 @@ The worst decision is buying a German car expecting Japanese maintenance costs. 
 
 ---
 
-**Comparing specific models?** Use our [free car longevity analyzer](/analyzer) to see head-to-head reliability data, maintenance cost estimates, and expected lifespan for any vehicle you're considering.
+**Comparing specific models?** Use our [free car longevity analyzer](/?utm_source=blog&utm_medium=body_link&utm_content=german-vs-japanese-car-reliability) to see head-to-head reliability data, maintenance cost estimates, and expected lifespan for any vehicle you're considering.
 
 ## Related reliability guides
 

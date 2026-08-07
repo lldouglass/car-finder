@@ -114,4 +114,4 @@ The 100,000-mile stigma is a gift to informed buyers. It drives prices down on c
 
 ---
 
-**Want to check if a specific high-mileage car is a good bet?** Use our [free car longevity analyzer](/analyzer) to see reliability ratings, common problems, and expected remaining lifespan for any year, make, and model.
+**Want to check if a specific high-mileage car is a good bet?** Use our [free car longevity analyzer](/?utm_source=blog&utm_medium=body_link&utm_content=is-it-worth-buying-a-car-with-100k-miles) to see reliability ratings, common problems, and expected remaining lifespan for any year, make, and model.

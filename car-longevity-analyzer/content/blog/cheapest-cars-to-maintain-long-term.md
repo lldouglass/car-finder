@@ -148,4 +148,4 @@ If low maintenance cost is your top priority, buy a Toyota Corolla, Toyota Camry
 
 ---
 
-**Want to see the estimated maintenance costs for a specific car you're considering?** Use our [free car longevity analyzer](/analyzer) to get detailed cost projections, reliability ratings, and common problem reports for any year, make, and model.
+**Want to see the estimated maintenance costs for a specific car you're considering?** Use our [free car longevity analyzer](/?utm_source=blog&utm_medium=body_link&utm_content=cheapest-cars-to-maintain-long-term) to get detailed cost projections, reliability ratings, and common problem reports for any year, make, and model.

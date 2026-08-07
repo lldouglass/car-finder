@@ -121,4 +121,4 @@ The data is clear: a Corolla bought for $6,000 with 80,000 miles can easily deli
 
 ---
 
-**Want to check the reliability rating on a specific Corolla you're considering?** Use our [free car longevity analyzer](/analyzer) to get detailed lifespan data, common problems, and maintenance cost estimates for any year and model.
+**Want to check the reliability rating on a specific Corolla you're considering?** Use our [free car longevity analyzer](/?make=Toyota&model=Corolla&utm_source=blog&utm_medium=body_link&utm_content=how-long-does-toyota-corolla-last) to get detailed lifespan data, common problems, and maintenance cost estimates for any year and model.
