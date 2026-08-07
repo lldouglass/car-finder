@@ -8,6 +8,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { gatePremiumAnalysis } from '@/lib/premium-gate';
 
 export async function GET(
   request: Request,
@@ -46,9 +47,17 @@ export async function GET(
       );
     }
 
+    // Shared links are public and unauthenticated, so paid analysis is stripped
+    // on read as well as on write — rows stored before sanitization existed may
+    // still contain premium fields.
+    const analysisData =
+      sharedReport.analysisData && typeof sharedReport.analysisData === 'object'
+        ? gatePremiumAnalysis(sharedReport.analysisData as Record<string, unknown>, false)
+        : sharedReport.analysisData;
+
     return NextResponse.json({
       success: true,
-      analysisData: sharedReport.analysisData,
+      analysisData,
       createdAt: sharedReport.createdAt.toISOString(),
       viewCount: sharedReport.viewCount,
     });

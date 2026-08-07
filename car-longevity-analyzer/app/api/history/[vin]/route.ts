@@ -17,6 +17,8 @@ import {
     getUsageStats,
     isVinAuditConfigured,
 } from '@/lib/vehicle-history';
+import { checkRateLimit, getClientIdentifier } from '@/lib/rate-limit';
+import { VEHICLE_HISTORY_RATE_LIMIT } from '@/lib/constants';
 
 // VIN validation regex (17 alphanumeric, excluding I, O, Q)
 const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i;
@@ -36,6 +38,23 @@ export async function GET(
                     error: 'Invalid VIN format. Must be 17 characters (A-Z, 0-9, excluding I, O, Q).',
                 },
                 { status: 400 }
+            );
+        }
+
+        // Every call here can spend a paid VinAudit lookup, so cap per client
+        // before the shared daily quota is ever touched.
+        const rateLimit = checkRateLimit(
+            `vehicle-history:${getClientIdentifier(request)}`,
+            VEHICLE_HISTORY_RATE_LIMIT.maxRequests,
+            VEHICLE_HISTORY_RATE_LIMIT.windowMs
+        );
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: 'Too many vehicle history lookups. Please try again later.',
+                },
+                { status: 429, headers: { 'Retry-After': String(Math.ceil((rateLimit.retryAfterMs ?? 60_000) / 1000)) } }
             );
         }
 
@@ -106,12 +125,12 @@ export async function GET(
 export async function HEAD() {
     const stats = getUsageStats();
 
+    // Availability only — remaining quota and cache size are operational
+    // details that would tell an abuser exactly how much budget is left.
     return new NextResponse(null, {
         status: stats.isConfigured ? 200 : 503,
         headers: {
             'X-Feature-Available': stats.isConfigured ? 'true' : 'false',
-            'X-Remaining-Calls': stats.remainingCalls.toString(),
-            'X-Cache-Size': stats.cacheSize.toString(),
         },
     });
 }

@@ -1,6 +1,14 @@
 /**
  * Simple in-memory rate limiting utility.
- * For production, consider using Redis or a dedicated rate limiting service.
+ *
+ * SERVERLESS CAVEAT: on Vercel this state is per-lambda-instance and is lost on
+ * cold start, so limits are softer than the configured numbers suggest — a
+ * determined caller can exceed them by spreading requests across instances.
+ * Client-supplied x-forwarded-for is NOT a bypass (Vercel normalizes the header
+ * at the edge), and every expensive call site checks the limit before spending
+ * money, so this bounds cost rather than eliminating abuse. Making the limits
+ * globally exact requires a shared store (Redis, or a Prisma table plus a
+ * migration).
  */
 
 import { RATE_LIMIT_DEFAULTS } from './constants';

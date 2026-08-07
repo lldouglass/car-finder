@@ -87,6 +87,18 @@ export const UNAUTH_ANALYSIS_RATE_LIMIT = {
 
 // Rate limit for unauthenticated Make/Model/Year searches
 // Tight limit to incentivize sign-up (free account gets unlimited)
+/** Share-link creation, per IP. Generous for humans, hostile to scripted abuse. */
+export const SHARE_RATE_LIMIT = {
+    maxRequests: 10,
+    windowMs: 60 * 60 * 1000, // 1 hour
+} as const;
+
+/** Vehicle-history lookups hit a paid third-party API, so cap per IP. */
+export const VEHICLE_HISTORY_RATE_LIMIT = {
+    maxRequests: 5,
+    windowMs: 60 * 60 * 1000, // 1 hour
+} as const;
+
 export const UNAUTH_VEHICLE_SEARCH_RATE_LIMIT = {
     maxRequests: 3,
     windowMs: 24 * 60 * 60 * 1000, // 24 hours (3/day)
