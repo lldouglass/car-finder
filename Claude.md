@@ -244,6 +244,8 @@ Edit `lib/constants.ts`:
 
 **Optional:**
 - `OPENAI_API_KEY` - Enables AI-powered listing analysis
+- `RATE_LIMIT_DURABLE` - Set to `off` to force the per-instance in-memory rate
+  limiter instead of the shared `RateLimitEntry` table (see `lib/rate-limit.ts`)
 
 **NEVER TOUCH THE .env FILE**
 

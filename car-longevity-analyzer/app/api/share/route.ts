@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   try {
     // Anonymous sharing stays open, but capped so it cannot be used to bulk
     // write rows into the database or publish content on our domain.
-    const rateLimit = checkRateLimit(
+    const rateLimit = await checkRateLimit(
       `share:${getClientIdentifier(request)}`,
       SHARE_RATE_LIMIT.maxRequests,
       SHARE_RATE_LIMIT.windowMs

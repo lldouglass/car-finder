@@ -43,7 +43,7 @@ export async function GET(
 
         // Every call here can spend a paid VinAudit lookup, so cap per client
         // before the shared daily quota is ever touched.
-        const rateLimit = checkRateLimit(
+        const rateLimit = await checkRateLimit(
             `vehicle-history:${getClientIdentifier(request)}`,
             VEHICLE_HISTORY_RATE_LIMIT.maxRequests,
             VEHICLE_HISTORY_RATE_LIMIT.windowMs

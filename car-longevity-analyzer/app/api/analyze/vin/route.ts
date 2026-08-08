@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         } else {
             // Unauthenticated: tight limit to incentivize sign-up (3/day)
             const ip = getClientIdentifier(request);
-            const rateLimit = checkRateLimit(
+            const rateLimit = await checkRateLimit(
                 `unauth:analysis:${ip}`,
                 UNAUTH_ANALYSIS_RATE_LIMIT.maxRequests,
                 UNAUTH_ANALYSIS_RATE_LIMIT.windowMs
