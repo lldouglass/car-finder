@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getSafetyRatings, getRecalls, getComplaints, decodeVin, normalizeModelForNhtsa } from './nhtsa';
+import { getSafetyRatings, getRecalls, getComplaints, decodeVin, normalizeModelForNhtsa, sanitizeNhtsaText } from './nhtsa';
 
 // Mock fetch globally
 const originalFetch = global.fetch;
@@ -479,5 +479,125 @@ describe('Make/Model/Year Matrix - API Isolation', () => {
         expect(firstCalls[0]).toContain('modelyear/2018');
         expect(firstCalls[1]).toContain('modelyear/2019');
         expect(firstCalls[2]).toContain('modelyear/2020');
+    });
+});
+
+describe('NHTSA free-text sanitization', () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+        fetchMock = vi.fn();
+        global.fetch = fetchMock;
+    });
+
+    afterEach(() => {
+        global.fetch = originalFetch;
+        vi.restoreAllMocks();
+    });
+
+    describe('sanitizeNhtsaText', () => {
+        it('replaces every C0 control character and DEL with a space', () => {
+            const controls =
+                Array.from({ length: 0x20 }, (_, i) => String.fromCharCode(i)).join('') + '\u007f';
+
+            const result = sanitizeNhtsaText(`before${controls}after`);
+
+            expect(result).toBe('before after');
+            expect(/[\x00-\x1f\x7f]/.test(result)).toBe(false);
+        });
+
+        it('collapses CR/LF line breaks into single spaces', () => {
+            expect(sanitizeNhtsaText('THE ENGINE\r\n\r\nSTALLED WITHOUT WARNING')).toBe(
+                'THE ENGINE STALLED WITHOUT WARNING'
+            );
+        });
+
+        it('trims leading and trailing control characters', () => {
+            expect(sanitizeNhtsaText('\r\n  brake failure  \u0007')).toBe('brake failure');
+        });
+
+        it('leaves clean text untouched', () => {
+            expect(sanitizeNhtsaText('Transmission slips between 2nd and 3rd gear.')).toBe(
+                'Transmission slips between 2nd and 3rd gear.'
+            );
+        });
+
+        it('reduces an all-control-character string to empty', () => {
+            expect(sanitizeNhtsaText('\u0000\u0001\u001f\u007f')).toBe('');
+        });
+    });
+
+    describe('getComplaints', () => {
+        it('strips control characters from complaint summaries and components', async () => {
+            fetchMock.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({
+                    results: [{
+                        components: 'ENGINE\u0007',
+                        summary: 'WHILE DRIVING THE VEHICLE\r\nLOST POWER.\u0000',
+                        dateOfIncident: '2020-01-01',
+                        crash: false,
+                        fire: false,
+                        numberOfInjuries: 0,
+                        numberOfDeaths: 0,
+                    }],
+                }),
+            });
+
+            const complaints = await getComplaints('Subaru', 'Outback', 2005);
+
+            expect(complaints[0].Component).toBe('ENGINE');
+            expect(complaints[0].Summary).toBe('WHILE DRIVING THE VEHICLE LOST POWER.');
+        });
+
+        it('produces a payload that strict JSON parsers accept', async () => {
+            fetchMock.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({
+                    results: [{
+                        components: 'AIR BAGS',
+                        summary: 'INFLATOR RUPTURED.\r\nDRIVER INJURED.\u0016',
+                        crash: true,
+                        fire: false,
+                        numberOfInjuries: 1,
+                        numberOfDeaths: 0,
+                    }],
+                }),
+            });
+
+            const complaints = await getComplaints('Subaru', 'Outback', 2005);
+            const serialized = JSON.stringify(complaints);
+
+            // No control-character escape sequences survive serialization
+            expect(serialized).not.toMatch(/\\[rnt]|\\u00[01][0-9a-f]/i);
+            expect(JSON.parse(serialized)[0].Summary).toBe('INFLATOR RUPTURED. DRIVER INJURED.');
+        });
+    });
+
+    describe('getRecalls', () => {
+        it('strips the CR/LF line breaks NHTSA embeds in recall summaries', async () => {
+            fetchMock.mockResolvedValueOnce({
+                ok: true,
+                json: () => Promise.resolve({
+                    results: [{
+                        Component: 'AIR BAGS:FRONTAL',
+                        Summary: 'Subaru is recalling certain vehicles.\r\n\r\nThe inflators may explode.',
+                        Remedy: 'Dealers will replace the inflator.\r\n',
+                        Conequence: 'An explosion may cause injury.\r\n',
+                        NHTSACampaignNumber: '20V001000',
+                        ReportReceivedDate: '02/01/2020',
+                    }],
+                }),
+            });
+
+            const recalls = await getRecalls('Subaru', 'Outback', 2005);
+
+            expect(recalls[0].Summary).toBe(
+                'Subaru is recalling certain vehicles. The inflators may explode.'
+            );
+            expect(recalls[0].Remedy).toBe('Dealers will replace the inflator.');
+            expect(recalls[0].Conequence).toBe('An explosion may cause injury.');
+            expect(JSON.stringify(recalls)).not.toMatch(/\\[rnt]|\\u00[01][0-9a-f]/i);
+        });
     });
 });

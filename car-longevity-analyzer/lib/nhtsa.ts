@@ -6,6 +6,19 @@ const NHTSA_SAFETY_API = 'https://api.nhtsa.gov';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * NHTSA free text carries raw control characters - recall summaries are full of
+ * CR/LF line breaks, and owner-typed complaint summaries pick up stray C0/DEL
+ * bytes. They reach the UI as invisible gaps, break phrase matching that expects
+ * single-space text, and force every downstream consumer to parse escape noise.
+ * Replace each with a space and collapse the runs so only printable text ships.
+ */
+const CONTROL_CHARS = /[\x00-\x1f\x7f]/g;
+
+export function sanitizeNhtsaText(value: string): string {
+    return value.replace(CONTROL_CHARS, ' ').replace(/\s{2,}/g, ' ').trim();
+}
+
 // Zod schemas for NHTSA API response validation
 const VINDecodeResultSchema = z.object({
     Variable: z.string(),
@@ -26,7 +39,13 @@ const RecallSchema = z.object({
     Model: z.string().optional().default(''),
     NHTSACampaignNumber: z.string().optional().default(''),
     ReportReceivedDate: z.string().optional().default(''),
-});
+}).transform((raw) => ({
+    ...raw,
+    Component: sanitizeNhtsaText(raw.Component),
+    Summary: sanitizeNhtsaText(raw.Summary),
+    Remedy: sanitizeNhtsaText(raw.Remedy),
+    Conequence: sanitizeNhtsaText(raw.Conequence),
+}));
 
 const RecallsResponseSchema = z.object({
     results: z.array(RecallSchema).optional().default([]),
@@ -47,8 +66,8 @@ const ComplaintRawSchema = z.object({
 // Transform to our internal format (PascalCase for consistency)
 // Handle null values by converting to appropriate defaults
 const ComplaintSchema = ComplaintRawSchema.transform((raw) => ({
-    Component: raw.components ?? '',
-    Summary: raw.summary ?? '',
+    Component: sanitizeNhtsaText(raw.components ?? ''),
+    Summary: sanitizeNhtsaText(raw.summary ?? ''),
     DateOfIncident: raw.dateOfIncident ?? '',
     Crash: raw.crash ?? false,
     Fire: raw.fire ?? false,

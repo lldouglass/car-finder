@@ -3,7 +3,7 @@
  * Analyzes NHTSA complaints to extract known issues for a vehicle
  */
 
-import type { Complaint } from './nhtsa';
+import { sanitizeNhtsaText, type Complaint } from './nhtsa';
 import type { KnownIssue } from './api';
 
 /**
@@ -120,7 +120,10 @@ function extractSampleComplaints(complaints: Complaint[], maxSamples: number = 3
     for (const complaint of sorted) {
         if (samples.length >= maxSamples) break;
 
-        const summary = complaint.Summary?.trim();
+        // Sanitized again here: this is the one place full, untruncated
+        // complaint text reaches the response, and callers may hand us
+        // complaints that never went through the NHTSA schemas.
+        const summary = sanitizeNhtsaText(complaint.Summary ?? '');
         if (!summary) continue;
 
         // Keep full complaint text - don't truncate so users can read everything
