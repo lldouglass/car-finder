@@ -1,2 +1,3 @@
+-- AlterTable
 ALTER TABLE "User"
-ADD COLUMN "buyerPassExpiresAt" TIMESTAMP(3);
+ADD COLUMN IF NOT EXISTS "buyerPassExpiresAt" TIMESTAMP(3);
