@@ -136,6 +136,25 @@ model SharedReport {
   @@index([createdBy])
 }
 
+/// Durable rate-limit counters shared by every lambda instance.
+///
+/// One row per (key, fixed window). Written by `lib/rate-limit-store.ts` with a
+/// single atomic `INSERT ... ON CONFLICT DO UPDATE`, so concurrent requests on
+/// different instances cannot both slip past the limit.
+///
+/// `key` never contains a raw IP — `lib/rate-limit-store.ts` stores
+/// `<scope>:<sha256 of the identifier>` so this table holds no PII.
+model RateLimitEntry {
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+  expiresAt   DateTime
+  updatedAt   DateTime @updatedAt
+
+  @@id([key, windowStart])
+  @@index([expiresAt])
+}
+
 model LifespanEstimate {
   id                    String   @id @default(cuid())
   make                  String   // stored lowercase

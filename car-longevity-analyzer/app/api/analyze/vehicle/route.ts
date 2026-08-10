@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         if (!userId) {
             // Unauthenticated: rate limit (5/day per IP)
             const ip = getClientIdentifier(request);
-            const rateLimit = checkRateLimit(
+            const rateLimit = await checkRateLimit(
                 `unauth:vehicle:${ip}`,
                 UNAUTH_VEHICLE_SEARCH_RATE_LIMIT.maxRequests,
                 UNAUTH_VEHICLE_SEARCH_RATE_LIMIT.windowMs
